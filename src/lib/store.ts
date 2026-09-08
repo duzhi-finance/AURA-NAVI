@@ -96,3 +96,101 @@ export function ensureSeedProfiles() {
     // storage unavailable — skip seeding silently
   }
 }
+
+interface BackupFile {
+  app: "aura-navi";
+  version: 1;
+  exported_at: string;
+  profiles: TalentProfile[];
+}
+
+function todayFileStamp(date: Date = new Date()): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}${m}${d}`;
+}
+
+export function exportProfilesAsJson(): void {
+  const backup: BackupFile = {
+    app: "aura-navi",
+    version: 1,
+    exported_at: new Date().toISOString(),
+    profiles: readAll(),
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `aura-navi-backup-${todayFileStamp()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function normalizeImportedProfile(raw: unknown): TalentProfile | null {
+  if (!raw || typeof raw !== "object") return null;
+  const p = raw as Partial<TalentProfile>;
+  if (typeof p.profile_id !== "string" || typeof p.name_alias !== "string") return null;
+  if (typeof p.profile_type !== "string") return null;
+
+  return {
+    profile_id: p.profile_id,
+    profile_type: p.profile_type,
+    name_alias: p.name_alias,
+    maya_kin: typeof p.maya_kin === "number" ? p.maya_kin : null,
+    maya_tone: typeof p.maya_tone === "string" ? p.maya_tone : "",
+    maya_totem: typeof p.maya_totem === "string" ? p.maya_totem : "",
+    life_path_num: typeof p.life_path_num === "number" ? p.life_path_num : null,
+    core_traits_tags: Array.isArray(p.core_traits_tags) ? p.core_traits_tags : [],
+    relationship_notes: typeof p.relationship_notes === "string" ? p.relationship_notes : "",
+    created_at: typeof p.created_at === "string" ? p.created_at : new Date().toISOString(),
+  };
+}
+
+export interface ImportResult {
+  success: boolean;
+  count: number;
+  error?: string;
+}
+
+export function importProfilesFromJson(fileContent: string): ImportResult {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(fileContent);
+  } catch {
+    return { success: false, count: 0, error: "檔案格式錯誤，無法解析 JSON。" };
+  }
+
+  const rawProfiles = Array.isArray(parsed)
+    ? parsed
+    : Array.isArray((parsed as Partial<BackupFile> | null)?.profiles)
+      ? (parsed as BackupFile).profiles
+      : null;
+
+  if (!rawProfiles) {
+    return { success: false, count: 0, error: "檔案內容不是有效的備份格式。" };
+  }
+
+  const valid = rawProfiles
+    .map(normalizeImportedProfile)
+    .filter((p): p is TalentProfile => p !== null);
+
+  if (valid.length === 0) {
+    return { success: false, count: 0, error: "備份檔案中沒有可匯入的天賦檔案。" };
+  }
+
+  const merged = readAll();
+  for (const p of valid) {
+    const idx = merged.findIndex((e) => e.profile_id === p.profile_id);
+    if (idx >= 0) {
+      merged[idx] = p;
+    } else {
+      merged.push(p);
+    }
+  }
+  writeAll(merged);
+
+  return { success: true, count: valid.length };
+}

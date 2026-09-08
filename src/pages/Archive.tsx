@@ -1,15 +1,24 @@
-import { FolderOpen, Pencil, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Download, FolderOpen, Pencil, Plus, Trash2, Upload } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import PageHeader from "../components/PageHeader";
 import ProfileFormModal from "../components/ProfileFormModal";
+import Toast from "../components/Toast";
 import { PROFILE_TYPE_LABEL } from "../lib/mayaOptions";
-import { deleteProfile, listProfiles, saveProfile } from "../lib/store";
+import {
+  deleteProfile,
+  exportProfilesAsJson,
+  importProfilesFromJson,
+  listProfiles,
+  saveProfile,
+} from "../lib/store";
 import type { TalentProfile } from "../types/talent";
 
 export default function Archive() {
   const [profiles, setProfiles] = useState<TalentProfile[]>([]);
   const [editing, setEditing] = useState<TalentProfile | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setProfiles(listProfiles());
@@ -17,6 +26,11 @@ export default function Archive() {
 
   function refresh() {
     setProfiles(listProfiles());
+  }
+
+  function showToast(message: string) {
+    setToastMessage(message);
+    setTimeout(() => setToastMessage(""), 2500);
   }
 
   function handleSave(profile: TalentProfile) {
@@ -30,6 +44,34 @@ export default function Archive() {
     if (!confirm("確定要刪除這個天賦檔案嗎？")) return;
     deleteProfile(id);
     refresh();
+  }
+
+  function handleExport() {
+    exportProfilesAsJson();
+    showToast("已匯出 JSON 備份檔案。");
+  }
+
+  function handleImportClick() {
+    fileInputRef.current?.click();
+  }
+
+  function handleImportFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const content = typeof reader.result === "string" ? reader.result : "";
+      const result = importProfilesFromJson(content);
+      if (result.success) {
+        refresh();
+        showToast(`已匯入 ${result.count} 筆天賦檔案。`);
+      } else {
+        showToast(result.error ?? "匯入失敗，請確認檔案格式。");
+      }
+    };
+    reader.readAsText(file);
   }
 
   return (
@@ -50,6 +92,27 @@ export default function Archive() {
           <Plus size={16} strokeWidth={1.75} />
           新增檔案
         </button>
+      </div>
+
+      <div className="panel px-5 py-4 mb-8 flex items-center justify-between gap-4 flex-wrap">
+        <p className="text-xs text-text-tertiary">資料僅儲存於本機。更換裝置前請先備份。</p>
+        <div className="flex gap-2">
+          <button onClick={handleExport} className="btn-secondary border border-border">
+            <Download size={14} strokeWidth={1.75} />
+            匯出 JSON 備份
+          </button>
+          <button onClick={handleImportClick} className="btn-secondary border border-border">
+            <Upload size={14} strokeWidth={1.75} />
+            匯入備份檔案
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json"
+            onChange={handleImportFile}
+            className="hidden"
+          />
+        </div>
       </div>
 
       {profiles.length === 0 ? (
@@ -86,6 +149,8 @@ export default function Archive() {
           }}
         />
       )}
+
+      <Toast message={toastMessage} show={Boolean(toastMessage)} />
     </div>
   );
 }
