@@ -1,0 +1,21 @@
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Layout from "./components/Layout";
+import Dashboard from "./pages/Dashboard";
+import RelationHub from "./pages/RelationHub";
+import PromptStation from "./pages/PromptStation";
+import Archive from "./pages/Archive";
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="relations" element={<RelationHub />} />
+          <Route path="prompt-station" element={<PromptStation />} />
+          <Route path="archive" element={<Archive />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}

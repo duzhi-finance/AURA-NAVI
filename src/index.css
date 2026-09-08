@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Noto Sans TC", system-ui, "Segoe UI", Roboto, sans-serif;
+
+  --color-space-black: #0b0c10;
+  --color-deep-navy: #1f2833;
+  --color-eagle-blue: #45a29e;
+  --color-earth-pink: #ff007f;
+  --color-star-gold: #c5a059;
+
+  --color-ink-100: #eef1f3;
+  --color-ink-300: #b9c2c9;
+  --color-ink-500: #8592a0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(69, 162, 158, 0.18), transparent),
+    radial-gradient(ellipse 60% 50% at 90% 10%, rgba(255, 0, 127, 0.12), transparent),
+    var(--color-space-black);
+  color: var(--color-ink-100);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(69, 162, 158, 0.4);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.glass-card {
+  background: linear-gradient(160deg, rgba(31, 40, 51, 0.65), rgba(11, 12, 16, 0.55));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(69, 162, 158, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.glow-eagle {
+  box-shadow: 0 0 0 1px rgba(69, 162, 158, 0.4), 0 0 24px rgba(69, 162, 158, 0.25);
+}
+.glow-pink {
+  box-shadow: 0 0 0 1px rgba(255, 0, 127, 0.4), 0 0 24px rgba(255, 0, 127, 0.25);
+}
+.glow-gold {
+  box-shadow: 0 0 0 1px rgba(197, 160, 89, 0.4), 0 0 24px rgba(197, 160, 89, 0.2);
+}
+
+.text-gradient-aura {
+  background: linear-gradient(90deg, var(--color-eagle-blue), var(--color-star-gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.input-base,
+.select-base {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(11, 12, 16, 0.5);
+  padding: 0.6rem 0.9rem;
+  color: var(--color-ink-100);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.input-base::placeholder {
+  color: var(--color-ink-500);
+}
+.input-base:focus,
+.select-base:focus {
+  border-color: var(--color-eagle-blue);
+}
+.select-base option {
+  background: var(--color-deep-navy);
+  color: var(--color-ink-100);
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
