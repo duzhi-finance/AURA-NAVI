@@ -22,6 +22,9 @@ export default function Archive() {
   const [showForm, setShowForm] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [teamQuizUrl] = useState(
+    () => `${window.location.origin}${window.location.pathname}#/team-dna`
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -57,10 +60,9 @@ export default function Archive() {
   }
 
   async function handleCopyTeamQuizLink() {
-    const url = `${window.location.origin}${window.location.pathname}#/team-dna`;
     try {
-      await navigator.clipboard.writeText(url);
-      showToast("已複製測驗連結，傳送給團隊成員吧！");
+      await navigator.clipboard.writeText(teamQuizUrl);
+      showToast("已複製邀請連結，可直接傳送給團隊夥伴");
     } catch {
       showToast("複製失敗，請手動複製網址列連結。");
     }
@@ -99,7 +101,7 @@ export default function Archive() {
 
   function handleCompare() {
     if (selectedIds.length !== 2) return;
-    navigate("/relations", { state: { selfId: selectedIds[0], targetId: selectedIds[1] } });
+    navigate("/app/relations", { state: { selfId: selectedIds[0], targetId: selectedIds[1] } });
   }
 
   return (
@@ -112,22 +114,36 @@ export default function Archive() {
         />
       </div>
 
-      <div className="card-luxe card-hover p-6 mb-10 flex items-center justify-between gap-4 flex-wrap">
-        <div className="inline-flex items-start gap-3">
+      <div className="rounded-2xl bg-[#FAF9F6] border border-[#E2D8D8] p-6 mb-10">
+        <div className="flex items-start gap-3">
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg border border-border shrink-0">
             <Users size={15} strokeWidth={1.5} className="text-luxe-gold" />
           </span>
-          <div>
-            <div className="text-sm font-serif text-text-primary">需要建立團隊檔案？</div>
-            <p className="desc-text text-xs text-text-secondary mt-1 max-w-sm leading-relaxed">
-              提供「職場天賦原型輕測驗」連結給成員，輕鬆獲得天賦 KIN 碼。
+          <div className="flex-1 min-w-0">
+            <div className="font-serif text-text-primary text-[15px] tracking-[0.08em]" style={{ fontWeight: 400 }}>
+              ✦ 團隊天賦原貌｜職場頻率與充電模式對焦
+            </div>
+            <p
+              className="font-serif leading-[1.6] mt-2"
+              style={{ color: "#7A7571", fontSize: "12px" }}
+            >
+              無痛邀請夥伴或主管測算 KIN 碼，建立高共振的職場溝通生態。點擊下方按鈕即可複製專屬邀請連結。
             </p>
           </div>
         </div>
-        <button onClick={handleCopyTeamQuizLink} className="btn-invite shrink-0">
-          <ClipboardList size={14} strokeWidth={1.75} />
-          複製測驗邀請連結
-        </button>
+
+        <div className="mt-5 flex items-center gap-2.5 flex-wrap">
+          <div
+            className="flex-1 min-w-[200px] rounded-lg px-3.5 py-2.5 text-xs truncate"
+            style={{ background: "#F2EFE9", color: "#9A9186" }}
+          >
+            {teamQuizUrl}
+          </div>
+          <button onClick={handleCopyTeamQuizLink} className="btn-invite-dark shrink-0">
+            <ClipboardList size={14} strokeWidth={1.75} />
+            複製測驗邀請連結
+          </button>
+        </div>
       </div>
 
       <input
@@ -177,7 +193,7 @@ export default function Archive() {
 
       <div className="notice-pink px-[14px] py-[11px] mt-10 flex items-center justify-between gap-3 flex-wrap">
         <p className="desc-text text-[11px] leading-[1.5] max-w-2xl">
-          貼心提醒：資料僅儲存於此裝置與瀏覽器，更換裝置或清除快取會導致資料遺失，請定期匯出備份。本產品為數位商品與指令服務，一經購買或發送即完成交付，恕不接受退換貨。
+          貼心提醒：資料僅儲存於此裝置與瀏覽器，更換裝置或清除快取會導致資料遺失，請定期匯出備份。
         </p>
         <div className="flex gap-2">
           <button onClick={handleExport} className="btn-secondary !px-2.5 !py-1.5 border border-notice-border !text-notice-text">

@@ -2,12 +2,14 @@ import { Compass, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { IssueLabel } from "../components/Editorial";
-import Footer from "../components/Footer";
+import { AppFooter } from "../components/Footer";
 import TotemEmblem from "../components/TotemEmblem";
+import { TONE_COMMUNICATION_STYLE, TONE_NUANCE, TONE_RECHARGE_MODE } from "../lib/deepTalent";
 import { computeKinFromBirthdate, type DreamspellResult } from "../lib/dreamspellKin";
-import { MAYA_TOTEMS } from "../lib/mayaOptions";
+import { MAYA_TONES, MAYA_TOTEMS } from "../lib/mayaOptions";
 
 export default function TeamDnaPage() {
+  const [nickname, setNickname] = useState("");
   const [birthdate, setBirthdate] = useState("");
   const [result, setResult] = useState<DreamspellResult | null>(null);
 
@@ -18,7 +20,8 @@ export default function TeamDnaPage() {
     setResult(computeKinFromBirthdate(y, m, d));
   }
 
-  const seed = result ? MAYA_TOTEMS.indexOf(result.totem) : 0;
+  const totemSeed = result ? MAYA_TOTEMS.indexOf(result.totem) : 0;
+  const toneIdx = result ? MAYA_TONES.indexOf(result.tone) : 0;
 
   return (
     <div className="min-h-screen flex items-center justify-center px-5 py-16 bg-bg">
@@ -32,14 +35,34 @@ export default function TeamDnaPage() {
         </div>
 
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-light text-text-primary">高維天賦圖譜</h1>
-          <p className="desc-text mt-3 text-sm text-text-secondary leading-relaxed">
-            你的職場天賦原型與能量指南
+          <h1 className="text-2xl font-light text-text-primary leading-snug">
+            ✦ 團隊天賦原貌對焦
+            <br />
+            <span className="text-lg">｜AURA-Navi</span>
+          </h1>
+          <p
+            className="font-serif leading-relaxed mt-3"
+            style={{ color: "#7A7571", fontSize: "13px" }}
+          >
+            無需熟悉複雜指標，只需 10 秒輸入資訊，為您生成專屬的職場溝通頻率與天賦圖譜。
           </p>
         </div>
 
         {!result ? (
-          <form onSubmit={handleSubmit} className="panel p-7 flex flex-col gap-5">
+          <form
+            onSubmit={handleSubmit}
+            className="rounded-xl flex flex-col gap-5"
+            style={{ background: "#FAF9F6", border: "1px solid #E2D8D8", padding: "32px" }}
+          >
+            <label className="flex flex-col gap-2 text-sm">
+              <span className="text-text-secondary">您的稱呼 / 姓名</span>
+              <input
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                placeholder="請輸入您的稱呼"
+                className="input-base"
+              />
+            </label>
             <label className="flex flex-col gap-2 text-sm">
               <span className="text-text-secondary">出生年月日</span>
               <input
@@ -50,17 +73,20 @@ export default function TeamDnaPage() {
                 required
               />
             </label>
-            <button type="submit" className="btn-primary justify-center">
+            <button type="submit" className="btn-luxe-cta">
               <Sparkles size={16} strokeWidth={1.75} />
-              生成我的天賦圖騰
+              生成我的職場天賦卡片
             </button>
           </form>
         ) : (
           <div className="card-luxe card-halo p-8 flex flex-col items-center text-center gap-3">
             <span className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary">
-              Your Talent Seal
+              Team Talent Card
             </span>
-            <TotemEmblem seed={seed >= 0 ? seed : 0} size={96} className="text-luxe-gold my-2" />
+            {nickname.trim() && (
+              <div className="text-sm text-text-secondary">{nickname.trim()}</div>
+            )}
+            <TotemEmblem seed={totemSeed >= 0 ? totemSeed : 0} size={96} className="text-luxe-gold my-2" />
             <div className="text-2xl font-serif font-normal text-text-primary">{result.totem}</div>
             <div className="flex flex-wrap justify-center gap-2 text-xs text-text-secondary mt-1">
               <span className="rounded-lg bg-bg border border-border px-2.5 py-1 font-serif">
@@ -71,7 +97,13 @@ export default function TeamDnaPage() {
               </span>
             </div>
 
-            <p className="desc-text text-xs text-text-tertiary leading-relaxed mt-4 pt-4 border-t border-border">
+            <div className="w-full flex flex-col gap-2.5 mt-4 pt-4 border-t border-border text-left">
+              <TalentCardRow label="核心特質" value={TONE_NUANCE[toneIdx] ?? ""} />
+              <TalentCardRow label="適合的溝通方式" value={TONE_COMMUNICATION_STYLE[toneIdx] ?? ""} />
+              <TalentCardRow label="能量充電模式" value={TONE_RECHARGE_MODE[toneIdx] ?? ""} />
+            </div>
+
+            <p className="desc-text text-xs text-text-tertiary leading-relaxed mt-2 pt-4 border-t border-border">
               將此圖卡截圖傳送給你的主管或 HR，即可完成天賦建檔。
             </p>
 
@@ -88,13 +120,23 @@ export default function TeamDnaPage() {
         )}
 
         <div className="text-center mt-10">
-          <Link to="/about" className="text-xs text-text-tertiary hover:text-text-secondary underline">
+          <Link to="/" className="text-xs text-text-tertiary hover:text-text-secondary underline">
             了解更多關於 AURA-Navi
           </Link>
         </div>
 
-        <Footer />
+        <AppFooter />
       </div>
+    </div>
+  );
+}
+
+function TalentCardRow({ label, value }: { label: string; value: string }) {
+  if (!value) return null;
+  return (
+    <div className="rounded-lg bg-bg border border-border px-3 py-2.5 text-xs">
+      <span className="text-text-tertiary">{label}：</span>
+      <span className="desc-text text-text-secondary">{value}</span>
     </div>
   );
 }

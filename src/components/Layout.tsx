@@ -1,14 +1,14 @@
 import { BookHeart, Compass, FolderOpen, SendHorizonal, Users } from "lucide-react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { IssueLabel } from "./Editorial";
-import Footer from "./Footer";
+import { AppFooter } from "./Footer";
 
 const NAV_ITEMS = [
-  { to: "/", label: "星軌儀表板", chapter: "01", Icon: Compass, end: true },
-  { to: "/journal", label: "靈魂日誌", chapter: "02", Icon: BookHeart, end: false },
-  { to: "/relations", label: "頻率藝廊", chapter: "03", Icon: Users, end: false },
-  { to: "/prompt-station", label: "策略樞紐", chapter: "04", Icon: SendHorizonal, end: false },
-  { to: "/archive", label: "靈魂典藏館", chapter: "05", Icon: FolderOpen, end: false },
+  { to: "/app", label: "星軌儀表板", chapter: "01", Icon: Compass, end: true },
+  { to: "/app/journal", label: "靈魂日誌", chapter: "02", Icon: BookHeart, end: false },
+  { to: "/app/relations", label: "頻率藝廊", chapter: "03", Icon: Users, end: false },
+  { to: "/app/prompt-station", label: "策略樞紐", chapter: "04", Icon: SendHorizonal, end: false },
+  { to: "/app/archive", label: "靈魂典藏館", chapter: "05", Icon: FolderOpen, end: false },
 ];
 
 export default function Layout() {
@@ -26,7 +26,7 @@ export default function Layout() {
         </nav>
 
         <Link
-          to="/about"
+          to="/"
           className="mt-auto text-[11px] text-text-tertiary hover:text-text-secondary underline"
         >
           認識 AURA-Navi Journal
@@ -42,7 +42,7 @@ export default function Layout() {
         <main className="flex-1 min-w-0 px-5 py-8 md:px-14 md:py-14 pb-24 md:pb-14">
           <div className="mx-auto w-full max-w-5xl">
             <Outlet />
-            <Footer />
+            <AppFooter />
           </div>
         </main>
 

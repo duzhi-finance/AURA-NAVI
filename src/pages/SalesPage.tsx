@@ -184,7 +184,7 @@ export default function SalesPage() {
             ))}
           </div>
 
-          <Link to="/" className="btn-primary justify-center mt-12 mx-auto !text-base !px-8 !py-3.5">
+          <Link to="/app" className="btn-primary justify-center mt-12 mx-auto !text-base !px-8 !py-3.5">
             <Sparkles size={16} strokeWidth={1.75} />
             開啟你的 AURA-Navi 星軌導航
           </Link>

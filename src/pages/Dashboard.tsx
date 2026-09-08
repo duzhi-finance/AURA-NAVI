@@ -1,9 +1,10 @@
-import { ArrowRight, BookHeart, ChevronRight, ExternalLink, FolderOpen, SendHorizonal, type LucideIcon } from "lucide-react";
+import { ArrowRight, BookHeart, ChevronRight, ExternalLink, FolderOpen, SendHorizonal, Sparkles, type LucideIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import DailyCardDraw from "../components/DailyCardDraw";
 import { PullQuote, VerticalMicrocopy } from "../components/Editorial";
 import PageHeader from "../components/PageHeader";
+import TotemEmblem from "../components/TotemEmblem";
 import { formatBilingualDateLabel, getTodayFrequency } from "../lib/dailyFrequency";
 import { GLOWING_URL } from "../lib/promptTemplates";
 import { getSelfProfile } from "../lib/store";
@@ -15,7 +16,7 @@ export default function Dashboard() {
   const frequency = getTodayFrequency();
 
   function handleBringTodayEnergy() {
-    navigate("/prompt-station", {
+    navigate("/app/prompt-station", {
       state: { presetContext: `今日流年：${frequency.label}` },
     });
   }
@@ -79,7 +80,7 @@ export default function Dashboard() {
           ) : (
             <div className="text-sm text-text-secondary">
               尚未建立你的靈魂印記。
-              <Link to="/archive" className="text-text-primary underline ml-1">
+              <Link to="/app/archive" className="text-text-primary underline ml-1">
                 前往建立
               </Link>
             </div>
@@ -96,7 +97,7 @@ export default function Dashboard() {
       </div>
 
       <Link
-        to="/journal"
+        to="/app/journal"
         className="card-luxe card-halo card-hover mt-8 flex items-center gap-5 p-7 relative overflow-hidden transition-all hover:opacity-90"
       >
         <VerticalMicrocopy text="MANIFESTATION DAY" className="top-7 right-3" />
@@ -121,24 +122,74 @@ export default function Dashboard() {
             description="前往 glowing.cc 輸入生日生成圖卡"
           />
           <QuickLink
-            to="/prompt-station"
+            to="/app/prompt-station"
             Icon={SendHorizonal}
             title="一鍵生成 Gemini 導航指令"
             description="合成高維對焦 Prompt"
           />
           <QuickLink
-            to="/archive"
+            to="/app/archive"
             Icon={FolderOpen}
             title="開啟靈魂印記典藏館"
             description="管理你與關係人的靈魂印記"
           />
         </div>
-      </div>
 
-      <p className="desc-text mt-6 text-[11px] text-text-tertiary leading-[1.5]">
-        貼心提醒：所有靈魂印記皆安全儲存於此裝置與瀏覽器。換裝置或清除快取會導致資料遺失，請記得至靈魂印記典藏館進行【匯出備份】。
-      </p>
+        <GlowingGuideCard />
+      </div>
     </div>
+  );
+}
+
+function GlowingGuideCard() {
+  return (
+    <details className="group mt-4 rounded-xl border border-border bg-[#F5F5F3] px-5 py-4">
+      <summary className="desc-text cursor-pointer text-[12px] text-[#7A7571] select-none flex items-center gap-2">
+        <Sparkles size={13} strokeWidth={1.5} className="shrink-0" />
+        glowing.cc 3 秒快速擷取指引
+      </summary>
+
+      <div className="mt-4 flex flex-col gap-4">
+        <ol className="flex flex-col gap-2.5">
+          <GuideStep n={1}>進入 glowing.cc 輸入您的「出生年月日」並點擊測算。</GuideStep>
+          <GuideStep n={2}>
+            無視密密麻麻的文字，直接尋找畫面上帶有「五色圖騰卡片」且寫有「KIN 數字」（如 KIN 215）的視覺圖卡。
+          </GuideStep>
+          <GuideStep n={3}>
+            直接「手機螢幕截圖」儲存，返回 AURA-Navi 輸入該 KIN 號碼即可完成高維對焦。
+          </GuideStep>
+        </ol>
+
+        <div className="rounded-lg border border-dashed border-[#C9C2B8] bg-surface p-4">
+          <div className="desc-text text-[10px] text-text-tertiary mb-2.5">
+            範例：請截圖此類圖卡畫面
+          </div>
+          <div className="rounded-md border border-border bg-bg p-3 flex flex-col items-center gap-2">
+            <div className="flex items-center justify-center gap-2">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <TotemEmblem key={i} seed={i} size={20} className="text-luxe-gold/70" />
+              ))}
+            </div>
+            <span className="border-2 border-red-500 rounded px-2 py-0.5 text-[11px] font-serif text-text-primary">
+              KIN 215
+            </span>
+          </div>
+        </div>
+
+        <p className="desc-text text-[10px] text-text-tertiary">
+          畫面來源：glowing.cc 測算介面示意
+        </p>
+      </div>
+    </details>
+  );
+}
+
+function GuideStep({ n, children }: { n: number; children: React.ReactNode }) {
+  return (
+    <li className="flex items-start gap-2.5 desc-text text-[12px] text-[#7A7571] leading-relaxed">
+      <span className="shrink-0 text-luxe-gold">Step {n}</span>
+      <span>{children}</span>
+    </li>
   );
 }
 
@@ -181,5 +232,5 @@ function QuickLink({
       </a>
     );
   }
-  return <Link to={to ?? "/"}>{content}</Link>;
+  return <Link to={to ?? "/app"}>{content}</Link>;
 }

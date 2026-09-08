@@ -15,9 +15,9 @@ export default function App() {
   return (
     <HashRouter>
       <Routes>
+        <Route path="/" element={<SalesPage />} />
         <Route path="team-dna" element={<TeamDnaPage />} />
-        <Route path="about" element={<SalesPage />} />
-        <Route element={<Layout />}>
+        <Route path="app" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="relations" element={<RelationHub />} />
           <Route path="prompt-station" element={<PromptStation />} />

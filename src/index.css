@@ -156,21 +156,39 @@
   color: transparent;
 }
 
-.btn-invite {
+.btn-invite-dark {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  border: 1px solid #e2d8d8;
+  border: 1px solid #2c2c2a;
   border-radius: 999px;
-  padding: 0.6rem 1.15rem;
+  padding: 0.65rem 1.2rem;
   font-size: 0.75rem;
-  color: var(--color-luxe-gold);
-  background: var(--color-surface);
-  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+  color: #faf9f6;
+  background: #2c2c2a;
+  transition: box-shadow 0.25s ease, transform 0.2s ease, opacity 0.2s ease;
 }
-.btn-invite:hover {
-  border-color: var(--color-luxe-gold);
-  box-shadow: 0 0 0 3px rgba(184, 147, 90, 0.14);
+.btn-invite-dark:hover {
+  box-shadow: 0 0 0 3px rgba(184, 147, 90, 0.22);
+  transform: translateY(-1px);
+  opacity: 0.9;
+}
+
+.btn-luxe-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #2c2c2a;
+  color: #faf9f6;
+  border: 1px solid #2c2c2a;
+  border-radius: 12px;
+  padding: 0.85rem 1.5rem;
+  font-size: 0.9rem;
+  transition: box-shadow 0.25s ease, transform 0.2s ease;
+}
+.btn-luxe-cta:hover {
+  box-shadow: 0 0 0 3px rgba(184, 147, 90, 0.25);
   transform: translateY(-1px);
 }
 

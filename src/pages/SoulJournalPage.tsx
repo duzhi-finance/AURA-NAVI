@@ -37,7 +37,7 @@ export default function SoulJournalPage() {
           <p className="mb-1.5">日誌還是空的</p>
           <p className="desc-text text-sm text-text-tertiary">
             前往
-            <Link to="/prompt-station" className="text-text-primary underline mx-1">
+            <Link to="/app/prompt-station" className="text-text-primary underline mx-1">
               高維策略樞紐
             </Link>
             生成一次對焦指令後，點擊「存入今日個人觀照」即可開始紀錄。

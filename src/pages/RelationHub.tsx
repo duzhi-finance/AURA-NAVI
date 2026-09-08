@@ -64,7 +64,7 @@ export default function RelationHub() {
             </span>
           </div>
           <div>
-            <Link to="/archive" className="btn-primary">
+            <Link to="/app/archive" className="btn-primary">
               前往靈魂印記典藏館選取
               <ArrowRight size={16} strokeWidth={1.75} />
             </Link>
