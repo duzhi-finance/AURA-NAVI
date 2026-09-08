@@ -1,5 +1,5 @@
 import type { DailyCard } from "./dailyCard";
-import type { LifeDomain, PromptTemplate, TalentProfile } from "../types/talent";
+import type { LifeDomain, PromptTemplate, RelationshipStatus, TalentProfile } from "../types/talent";
 import { PROFILE_TYPE_LABEL } from "./mayaOptions";
 
 export const LIFE_DOMAIN_OPTIONS: { value: LifeDomain; label: string }[] = [
@@ -15,10 +15,31 @@ export const LIFE_DOMAIN_LABEL: Record<LifeDomain, string> = Object.fromEntries(
 
 export const CONTEXT_PRESETS = ["溝通缺乏共識", "工作找不到動力", "主管不理解我", "渴望深層安全感"];
 
+export const RELATIONSHIP_STATUS_OPTIONS: { value: RelationshipStatus; label: string }[] = [
+  { value: "Single", label: "單身／尋覓中" },
+  { value: "InRelationship", label: "交往中／婚姻中" },
+  { value: "Ambiguous", label: "斷聯／模糊曖昧" },
+];
+
+export const RELATIONSHIP_STATUS_LABEL: Record<RelationshipStatus, string> = Object.fromEntries(
+  RELATIONSHIP_STATUS_OPTIONS.map((o) => [o.value, o.label])
+) as Record<RelationshipStatus, string>;
+
+// Only surfaced for domains where a same-sounding typo could flip the meaning of the
+// user's situation (e.g. 想交男朋友 vs 想教男朋友) into an unrelated one.
+export const RELATIONSHIP_STATUS_DOMAINS: LifeDomain[] = ["Romance", "Interpersonal"];
+
+export const ROMANCE_SINGLE_PRESETS = [
+  "想交男朋友",
+  "想交女朋友",
+  "想脫單卻不知道從何開始",
+  "容易吸引到不適合的對象",
+];
+
 const BASE_TEMPLATE_TEXT = `你現在是一位精通星際瑪雅曆（Dreamspell）、生命靈數與職場/人際心理學的「高維生命導航員」。
 
 我已經附上我從 glowing.cc 下載的個人星系印記圖卡（包含主印記、圖騰、波符、力量動物等資訊）。
-{{ Profile_Reference }}{{ Daily_Card_Reference }}
+{{ Profile_Reference }}{{ Daily_Card_Reference }}{{ Relationship_Status_Guardrail }}
 請幫我閱讀這張圖片中的所有資料，並為我進行深度解析。請依據以下四大模組輸出：
 
 ---
@@ -69,15 +90,36 @@ function dailyCardReferenceLine(dailyCard?: DailyCard | null): string {
   return `* 今日對焦牌卡：${dailyCard.name}（${dailyCard.insight}）\n`;
 }
 
+const RELATIONSHIP_STATUS_FOCUS: Record<RelationshipStatus, string> = {
+  Single:
+    "當狀態為「單身／尋覓中」時，請聚焦於：個人吸引力磁場、擇偶地雷、如何吸引合適對象；切勿假設對方已有伴侶。",
+  InRelationship:
+    "當狀態為「交往中／婚姻中」時，請聚焦於：兩人相處磨合、溝通模式、關係維繫與衝突化解；請以使用者目前已有穩定對象為前提解讀。",
+  Ambiguous:
+    "當狀態為「斷聯／模糊曖昧」時，請聚焦於：釐清對方心意、辨識關係中的訊號、進退場時機；不要假設這是穩定交往關係，也不要假設兩人已完全沒有交集。",
+};
+
+function relationshipStatusGuardrail(status?: RelationshipStatus | null): string {
+  if (!status) return "";
+  const label = RELATIONSHIP_STATUS_LABEL[status];
+  return `【關係狀態防呆設定】
+目前的關係狀態為：${label}。
+請特別注意：若使用者輸入包含同音錯字（如將「想交男朋友」打成「想教男朋友」），請依據其「${label}」的狀態進行解讀，切勿誤判為無關的情境（例如「已有伴侶並嘗試教育對方」）。
+${RELATIONSHIP_STATUS_FOCUS[status]}
+`;
+}
+
 export function generateNavigationPrompt(
   domain: LifeDomain,
   contextDescription: string,
   selfProfile?: TalentProfile | null,
-  dailyCard?: DailyCard | null
+  dailyCard?: DailyCard | null,
+  relationshipStatus?: RelationshipStatus | null
 ): string {
   return BASE_TEMPLATE_TEXT
     .replace("{{ Profile_Reference }}", profileReferenceLine(selfProfile))
     .replace("{{ Daily_Card_Reference }}", dailyCardReferenceLine(dailyCard))
+    .replace("{{ Relationship_Status_Guardrail }}", relationshipStatusGuardrail(relationshipStatus))
     .replace("{{ Life_Domain }}", LIFE_DOMAIN_LABEL[domain])
     .replace("{{ Context_Description }}", contextDescription.trim() || "（尚未填寫）")
     .replace(/\n{3,}/g, "\n\n");

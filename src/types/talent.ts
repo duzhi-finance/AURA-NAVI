@@ -21,6 +21,8 @@ export interface TalentProfile {
 
 export type LifeDomain = "Career" | "Romance" | "Family" | "Interpersonal";
 
+export type RelationshipStatus = "Single" | "InRelationship" | "Ambiguous";
+
 export interface PromptTemplate {
   template_id: string;
   domain_type: LifeDomain;

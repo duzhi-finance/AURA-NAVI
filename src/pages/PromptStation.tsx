@@ -4,9 +4,16 @@ import CopyPromptBlock from "../components/CopyPromptBlock";
 import GeminiButton from "../components/GeminiButton";
 import PageHeader from "../components/PageHeader";
 import { getTodayCard } from "../lib/dailyCard";
-import { CONTEXT_PRESETS, LIFE_DOMAIN_OPTIONS, generateNavigationPrompt } from "../lib/promptTemplates";
+import {
+  CONTEXT_PRESETS,
+  LIFE_DOMAIN_OPTIONS,
+  RELATIONSHIP_STATUS_DOMAINS,
+  RELATIONSHIP_STATUS_OPTIONS,
+  ROMANCE_SINGLE_PRESETS,
+  generateNavigationPrompt,
+} from "../lib/promptTemplates";
 import { getSelfProfile } from "../lib/store";
-import type { LifeDomain } from "../types/talent";
+import type { LifeDomain, RelationshipStatus } from "../types/talent";
 
 interface PromptStationNavState {
   presetContext?: string;
@@ -15,6 +22,7 @@ interface PromptStationNavState {
 export default function PromptStation() {
   const location = useLocation();
   const [domain, setDomain] = useState<LifeDomain | null>(null);
+  const [relationshipStatus, setRelationshipStatus] = useState<RelationshipStatus | null>(null);
   const [context, setContext] = useState("");
   const selfProfile = useMemo(() => getSelfProfile(), []);
   const dailyCard = useMemo(() => getTodayCard(), []);
@@ -28,12 +36,32 @@ export default function PromptStation() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const showRelationshipStatus = domain !== null && RELATIONSHIP_STATUS_DOMAINS.includes(domain);
+
+  function handleSelectDomain(next: LifeDomain) {
+    setDomain(next);
+    if (!RELATIONSHIP_STATUS_DOMAINS.includes(next)) {
+      setRelationshipStatus(null);
+    }
+  }
+
   const prompt = useMemo(() => {
     if (!domain) return "";
-    return generateNavigationPrompt(domain, context, selfProfile, dailyCard);
-  }, [domain, context, selfProfile, dailyCard]);
+    return generateNavigationPrompt(
+      domain,
+      context,
+      selfProfile,
+      dailyCard,
+      showRelationshipStatus ? relationshipStatus : null
+    );
+  }, [domain, context, selfProfile, dailyCard, showRelationshipStatus, relationshipStatus]);
 
   const step = !domain ? 1 : !context.trim() ? 2 : 3;
+
+  const presets =
+    domain === "Romance" && relationshipStatus === "Single"
+      ? [...CONTEXT_PRESETS, ...ROMANCE_SINGLE_PRESETS]
+      : CONTEXT_PRESETS;
 
   return (
     <div>
@@ -53,7 +81,7 @@ export default function PromptStation() {
               {LIFE_DOMAIN_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
-                  onClick={() => setDomain(opt.value)}
+                  onClick={() => handleSelectDomain(opt.value)}
                   className={`rounded-xl px-4 py-3 text-sm border transition-colors ${
                     domain === opt.value
                       ? "border-text-primary bg-bg text-text-primary font-medium"
@@ -68,14 +96,36 @@ export default function PromptStation() {
 
           <section className={`panel p-6 ${!domain ? "opacity-50 pointer-events-none" : ""}`}>
             <StepLabel n={2} title="選擇目前痛點與目標" />
+
+            {showRelationshipStatus && (
+              <div className="mb-4">
+                <div className="text-xs text-text-tertiary mb-2">目前的關係狀態</div>
+                <div className="flex flex-wrap gap-2">
+                  {RELATIONSHIP_STATUS_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setRelationshipStatus(opt.value)}
+                      className={`rounded-full px-3 py-1.5 text-xs border transition-colors ${
+                        relationshipStatus === opt.value
+                          ? "border-text-primary bg-bg text-text-primary font-medium"
+                          : "border-border text-text-secondary hover:border-text-tertiary"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <textarea
               value={context}
               onChange={(e) => setContext(e.target.value)}
               placeholder="請描述你目前的困境或想達成的目標，例如：主管不理解我"
-              className="input-base mt-4 min-h-24 resize-y"
+              className="input-base mt-1 min-h-24 resize-y"
             />
             <div className="flex flex-wrap gap-2 mt-3">
-              {CONTEXT_PRESETS.map((s) => (
+              {presets.map((s) => (
                 <button
                   key={s}
                   onClick={() => setContext(s)}
