@@ -54,7 +54,7 @@
     font-family: var(--font-serif);
     font-weight: 400;
     text-wrap: balance;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.05em;
   }
 
   ::-webkit-scrollbar {
@@ -118,7 +118,7 @@
   border-radius: 12px;
   padding: 0.7rem 1.3rem;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 300;
   transition: opacity 0.15s ease;
 }
 .btn-primary:hover {
@@ -134,7 +134,7 @@
   border-radius: 12px;
   padding: 0.65rem 1.1rem;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 300;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 .btn-secondary:hover {
@@ -199,7 +199,19 @@
   inset: -16%;
   background: radial-gradient(closest-side, rgba(184, 147, 90, 0.22), transparent 72%);
   filter: blur(4px);
+  opacity: 0.85;
+  transition: opacity 0.3s ease, filter 0.3s ease;
   z-index: -1;
+}
+.card-hover {
+  transition: transform 0.3s ease;
+}
+.card-hover:hover {
+  transform: scale(1.02);
+}
+.card-hover.card-halo:hover::after {
+  opacity: 1;
+  filter: blur(7px);
 }
 
 .card-shimmer {

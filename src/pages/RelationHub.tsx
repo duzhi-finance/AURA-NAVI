@@ -113,7 +113,7 @@ function PortraitFrame({ profile, label }: { profile: TalentProfile; label: stri
   const seed = MAYA_TOTEMS.indexOf(profile.maya_totem);
 
   return (
-    <div className="card-luxe card-halo p-8 flex flex-col items-center text-center gap-3">
+    <div className="card-luxe card-halo card-hover p-8 flex flex-col items-center text-center gap-3">
       <span className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary">{label}</span>
       <TotemEmblem seed={seed >= 0 ? seed : 0} size={84} className="text-luxe-gold my-1" />
       <div className="text-xl font-serif font-normal text-text-primary">{profile.name_alias}</div>

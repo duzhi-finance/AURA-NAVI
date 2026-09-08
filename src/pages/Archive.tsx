@@ -135,7 +135,7 @@ export default function Archive() {
           setEditing(null);
           setShowForm(true);
         }}
-        className="card-luxe w-full flex items-center justify-center gap-2.5 py-6 mb-10 text-sm font-medium text-text-primary hover:opacity-80 transition-opacity"
+        className="card-luxe card-hover w-full flex items-center justify-center gap-2.5 py-6 mb-10 text-sm font-medium text-text-primary transition-all hover:opacity-80"
       >
         <Plus size={18} strokeWidth={1.75} />
         新增靈魂印記
@@ -210,7 +210,7 @@ function ProfileCard({
   return (
     <div
       onClick={onSelect}
-      className={`relative p-6 flex flex-col gap-4 cursor-pointer transition-shadow rounded-[20px] ${
+      className={`relative p-6 flex flex-col gap-4 cursor-pointer card-hover transition-all rounded-[20px] ${
         profile.is_self ? "card-luxe card-halo" : "panel"
       } ${selected ? "ring-2 ring-luxe-gold" : ""}`}
     >

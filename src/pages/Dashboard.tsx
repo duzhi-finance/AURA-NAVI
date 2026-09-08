@@ -90,7 +90,7 @@ export default function Dashboard() {
 
       <Link
         to="/journal"
-        className="card-luxe card-halo mt-5 flex items-center gap-5 p-7 hover:opacity-90 transition-opacity"
+        className="card-luxe card-halo card-hover mt-5 flex items-center gap-5 p-7 transition-all hover:opacity-90"
       >
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-bg border border-border shrink-0">
           <BookHeart size={24} strokeWidth={1.25} className="text-luxe-gold" />
@@ -146,7 +146,7 @@ function QuickLink({
   description: string;
 }) {
   const content = (
-    <div className="panel p-6 h-full flex flex-col gap-3 transition-colors hover:bg-surface-hover">
+    <div className="panel card-hover p-6 h-full flex flex-col gap-3 transition-all hover:bg-surface-hover">
       <Icon size={22} strokeWidth={1.25} className="text-text-primary" />
       <div className="text-sm font-medium text-text-primary">{title}</div>
       <p className="text-xs text-text-secondary leading-relaxed">{description}</p>
