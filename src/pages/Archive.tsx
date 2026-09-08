@@ -1,4 +1,4 @@
-import { ArrowRight, Check, Download, Pencil, Plus, Sparkles, Trash2, Upload } from "lucide-react";
+import { ArrowRight, Check, Download, Pencil, Plus, Sparkles, Trash2, Upload, Users } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
@@ -100,6 +100,13 @@ export default function Archive() {
           title="靈魂印記典藏館"
           description="典藏你與所有重要關係人的靈魂印記，隨時檢視瑪雅圖騰與個性說明書。選取兩張印記，即可前往頻率共振藝廊比對。"
         />
+      </div>
+
+      <div className="inline-flex items-start gap-2 text-xs text-text-secondary mb-6">
+        <Users size={14} strokeWidth={1.75} className="text-luxe-gold shrink-0 mt-0.5" />
+        <span>
+          需要建立團隊檔案？提供「職場天賦原型輕測驗」連結給成員，輕鬆獲得天賦 KIN 碼。
+        </span>
       </div>
 
       <div className="notice-pink px-5 py-4 mb-10 flex items-center justify-between gap-4 flex-wrap">
@@ -250,7 +257,7 @@ function ProfileCard({
       </div>
 
       <div className="relative">
-        <h3 className="text-lg font-serif font-semibold text-text-primary">{profile.name_alias}</h3>
+        <h3 className="text-lg font-serif font-normal text-text-primary">{profile.name_alias}</h3>
         <p className="text-xs text-text-tertiary mt-1">
           {profile.maya_totem ? `圖騰：${profile.maya_totem}` : "尚未填寫圖騰"}
         </p>

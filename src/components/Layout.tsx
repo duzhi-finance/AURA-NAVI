@@ -54,7 +54,7 @@ function Brand({ compact }: { compact?: boolean }) {
     <div className="flex items-center gap-2.5">
       <Compass size={22} strokeWidth={1.5} className="text-text-primary" />
       <div>
-        <div className={`font-serif font-semibold text-text-primary leading-tight ${compact ? "text-base" : "text-lg"}`}>
+        <div className={`font-serif font-normal text-text-primary leading-tight ${compact ? "text-base" : "text-lg"}`}>
           AURA-Navi
         </div>
         {!compact && (

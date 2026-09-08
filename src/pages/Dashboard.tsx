@@ -5,14 +5,12 @@ import DailyCardDraw from "../components/DailyCardDraw";
 import PageHeader from "../components/PageHeader";
 import { formatBilingualDateLabel, getTodayFrequency } from "../lib/dailyFrequency";
 import { GLOWING_URL } from "../lib/promptTemplates";
-import { formatJournalDate, getSoulJournal, type SoulJournalEntry } from "../lib/soulJournal";
 import { getSelfProfile } from "../lib/store";
 import type { TalentProfile } from "../types/talent";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [selfProfile, setSelfProfile] = useState<TalentProfile | undefined>(undefined);
-  const [journal, setJournal] = useState<SoulJournalEntry[]>([]);
   const frequency = getTodayFrequency();
 
   function handleBringTodayEnergy() {
@@ -23,7 +21,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     setSelfProfile(getSelfProfile());
-    setJournal(getSoulJournal());
   }, []);
 
   return (
@@ -40,7 +37,7 @@ export default function Dashboard() {
           <div className="flex items-center gap-4">
             <frequency.Icon size={36} strokeWidth={1.25} className={frequency.colorClass} />
             <div>
-              <div className={`text-2xl font-serif font-semibold ${frequency.colorClass}`}>
+              <div className={`text-2xl font-serif font-normal ${frequency.colorClass}`}>
                 {frequency.label}
               </div>
               <p className="text-sm text-text-secondary mt-1.5 max-w-xs leading-relaxed">
@@ -61,7 +58,7 @@ export default function Dashboard() {
           <div className="text-xs text-text-tertiary">今日瑪雅印記小卡</div>
           {selfProfile ? (
             <div>
-              <div className="text-lg font-serif font-semibold text-text-primary">
+              <div className="text-lg font-serif font-normal text-text-primary">
                 {selfProfile.name_alias}
               </div>
               <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-text-secondary">
@@ -91,43 +88,23 @@ export default function Dashboard() {
         <DailyCardDraw />
       </div>
 
-      {journal.length > 0 && (
-        <div className="panel p-7 mt-5">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2 text-xs text-text-tertiary">
-              <BookHeart size={14} strokeWidth={1.75} />
-              靈魂共振日誌
-            </div>
-            <Link
-              to="/journal"
-              className="flex items-center gap-1 text-xs text-text-secondary hover:text-text-primary"
-            >
-              查看完整日誌
-              <ChevronRight size={13} strokeWidth={1.75} />
-            </Link>
-          </div>
-          <div className="flex flex-col gap-2">
-            {journal.slice(0, 3).map((entry) => (
-              <div
-                key={entry.id}
-                className="flex items-start justify-between gap-3 text-xs rounded-lg bg-bg border border-border px-3 py-2.5"
-              >
-                <div className="min-w-0">
-                  <span className="text-text-primary font-medium">{entry.domainLabel}</span>
-                  {entry.context && (
-                    <p className="text-text-secondary mt-0.5 truncate">{entry.context}</p>
-                  )}
-                </div>
-                <span className="text-text-tertiary shrink-0">{formatJournalDate(entry.created_at)}</span>
-              </div>
-            ))}
-          </div>
+      <Link
+        to="/journal"
+        className="card-luxe card-halo mt-5 flex items-center gap-5 p-7 hover:opacity-90 transition-opacity"
+      >
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-bg border border-border shrink-0">
+          <BookHeart size={24} strokeWidth={1.25} className="text-luxe-gold" />
         </div>
-      )}
+        <div className="flex-1 min-w-0">
+          <div className="text-lg font-serif text-text-primary">前往靈魂共振日記</div>
+          <p className="text-sm text-text-secondary mt-0.5">查看你的歷程觀照</p>
+        </div>
+        <ChevronRight size={20} strokeWidth={1.5} className="text-text-tertiary shrink-0" />
+      </Link>
 
       <div className="mt-10">
         <h2 className="text-sm font-medium text-text-secondary mb-4">快捷引導</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-3">
           <QuickLink
             href={GLOWING_URL}
             external
@@ -140,12 +117,6 @@ export default function Dashboard() {
             Icon={SendHorizonal}
             title="一鍵生成 Gemini 導航指令"
             description="合成高維對焦 Prompt"
-          />
-          <QuickLink
-            to="/journal"
-            Icon={BookHeart}
-            title="開啟靈魂共振日誌"
-            description="回顧每一次的個人觀照紀錄"
           />
           <QuickLink
             to="/archive"

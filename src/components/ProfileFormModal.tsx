@@ -53,7 +53,7 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
         className="bg-bg border border-border w-full max-w-lg rounded-2xl p-7 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="font-serif text-xl font-semibold text-text-primary mb-6">
+        <h2 className="font-serif text-xl font-normal text-text-primary mb-6">
           {isEditing ? "編輯靈魂印記" : "新增靈魂印記"}
         </h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

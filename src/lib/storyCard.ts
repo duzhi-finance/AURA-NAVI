@@ -131,22 +131,22 @@ export async function exportDailyStoryCard(opts: StoryCardOptions): Promise<void
   ctx.textAlign = "center";
 
   ctx.fillStyle = gold;
-  ctx.font = "600 32px 'Cinzel', serif";
+  ctx.font = "500 32px 'Noto Serif TC', serif";
   ctx.fillText("A U R A · N A V I", W / 2, 220);
 
   ctx.fillStyle = "#888888";
-  ctx.font = "400 30px 'Cormorant Garamond', serif";
+  ctx.font = "300 30px 'Noto Serif TC', serif";
   ctx.fillText(opts.dateLabel, W / 2, 270);
 
   ctx.fillStyle = opts.frequencyColor;
-  ctx.font = "600 52px 'Noto Serif TC', serif";
+  ctx.font = "500 52px 'Noto Serif TC', serif";
   ctx.fillText(`今日流年 · ${opts.frequencyLabel}`, W / 2, 380);
 
   const seed = cardSeedIndex(opts.card);
   drawTotemEmblem(ctx, W / 2, 760, 260, seed, gold);
 
   ctx.fillStyle = ink;
-  ctx.font = "600 96px 'Noto Serif TC', serif";
+  ctx.font = "400 96px 'Noto Serif TC', serif";
   ctx.fillText(opts.card.name, W / 2, 1180);
 
   ctx.font = "300 40px 'Noto Sans TC', sans-serif";
@@ -160,7 +160,7 @@ export async function exportDailyStoryCard(opts: StoryCardOptions): Promise<void
 
   ctx.globalAlpha = 0.75;
   ctx.fillStyle = gold;
-  ctx.font = "500 24px 'Cinzel', serif";
+  ctx.font = "500 24px 'Noto Serif TC', serif";
   ctx.fillText("CELESTIAL SYNASTRY CHRONOGRAPH", W / 2, H - margin - 60);
   ctx.globalAlpha = 1;
 

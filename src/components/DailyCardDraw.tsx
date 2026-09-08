@@ -52,7 +52,7 @@ export default function DailyCardDraw() {
             {card && (
               <>
                 <TotemEmblem seed={cardSeedIndex(card)} size={56} className="text-luxe-gold" />
-                <div className="text-xl font-serif font-semibold text-text-primary mt-1">{card.name}</div>
+                <div className="text-xl font-serif font-normal text-text-primary mt-1">{card.name}</div>
                 <p className="text-sm text-text-secondary leading-relaxed max-w-[240px] italic">
                   {card.insight}
                 </p>

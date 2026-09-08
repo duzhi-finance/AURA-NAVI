@@ -116,7 +116,7 @@ function PortraitFrame({ profile, label }: { profile: TalentProfile; label: stri
     <div className="card-luxe card-halo p-8 flex flex-col items-center text-center gap-3">
       <span className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary">{label}</span>
       <TotemEmblem seed={seed >= 0 ? seed : 0} size={84} className="text-luxe-gold my-1" />
-      <div className="text-xl font-serif font-semibold text-text-primary">{profile.name_alias}</div>
+      <div className="text-xl font-serif font-normal text-text-primary">{profile.name_alias}</div>
       <div className="flex flex-wrap justify-center gap-2 text-xs text-text-secondary mt-1">
         <span className="rounded-lg bg-bg border border-border px-2 py-1 font-serif">KIN {profile.maya_kin ?? "—"}</span>
         <span className="rounded-lg bg-bg border border-border px-2 py-1">{profile.maya_totem || "圖騰未填"}</span>
