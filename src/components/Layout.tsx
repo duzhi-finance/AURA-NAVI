@@ -5,10 +5,10 @@ import Footer from "./Footer";
 
 const NAV_ITEMS = [
   { to: "/", label: "星軌儀表板", chapter: "01", Icon: Compass, end: true },
-  { to: "/archive", label: "靈魂典藏館", chapter: "02", Icon: FolderOpen, end: false },
+  { to: "/journal", label: "靈魂日誌", chapter: "02", Icon: BookHeart, end: false },
   { to: "/relations", label: "頻率藝廊", chapter: "03", Icon: Users, end: false },
   { to: "/prompt-station", label: "策略樞紐", chapter: "04", Icon: SendHorizonal, end: false },
-  { to: "/journal", label: "靈魂日誌", chapter: null, Icon: BookHeart, end: false },
+  { to: "/archive", label: "靈魂典藏館", chapter: "05", Icon: FolderOpen, end: false },
 ];
 
 export default function Layout() {

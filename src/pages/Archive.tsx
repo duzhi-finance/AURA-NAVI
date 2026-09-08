@@ -324,11 +324,11 @@ function ProfileCard({
 }
 
 const DEEP_TALENT_FIELDS: { key: keyof TalentProfile; label: string }[] = [
-  { key: "core_resonance_nuance", label: "核心共鳴與性格細微差異" },
-  { key: "hidden_personality", label: "對方的隱藏性格" },
   { key: "totem_animal", label: "力量動物" },
-  { key: "hidden_push_psi", label: "隱藏推動（PSI）" },
   { key: "wavespell", label: "波符" },
+  { key: "hidden_push_psi", label: "隱藏推動（PSI）" },
+  { key: "core_resonance_nuance", label: "核心共鳴與細微差異" },
+  { key: "hidden_personality", label: "隱藏性格" },
   { key: "support_challenge_energy", label: "支持能量與挑戰擴展" },
 ];
 

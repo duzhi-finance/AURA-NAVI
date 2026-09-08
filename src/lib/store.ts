@@ -1,4 +1,5 @@
 import type { TalentProfile } from "../types/talent";
+import { computeDeepTalent } from "./deepTalent";
 
 const STORAGE_KEY = "aura-navi:talent_profiles";
 
@@ -76,12 +77,7 @@ const DEMO_PROFILES: TalentProfile[] = [
     life_path_num: null,
     core_traits_tags: [],
     relationship_notes: "",
-    core_resonance_nuance: "",
-    hidden_personality: "",
-    totem_animal: "",
-    hidden_push_psi: "",
-    wavespell: "",
-    support_challenge_energy: "",
+    ...computeDeepTalent(215 - 1),
     created_at: new Date(2026, 0, 1).toISOString(),
   },
 ];

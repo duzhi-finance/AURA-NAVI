@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { TalentProfile } from "../types/talent";
 import { MAYA_TONES, MAYA_TOTEMS } from "../lib/mayaOptions";
+import { computeDeepTalent, type DeepTalentData } from "../lib/deepTalent";
+import { computeKinFromBirthdate } from "../lib/dreamspellKin";
 import { createProfileId } from "../lib/store";
 
 interface Props {
@@ -9,10 +11,29 @@ interface Props {
   onClose: () => void;
 }
 
+const EMPTY_DEEP_TALENT: DeepTalentData = {
+  core_resonance_nuance: "",
+  hidden_personality: "",
+  totem_animal: "",
+  hidden_push_psi: "",
+  wavespell: "",
+  support_challenge_energy: "",
+};
+
+const DEEP_TALENT_LABELS: { key: keyof DeepTalentData; label: string }[] = [
+  { key: "totem_animal", label: "力量動物" },
+  { key: "wavespell", label: "波符" },
+  { key: "hidden_push_psi", label: "隱藏推動（PSI）" },
+  { key: "core_resonance_nuance", label: "核心共鳴與細微差異" },
+  { key: "hidden_personality", label: "隱藏性格" },
+  { key: "support_challenge_energy", label: "支持能量與挑戰擴展" },
+];
+
 export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
   const [profileType, setProfileType] = useState(initial?.profile_type ?? "");
   const [isSelf, setIsSelf] = useState(initial?.is_self ?? false);
   const [nameAlias, setNameAlias] = useState(initial?.name_alias ?? "");
+  const [birthdate, setBirthdate] = useState("");
   const [kin, setKin] = useState(initial?.maya_kin != null ? String(initial.maya_kin) : "");
   const [tone, setTone] = useState(initial?.maya_tone ?? "");
   const [totem, setTotem] = useState(initial?.maya_totem ?? "");
@@ -21,18 +42,23 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
   );
   const [tags, setTags] = useState(initial?.core_traits_tags.join("、") ?? "");
   const [notes, setNotes] = useState(initial?.relationship_notes ?? "");
-  const [coreResonanceNuance, setCoreResonanceNuance] = useState(
-    initial?.core_resonance_nuance ?? ""
-  );
-  const [hiddenPersonality, setHiddenPersonality] = useState(initial?.hidden_personality ?? "");
-  const [totemAnimal, setTotemAnimal] = useState(initial?.totem_animal ?? "");
-  const [hiddenPushPsi, setHiddenPushPsi] = useState(initial?.hidden_push_psi ?? "");
-  const [wavespell, setWavespell] = useState(initial?.wavespell ?? "");
-  const [supportChallengeEnergy, setSupportChallengeEnergy] = useState(
-    initial?.support_challenge_energy ?? ""
-  );
 
   const isEditing = Boolean(initial);
+
+  const deepTalent = useMemo<DeepTalentData>(() => {
+    if (!kin.trim()) return EMPTY_DEEP_TALENT;
+    return computeDeepTalent(Number(kin) - 1);
+  }, [kin]);
+
+  function handleBirthdateChange(value: string) {
+    setBirthdate(value);
+    if (!value) return;
+    const [y, m, d] = value.split("-").map(Number);
+    const result = computeKinFromBirthdate(y, m, d);
+    setKin(String(result.kin));
+    setTone(result.tone);
+    setTotem(result.totem);
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -52,12 +78,7 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
         .map((t) => t.trim())
         .filter(Boolean),
       relationship_notes: notes.trim(),
-      core_resonance_nuance: coreResonanceNuance.trim(),
-      hidden_personality: hiddenPersonality.trim(),
-      totem_animal: totemAnimal.trim(),
-      hidden_push_psi: hiddenPushPsi.trim(),
-      wavespell: wavespell.trim(),
-      support_challenge_energy: supportChallengeEnergy.trim(),
+      ...deepTalent,
       created_at: initial?.created_at ?? new Date().toISOString(),
     };
     onSave(profile);
@@ -97,6 +118,15 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
               onChange={(e) => setNameAlias(e.target.value)}
               className="input-base"
               required
+            />
+          </Field>
+
+          <Field label="出生年月日（選填，自動算定天賦資料）">
+            <input
+              type="date"
+              value={birthdate}
+              onChange={(e) => handleBirthdateChange(e.target.value)}
+              className="input-base"
             />
           </Field>
 
@@ -160,53 +190,26 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
             />
           </Field>
 
-          <details className="group rounded-xl border border-border px-4 py-3">
-            <summary className="cursor-pointer text-sm text-text-secondary select-none">
-              瑪雅深度天賦模組（選填）
+          <details className="group rounded-xl border border-border px-4 py-3" open={Boolean(kin.trim())}>
+            <summary className="cursor-pointer text-sm text-luxe-gold select-none">
+              ✦ 系統已自動對焦星軌數據（自動生成）
             </summary>
-            <div className="flex flex-col gap-4 mt-4">
-              <Field label="核心共鳴與性格細微差異">
-                <textarea
-                  value={coreResonanceNuance}
-                  onChange={(e) => setCoreResonanceNuance(e.target.value)}
-                  className="input-base min-h-16 resize-y"
-                />
-              </Field>
-              <Field label="對方的隱藏性格">
-                <textarea
-                  value={hiddenPersonality}
-                  onChange={(e) => setHiddenPersonality(e.target.value)}
-                  className="input-base min-h-16 resize-y"
-                />
-              </Field>
-              <Field label="力量動物（Totem Animal）">
-                <input
-                  value={totemAnimal}
-                  onChange={(e) => setTotemAnimal(e.target.value)}
-                  className="input-base"
-                />
-              </Field>
-              <Field label="隱藏推動（PSI / Hidden Push）">
-                <input
-                  value={hiddenPushPsi}
-                  onChange={(e) => setHiddenPushPsi(e.target.value)}
-                  className="input-base"
-                />
-              </Field>
-              <Field label="波符（Wavespell）">
-                <input
-                  value={wavespell}
-                  onChange={(e) => setWavespell(e.target.value)}
-                  className="input-base"
-                />
-              </Field>
-              <Field label="支持能量與挑戰擴展（Analog & Antipodal Energy）">
-                <textarea
-                  value={supportChallengeEnergy}
-                  onChange={(e) => setSupportChallengeEnergy(e.target.value)}
-                  className="input-base min-h-16 resize-y"
-                />
-              </Field>
+            <div className="flex flex-col gap-3 mt-4">
+              {kin.trim() ? (
+                DEEP_TALENT_LABELS.map(({ key, label }) => (
+                  <div
+                    key={key}
+                    className="rounded-lg bg-bg border border-border px-3 py-2.5 text-xs"
+                  >
+                    <span className="text-text-tertiary">{label}：</span>
+                    <span className="text-text-secondary">{deepTalent[key]}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-text-tertiary leading-relaxed">
+                  請先填寫出生年月日或 KIN 碼，系統將自動算出力量動物、波符、PSI 等深度天賦資料。
+                </p>
+              )}
             </div>
           </details>
 
