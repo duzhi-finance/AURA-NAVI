@@ -1,6 +1,7 @@
 import { ArrowRight, ExternalLink, FolderOpen, SendHorizonal, type LucideIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import DailyCardDraw from "../components/DailyCardDraw";
 import PageHeader from "../components/PageHeader";
 import { formatDateLabel, getTodayFrequency } from "../lib/dailyFrequency";
 import { GLOWING_URL } from "../lib/promptTemplates";
@@ -81,6 +82,10 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="mt-5">
+        <DailyCardDraw />
       </div>
 
       <div className="mt-10">

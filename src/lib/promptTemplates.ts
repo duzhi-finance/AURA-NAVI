@@ -1,3 +1,4 @@
+import type { DailyCard } from "./dailyCard";
 import type { LifeDomain, PromptTemplate, TalentProfile } from "../types/talent";
 import { PROFILE_TYPE_LABEL } from "./mayaOptions";
 
@@ -17,7 +18,7 @@ export const CONTEXT_PRESETS = ["溝通缺乏共識", "工作找不到動力", "
 const BASE_TEMPLATE_TEXT = `你現在是一位精通星際瑪雅曆（Dreamspell）、生命靈數與職場/人際心理學的「高維生命導航員」。
 
 我已經附上我從 glowing.cc 下載的個人星系印記圖卡（包含主印記、圖騰、波符、力量動物等資訊）。
-{{ Profile_Reference }}
+{{ Profile_Reference }}{{ Daily_Card_Reference }}
 請幫我閱讀這張圖片中的所有資料，並為我進行深度解析。請依據以下四大模組輸出：
 
 ---
@@ -63,13 +64,20 @@ function profileReferenceLine(selfProfile?: TalentProfile | null): string {
   return `（我在系統中預先典藏的資料供你參考核對：${parts.join("、")}）\n`;
 }
 
+function dailyCardReferenceLine(dailyCard?: DailyCard | null): string {
+  if (!dailyCard) return "";
+  return `* 今日對焦牌卡：${dailyCard.name}（${dailyCard.insight}）\n`;
+}
+
 export function generateNavigationPrompt(
   domain: LifeDomain,
   contextDescription: string,
-  selfProfile?: TalentProfile | null
+  selfProfile?: TalentProfile | null,
+  dailyCard?: DailyCard | null
 ): string {
   return BASE_TEMPLATE_TEXT
     .replace("{{ Profile_Reference }}", profileReferenceLine(selfProfile))
+    .replace("{{ Daily_Card_Reference }}", dailyCardReferenceLine(dailyCard))
     .replace("{{ Life_Domain }}", LIFE_DOMAIN_LABEL[domain])
     .replace("{{ Context_Description }}", contextDescription.trim() || "（尚未填寫）")
     .replace(/\n{3,}/g, "\n\n");

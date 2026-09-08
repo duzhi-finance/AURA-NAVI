@@ -124,3 +124,32 @@ h3 {
   background: var(--color-surface-hover);
   color: var(--color-text-primary);
 }
+
+.card-flip-scene {
+  perspective: 1200px;
+}
+.card-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.card-flip-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+.card-flip-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.card-flip-front {
+  transform: rotateY(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-flip-inner {
+    transition: none;
+  }
+}

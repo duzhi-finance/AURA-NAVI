@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import CopyPromptBlock from "../components/CopyPromptBlock";
 import GeminiButton from "../components/GeminiButton";
 import PageHeader from "../components/PageHeader";
+import { getTodayCard } from "../lib/dailyCard";
 import { CONTEXT_PRESETS, LIFE_DOMAIN_OPTIONS, generateNavigationPrompt } from "../lib/promptTemplates";
 import { getSelfProfile } from "../lib/store";
 import type { LifeDomain } from "../types/talent";
@@ -16,6 +17,7 @@ export default function PromptStation() {
   const [domain, setDomain] = useState<LifeDomain | null>(null);
   const [context, setContext] = useState("");
   const selfProfile = useMemo(() => getSelfProfile(), []);
+  const dailyCard = useMemo(() => getTodayCard(), []);
 
   useEffect(() => {
     const state = location.state as PromptStationNavState | null;
@@ -28,8 +30,8 @@ export default function PromptStation() {
 
   const prompt = useMemo(() => {
     if (!domain) return "";
-    return generateNavigationPrompt(domain, context, selfProfile);
-  }, [domain, context, selfProfile]);
+    return generateNavigationPrompt(domain, context, selfProfile, dailyCard);
+  }, [domain, context, selfProfile, dailyCard]);
 
   const step = !domain ? 1 : !context.trim() ? 2 : 3;
 
