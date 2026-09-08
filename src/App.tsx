@@ -6,6 +6,7 @@ import PromptStation from "./pages/PromptStation";
 import Archive from "./pages/Archive";
 import SoulJournalPage from "./pages/SoulJournalPage";
 import TeamDnaPage from "./pages/TeamDnaPage";
+import SalesPage from "./pages/SalesPage";
 import { ensureSeedProfiles } from "./lib/store";
 
 ensureSeedProfiles();
@@ -15,6 +16,7 @@ export default function App() {
     <HashRouter>
       <Routes>
         <Route path="team-dna" element={<TeamDnaPage />} />
+        <Route path="about" element={<SalesPage />} />
         <Route element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="relations" element={<RelationHub />} />

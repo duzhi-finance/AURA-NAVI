@@ -2,6 +2,7 @@ import { ArrowRight, BookHeart, ChevronRight, ExternalLink, FolderOpen, SendHori
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import DailyCardDraw from "../components/DailyCardDraw";
+import { PullQuote, VerticalMicrocopy } from "../components/Editorial";
 import PageHeader from "../components/PageHeader";
 import { formatBilingualDateLabel, getTodayFrequency } from "../lib/dailyFrequency";
 import { GLOWING_URL } from "../lib/promptTemplates";
@@ -33,7 +34,8 @@ export default function Dashboard() {
       />
 
       <div className="grid gap-5 md:grid-cols-2">
-        <div className="panel p-7 flex flex-col gap-4">
+        <div className="panel p-7 flex flex-col gap-4 relative overflow-hidden">
+          <VerticalMicrocopy text="THE SOUL FREQUENCY" className="top-7 right-3" />
           <div className="text-xs text-text-tertiary">{formatBilingualDateLabel()}</div>
           <div className="flex items-center gap-4">
             <frequency.Icon size={36} strokeWidth={1.25} className={frequency.colorClass} />
@@ -89,10 +91,15 @@ export default function Dashboard() {
         <DailyCardDraw />
       </div>
 
+      <div className="mt-8 px-2 text-center">
+        <PullQuote>從老鷹飛翔切換成孔雀展示：收回掌控手把，將自己活成優雅閃耀的示範者。</PullQuote>
+      </div>
+
       <Link
         to="/journal"
-        className="card-luxe card-halo card-hover mt-5 flex items-center gap-5 p-7 transition-all hover:opacity-90"
+        className="card-luxe card-halo card-hover mt-8 flex items-center gap-5 p-7 relative overflow-hidden transition-all hover:opacity-90"
       >
+        <VerticalMicrocopy text="MANIFESTATION DAY" className="top-7 right-3" />
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-bg border border-border shrink-0">
           <BookHeart size={24} strokeWidth={1.25} className="text-luxe-gold" />
         </div>

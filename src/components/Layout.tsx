@@ -1,29 +1,41 @@
 import { BookHeart, Compass, FolderOpen, SendHorizonal, Users } from "lucide-react";
-import { NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
+import { IssueLabel } from "./Editorial";
 import Footer from "./Footer";
 
 const NAV_ITEMS = [
-  { to: "/", label: "星軌儀表板", Icon: Compass, end: true },
-  { to: "/relations", label: "頻率藝廊", Icon: Users, end: false },
-  { to: "/prompt-station", label: "策略樞紐", Icon: SendHorizonal, end: false },
-  { to: "/journal", label: "靈魂日誌", Icon: BookHeart, end: false },
-  { to: "/archive", label: "靈魂典藏館", Icon: FolderOpen, end: false },
+  { to: "/", label: "星軌儀表板", chapter: "01", Icon: Compass, end: true },
+  { to: "/archive", label: "靈魂典藏館", chapter: "02", Icon: FolderOpen, end: false },
+  { to: "/relations", label: "頻率藝廊", chapter: "03", Icon: Users, end: false },
+  { to: "/prompt-station", label: "策略樞紐", chapter: "04", Icon: SendHorizonal, end: false },
+  { to: "/journal", label: "靈魂日誌", chapter: null, Icon: BookHeart, end: false },
 ];
 
 export default function Layout() {
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-bg">
       <aside className="hidden md:flex md:w-64 md:flex-col md:border-r md:border-border md:p-7 md:gap-10">
-        <Brand />
+        <div className="flex flex-col gap-3">
+          <IssueLabel text="AURA-Navi Journal ── ISSUE VOL.01 / AUTUMN" />
+          <Brand />
+        </div>
         <nav className="flex flex-col gap-1">
           {NAV_ITEMS.map((item) => (
             <NavItem key={item.to} {...item} />
           ))}
         </nav>
+
+        <Link
+          to="/about"
+          className="mt-auto text-[11px] text-text-tertiary hover:text-text-secondary underline"
+        >
+          認識 AURA-Navi Journal
+        </Link>
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
         <header className="md:hidden flex flex-col gap-2 px-5 py-5 border-b border-border">
+          <IssueLabel text="AURA-Navi Journal ── ISSUE VOL.01 / AUTUMN" />
           <Brand compact />
         </header>
 
@@ -67,11 +79,13 @@ function Brand({ compact }: { compact?: boolean }) {
 function NavItem({
   to,
   label,
+  chapter,
   Icon,
   end,
 }: {
   to: string;
   label: string;
+  chapter: string | null;
   Icon: typeof Compass;
   end: boolean;
 }) {
@@ -88,6 +102,11 @@ function NavItem({
       }
     >
       <Icon size={17} strokeWidth={1.5} />
+      {chapter && (
+        <span className="font-sans text-[10px] font-light tracking-[0.1em] text-text-tertiary">
+          {chapter}
+        </span>
+      )}
       <span>{label}</span>
     </NavLink>
   );
@@ -101,6 +120,7 @@ function MobileNavItem({
 }: {
   to: string;
   label: string;
+  chapter?: string | null;
   Icon: typeof Compass;
   end: boolean;
 }) {

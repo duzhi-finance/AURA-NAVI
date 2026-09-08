@@ -1,6 +1,7 @@
 import { Compass, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { IssueLabel } from "../components/Editorial";
 import Footer from "../components/Footer";
 import TotemEmblem from "../components/TotemEmblem";
 import { computeKinFromBirthdate, type DreamspellResult } from "../lib/dreamspellKin";
@@ -22,6 +23,9 @@ export default function TeamDnaPage() {
   return (
     <div className="min-h-screen flex items-center justify-center px-5 py-16 bg-bg">
       <div className="w-full max-w-md">
+        <div className="text-center mb-3">
+          <IssueLabel text="AURA-Navi Journal ── ISSUE VOL.01 / AUTUMN" className="justify-center inline-flex" />
+        </div>
         <div className="flex items-center justify-center gap-2 mb-8">
           <Compass size={20} strokeWidth={1.5} className="text-text-primary" />
           <span className="font-serif text-text-primary">AURA-Navi</span>
@@ -84,7 +88,7 @@ export default function TeamDnaPage() {
         )}
 
         <div className="text-center mt-10">
-          <Link to="/" className="text-xs text-text-tertiary hover:text-text-secondary underline">
+          <Link to="/about" className="text-xs text-text-tertiary hover:text-text-secondary underline">
             了解更多關於 AURA-Navi
           </Link>
         </div>
