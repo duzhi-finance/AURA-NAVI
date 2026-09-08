@@ -1,16 +1,20 @@
+import { BookHeart } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import CopyPromptBlock from "../components/CopyPromptBlock";
 import GeminiButton from "../components/GeminiButton";
 import PageHeader from "../components/PageHeader";
+import Toast from "../components/Toast";
 import { getTodayCard } from "../lib/dailyCard";
 import {
+  LIFE_DOMAIN_LABEL,
   LIFE_DOMAIN_OPTIONS,
   RELATIONSHIP_STATUS_DOMAINS,
   RELATIONSHIP_STATUS_OPTIONS,
   ROMANCE_SINGLE_PRESETS,
   generateNavigationPrompt,
 } from "../lib/promptTemplates";
+import { addSoulJournalEntry } from "../lib/soulJournal";
 import { getSelfProfile } from "../lib/store";
 import type { LifeDomain, RelationshipStatus } from "../types/talent";
 
@@ -23,6 +27,7 @@ export default function PromptStation() {
   const [domain, setDomain] = useState<LifeDomain | null>(null);
   const [relationshipStatus, setRelationshipStatus] = useState<RelationshipStatus | null>(null);
   const [context, setContext] = useState("");
+  const [journalToast, setJournalToast] = useState("");
   const selfProfile = useMemo(() => getSelfProfile(), []);
   const dailyCard = useMemo(() => getTodayCard(), []);
 
@@ -58,6 +63,18 @@ export default function PromptStation() {
   const step = !domain ? 1 : !context.trim() ? 2 : 3;
 
   const presets = domain === "Romance" && relationshipStatus === "Single" ? ROMANCE_SINGLE_PRESETS : [];
+
+  function handleSaveToJournal() {
+    if (!domain) return;
+    addSoulJournalEntry({
+      domain,
+      domainLabel: LIFE_DOMAIN_LABEL[domain],
+      context: context.trim(),
+      relationshipStatus: showRelationshipStatus ? relationshipStatus : null,
+    });
+    setJournalToast("已存入靈魂日誌。");
+    setTimeout(() => setJournalToast(""), 2000);
+  }
 
   return (
     <div>
@@ -140,7 +157,16 @@ export default function PromptStation() {
             <StepLabel n={3} title="複製導航指令並前往 Gemini" />
             <div className="mt-4 flex flex-col gap-4">
               {domain ? (
-                <CopyPromptBlock text={prompt} />
+                <>
+                  <CopyPromptBlock text={prompt} />
+                  <button
+                    onClick={handleSaveToJournal}
+                    className="btn-secondary border border-border self-start"
+                  >
+                    <BookHeart size={14} strokeWidth={1.75} />
+                    存入今日個人觀照
+                  </button>
+                </>
               ) : (
                 <div className="panel p-8 text-center text-sm text-text-tertiary">
                   完成步驟 1、2 後，將於此處生成完整指令
@@ -157,6 +183,8 @@ export default function PromptStation() {
           </section>
         </div>
       </div>
+
+      <Toast message={journalToast} show={Boolean(journalToast)} />
     </div>
   );
 }

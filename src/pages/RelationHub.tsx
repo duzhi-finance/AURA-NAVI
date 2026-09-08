@@ -2,9 +2,11 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import CopyPromptBlock from "../components/CopyPromptBlock";
+import FrequencyRadar from "../components/FrequencyRadar";
 import GeminiButton from "../components/GeminiButton";
 import PageHeader from "../components/PageHeader";
 import TotemEmblem from "../components/TotemEmblem";
+import { computeCompatibility } from "../lib/compatibility";
 import { MAYA_TOTEMS } from "../lib/mayaOptions";
 import { generateRelationPrompt } from "../lib/promptTemplates";
 import { getProfile, listProfiles } from "../lib/store";
@@ -37,6 +39,11 @@ export default function RelationHub() {
   const prompt = useMemo(() => {
     if (!selfProfile || !targetProfile) return "";
     return generateRelationPrompt(selfProfile, targetProfile);
+  }, [selfProfile, targetProfile]);
+
+  const radarAxes = useMemo(() => {
+    if (!selfProfile || !targetProfile) return null;
+    return computeCompatibility(selfProfile, targetProfile);
   }, [selfProfile, targetProfile]);
 
   if (!selfProfile || !targetProfile) {
@@ -76,6 +83,16 @@ export default function RelationHub() {
         <PortraitFrame profile={targetProfile} label={targetProfile.profile_type || "對象"} />
       </div>
 
+      {radarAxes && (
+        <div className="panel p-8 mt-6 flex flex-col items-center">
+          <p className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary mb-1">
+            Frequency Radar
+          </p>
+          <p className="text-sm text-text-secondary mb-4">四維能量相容度</p>
+          <FrequencyRadar axes={radarAxes} size={280} />
+        </div>
+      )}
+
       <ResonanceJunction self={selfProfile} target={targetProfile} />
 
       <div className="mt-6">
@@ -101,7 +118,7 @@ function PortraitFrame({ profile, label }: { profile: TalentProfile; label: stri
       <TotemEmblem seed={seed >= 0 ? seed : 0} size={84} className="text-luxe-gold my-1" />
       <div className="text-xl font-serif font-semibold text-text-primary">{profile.name_alias}</div>
       <div className="flex flex-wrap justify-center gap-2 text-xs text-text-secondary mt-1">
-        <span className="rounded-lg bg-bg border border-border px-2 py-1">KIN {profile.maya_kin ?? "—"}</span>
+        <span className="rounded-lg bg-bg border border-border px-2 py-1 font-serif">KIN {profile.maya_kin ?? "—"}</span>
         <span className="rounded-lg bg-bg border border-border px-2 py-1">{profile.maya_totem || "圖騰未填"}</span>
         <span className="rounded-lg bg-bg border border-border px-2 py-1">{profile.maya_tone || "音調未填"}</span>
       </div>

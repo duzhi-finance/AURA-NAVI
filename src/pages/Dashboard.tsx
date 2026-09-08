@@ -1,16 +1,18 @@
-import { ArrowRight, ExternalLink, FolderOpen, SendHorizonal, type LucideIcon } from "lucide-react";
+import { ArrowRight, BookHeart, ExternalLink, FolderOpen, SendHorizonal, type LucideIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import DailyCardDraw from "../components/DailyCardDraw";
 import PageHeader from "../components/PageHeader";
 import { formatBilingualDateLabel, getTodayFrequency } from "../lib/dailyFrequency";
 import { GLOWING_URL } from "../lib/promptTemplates";
+import { formatJournalDate, getSoulJournal, type SoulJournalEntry } from "../lib/soulJournal";
 import { getSelfProfile } from "../lib/store";
 import type { TalentProfile } from "../types/talent";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [selfProfile, setSelfProfile] = useState<TalentProfile | undefined>(undefined);
+  const [journal, setJournal] = useState<SoulJournalEntry[]>([]);
   const frequency = getTodayFrequency();
 
   function handleBringTodayEnergy() {
@@ -21,6 +23,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     setSelfProfile(getSelfProfile());
+    setJournal(getSoulJournal());
   }, []);
 
   return (
@@ -62,7 +65,7 @@ export default function Dashboard() {
                 {selfProfile.name_alias}
               </div>
               <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-text-secondary">
-                <div className="rounded-lg bg-bg border border-border px-2 py-2 text-center">
+                <div className="rounded-lg bg-bg border border-border px-2 py-2 text-center font-serif">
                   KIN {selfProfile.maya_kin ?? "—"}
                 </div>
                 <div className="rounded-lg bg-bg border border-border px-2 py-2 text-center">
@@ -87,6 +90,31 @@ export default function Dashboard() {
       <div className="mt-5">
         <DailyCardDraw />
       </div>
+
+      {journal.length > 0 && (
+        <div className="panel p-7 mt-5">
+          <div className="flex items-center gap-2 text-xs text-text-tertiary mb-4">
+            <BookHeart size={14} strokeWidth={1.75} />
+            靈魂共振日誌
+          </div>
+          <div className="flex flex-col gap-2 max-h-56 overflow-y-auto pr-1">
+            {journal.slice(0, 10).map((entry) => (
+              <div
+                key={entry.id}
+                className="flex items-start justify-between gap-3 text-xs rounded-lg bg-bg border border-border px-3 py-2.5"
+              >
+                <div className="min-w-0">
+                  <span className="text-text-primary font-medium">{entry.domainLabel}</span>
+                  {entry.context && (
+                    <p className="text-text-secondary mt-0.5 truncate">{entry.context}</p>
+                  )}
+                </div>
+                <span className="text-text-tertiary shrink-0">{formatJournalDate(entry.created_at)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mt-10">
         <h2 className="text-sm font-medium text-text-secondary mb-4">快捷引導</h2>

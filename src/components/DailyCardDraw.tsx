@@ -1,18 +1,37 @@
-import { Sparkles } from "lucide-react";
+import { Download, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { cardSeedIndex, drawTodayCard, getCardLog, getTodayCard, type DailyCard } from "../lib/dailyCard";
+import { formatBilingualDateLabel, getTodayFrequency } from "../lib/dailyFrequency";
+import { exportDailyStoryCard } from "../lib/storyCard";
 import TotemEmblem from "./TotemEmblem";
 
 export default function DailyCardDraw() {
   const [card, setCard] = useState<DailyCard | null>(() => getTodayCard());
   const [isFlipped, setIsFlipped] = useState<boolean>(() => card !== null);
   const [log, setLog] = useState(() => getCardLog());
+  const [isExporting, setIsExporting] = useState(false);
 
   function handleDraw() {
     const drawn = drawTodayCard();
     setCard(drawn);
     setIsFlipped(true);
     setLog(getCardLog());
+  }
+
+  async function handleExportStoryCard() {
+    if (!card || isExporting) return;
+    setIsExporting(true);
+    try {
+      const frequency = getTodayFrequency();
+      await exportDailyStoryCard({
+        dateLabel: formatBilingualDateLabel(),
+        frequencyLabel: frequency.label,
+        frequencyColor: frequency.colorHex,
+        card,
+      });
+    } finally {
+      setIsExporting(false);
+    }
   }
 
   return (
@@ -48,6 +67,17 @@ export default function DailyCardDraw() {
           ? "今日已完成抽牌，明天將重新開啟新的一輪。"
           : "每天限抽一張，抽出後將維持顯示一整天。"}
       </p>
+
+      {card && (
+        <button
+          onClick={handleExportStoryCard}
+          disabled={isExporting}
+          className="btn-secondary border border-border mt-4 disabled:opacity-50"
+        >
+          <Download size={14} strokeWidth={1.75} />
+          {isExporting ? "圖卡生成中…" : "匯出今日星軌限動圖卡"}
+        </button>
+      )}
 
       {log.length > 0 && (
         <div className="mt-6 pt-5 border-t border-border">

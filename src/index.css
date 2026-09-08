@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  --font-serif: "Noto Serif TC", "Songti TC", "STSong", serif;
+  --font-serif: "Cormorant Garamond", "Cinzel", "Noto Serif TC", "Songti TC", serif;
   --font-sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
 
-  --color-bg: #ffffff;
-  --color-bg-subtle: #f9f9f7;
-  --color-surface: #f2f2f0;
-  --color-surface-hover: #eaeae7;
-  --color-border: #e4e3df;
+  --color-bg: #faf9f6;
+  --color-bg-subtle: #f5f3ee;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f5f3ee;
+  --color-border: #eae8e3;
 
-  --color-text-primary: #222222;
+  --color-text-primary: #2c2c2a;
   --color-text-secondary: #888888;
   --color-text-tertiary: #a0a0a0;
 
@@ -38,7 +38,7 @@ body {
   background: var(--color-bg);
   color: var(--color-text-primary);
   font-family: var(--font-sans);
-  font-weight: 400;
+  font-weight: 300;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
@@ -71,6 +71,7 @@ h3 {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
 }
 
 .notice-pink {

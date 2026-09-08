@@ -258,7 +258,7 @@ function ProfileCard({
 
       <div className="grid grid-cols-2 gap-2 text-xs text-text-secondary relative">
         <div className="rounded-lg bg-bg border border-border px-2.5 py-1.5">
-          KIN：{profile.maya_kin ?? "—"}
+          <span className="font-serif">KIN：{profile.maya_kin ?? "—"}</span>
         </div>
         <div className="rounded-lg bg-bg border border-border px-2.5 py-1.5">
           音調：{profile.maya_tone || "—"}

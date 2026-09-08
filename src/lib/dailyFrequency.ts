@@ -7,6 +7,8 @@ export interface DailyFrequency {
   Icon: LucideIcon;
   description: string;
   colorClass: string;
+  /** Same value as colorClass's CSS token, for contexts (e.g. canvas) that can't read CSS vars. */
+  colorHex: string;
 }
 
 const FREQUENCIES: DailyFrequency[] = [
@@ -16,6 +18,7 @@ const FREQUENCIES: DailyFrequency[] = [
     Icon: Zap,
     description: "能量高漲，適合主動出擊、表達自我、推進重要決策。",
     colorClass: "text-freq-attack",
+    colorHex: "#b5533c",
   },
   {
     key: "rest",
@@ -23,6 +26,7 @@ const FREQUENCIES: DailyFrequency[] = [
     Icon: Moon,
     description: "頻率內收，適合休息、覆盤與整理內在，避免衝動決定。",
     colorClass: "text-freq-rest",
+    colorHex: "#5b7a99",
   },
   {
     key: "sync",
@@ -30,6 +34,7 @@ const FREQUENCIES: DailyFrequency[] = [
     Icon: Sparkles,
     description: "同步性強，容易遇見巧合與關鍵訊息，適合連結與溝通。",
     colorClass: "text-freq-sync",
+    colorHex: "#a98b4a",
   },
 ];
 
