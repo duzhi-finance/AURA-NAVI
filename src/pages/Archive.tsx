@@ -1,9 +1,11 @@
-import { Download, FolderOpen, Pencil, Plus, Trash2, Upload } from "lucide-react";
+import { ArrowRight, Check, Download, Pencil, Plus, Sparkles, Trash2, Upload } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
 import ProfileFormModal from "../components/ProfileFormModal";
+import TotemEmblem from "../components/TotemEmblem";
 import Toast from "../components/Toast";
-import { PROFILE_TYPE_LABEL } from "../lib/mayaOptions";
+import { MAYA_TOTEMS } from "../lib/mayaOptions";
 import {
   deleteProfile,
   exportProfilesAsJson,
@@ -14,10 +16,12 @@ import {
 import type { TalentProfile } from "../types/talent";
 
 export default function Archive() {
+  const navigate = useNavigate();
   const [profiles, setProfiles] = useState<TalentProfile[]>([]);
   const [editing, setEditing] = useState<TalentProfile | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -41,8 +45,9 @@ export default function Archive() {
   }
 
   function handleDelete(id: string) {
-    if (!confirm("確定要刪除這個天賦檔案嗎？")) return;
+    if (!confirm("確定要刪除這個靈魂印記嗎？")) return;
     deleteProfile(id);
+    setSelectedIds((ids) => ids.filter((i) => i !== id));
     refresh();
   }
 
@@ -66,7 +71,7 @@ export default function Archive() {
       const result = importProfilesFromJson(content);
       if (result.success) {
         refresh();
-        showToast(`已匯入 ${result.count} 筆天賦檔案。`);
+        showToast(`已匯入 ${result.count} 筆靈魂印記。`);
       } else {
         showToast(result.error ?? "匯入失敗，請確認檔案格式。");
       }
@@ -74,34 +79,37 @@ export default function Archive() {
     reader.readAsText(file);
   }
 
+  function toggleSelect(id: string) {
+    setSelectedIds((ids) => {
+      if (ids.includes(id)) return ids.filter((i) => i !== id);
+      if (ids.length >= 2) return [ids[1], id];
+      return [...ids, id];
+    });
+  }
+
+  function handleCompare() {
+    if (selectedIds.length !== 2) return;
+    navigate("/relations", { state: { selfId: selectedIds[0], targetId: selectedIds[1] } });
+  }
+
   return (
     <div>
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <PageHeader
-          eyebrow="Talent DNA Archive"
-          title="天賦檔案典藏庫"
-          description="典藏你與所有重要關係人的天賦設定檔，隨時檢視瑪雅圖騰與個性說明書。"
+          eyebrow="The Soul DNA Vault"
+          title="靈魂印記典藏館"
+          description="典藏你與所有重要關係人的靈魂印記，隨時檢視瑪雅圖騰與個性說明書。選取兩張印記，即可前往頻率共振藝廊比對。"
         />
-        <button
-          onClick={() => {
-            setEditing(null);
-            setShowForm(true);
-          }}
-          className="btn-primary whitespace-nowrap"
-        >
-          <Plus size={16} strokeWidth={1.75} />
-          新增檔案
-        </button>
       </div>
 
-      <div className="panel px-5 py-4 mb-8 flex items-center justify-between gap-4 flex-wrap">
-        <p className="text-xs text-text-tertiary">資料僅儲存於本機。更換裝置前請先備份。</p>
+      <div className="notice-pink px-5 py-4 mb-10 flex items-center justify-between gap-4 flex-wrap">
+        <p className="text-xs">資料僅儲存於本機。更換裝置前請先備份。</p>
         <div className="flex gap-2">
-          <button onClick={handleExport} className="btn-secondary border border-border">
+          <button onClick={handleExport} className="btn-secondary border border-notice-border !text-notice-text">
             <Download size={14} strokeWidth={1.75} />
             匯出 JSON 備份
           </button>
-          <button onClick={handleImportClick} className="btn-secondary border border-border">
+          <button onClick={handleImportClick} className="btn-secondary border border-notice-border !text-notice-text">
             <Upload size={14} strokeWidth={1.75} />
             匯入備份檔案
           </button>
@@ -115,12 +123,23 @@ export default function Archive() {
         </div>
       </div>
 
+      <button
+        onClick={() => {
+          setEditing(null);
+          setShowForm(true);
+        }}
+        className="card-luxe w-full flex items-center justify-center gap-2.5 py-6 mb-10 text-sm font-medium text-text-primary hover:opacity-80 transition-opacity"
+      >
+        <Plus size={18} strokeWidth={1.75} />
+        新增靈魂印記
+      </button>
+
       {profiles.length === 0 ? (
         <div className="panel p-12 text-center text-text-secondary">
-          <FolderOpen size={40} strokeWidth={1.25} className="mx-auto mb-4 text-text-tertiary" />
-          <p>還沒有任何天賦檔案</p>
+          <Sparkles size={40} strokeWidth={1.25} className="mx-auto mb-4 text-text-tertiary" />
+          <p>還沒有任何靈魂印記</p>
           <p className="text-sm text-text-tertiary mt-1.5">
-            先建立「自己」的檔案，再逐步新增伴侶、家人、主管等重要關係人。
+            先建立「自己」的印記，再逐步新增伴侶、家人、主管等重要關係人。
           </p>
         </div>
       ) : (
@@ -129,6 +148,8 @@ export default function Archive() {
             <ProfileCard
               key={p.profile_id}
               profile={p}
+              selected={selectedIds.includes(p.profile_id)}
+              onSelect={() => toggleSelect(p.profile_id)}
               onEdit={() => {
                 setEditing(p);
                 setShowForm(true);
@@ -136,6 +157,15 @@ export default function Archive() {
               onDelete={() => handleDelete(p.profile_id)}
             />
           ))}
+        </div>
+      )}
+
+      {selectedIds.length === 2 && (
+        <div className="fixed bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-20">
+          <button onClick={handleCompare} className="btn-primary shadow-lg">
+            前往頻率共振藝廊比對
+            <ArrowRight size={16} strokeWidth={1.75} />
+          </button>
         </div>
       )}
 
@@ -157,37 +187,76 @@ export default function Archive() {
 
 function ProfileCard({
   profile,
+  selected,
+  onSelect,
   onEdit,
   onDelete,
 }: {
   profile: TalentProfile;
+  selected: boolean;
+  onSelect: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }) {
+  const seed = MAYA_TOTEMS.indexOf(profile.maya_totem);
+
   return (
-    <div className="panel p-6 flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+    <div
+      onClick={onSelect}
+      className={`relative p-6 flex flex-col gap-4 cursor-pointer transition-shadow rounded-[20px] ${
+        profile.is_self ? "card-luxe card-halo" : "panel"
+      } ${selected ? "ring-2 ring-luxe-gold" : ""}`}
+    >
+      {profile.is_self && (
+        <TotemEmblem
+          seed={seed >= 0 ? seed : 0}
+          size={120}
+          className="absolute -right-4 -top-4 text-luxe-gold opacity-25 pointer-events-none"
+        />
+      )}
+
+      {selected && (
+        <span className="absolute top-4 right-4 flex h-5 w-5 items-center justify-center rounded-full bg-luxe-gold text-white">
+          <Check size={12} strokeWidth={2.5} />
+        </span>
+      )}
+
+      <div className="flex items-center justify-between relative">
         <span className="rounded-full bg-bg border border-border px-2.5 py-1 text-[11px] text-text-secondary">
-          {PROFILE_TYPE_LABEL[profile.profile_type]}
+          {profile.is_self ? "自己" : profile.profile_type || "未分類"}
         </span>
         <div className="flex gap-3 text-text-tertiary">
-          <button onClick={onEdit} className="hover:text-text-primary" aria-label="編輯">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit();
+            }}
+            className="hover:text-text-primary"
+            aria-label="編輯"
+          >
             <Pencil size={15} strokeWidth={1.5} />
           </button>
-          <button onClick={onDelete} className="hover:text-text-primary" aria-label="刪除">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            className="hover:text-text-primary"
+            aria-label="刪除"
+          >
             <Trash2 size={15} strokeWidth={1.5} />
           </button>
         </div>
       </div>
 
-      <div>
+      <div className="relative">
         <h3 className="text-lg font-serif font-semibold text-text-primary">{profile.name_alias}</h3>
         <p className="text-xs text-text-tertiary mt-1">
           {profile.maya_totem ? `圖騰：${profile.maya_totem}` : "尚未填寫圖騰"}
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 text-xs text-text-secondary">
+      <div className="grid grid-cols-2 gap-2 text-xs text-text-secondary relative">
         <div className="rounded-lg bg-bg border border-border px-2.5 py-1.5">
           KIN：{profile.maya_kin ?? "—"}
         </div>
@@ -200,7 +269,7 @@ function ProfileCard({
       </div>
 
       {profile.core_traits_tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mt-1">
+        <div className="flex flex-wrap gap-1.5 mt-1 relative">
           {profile.core_traits_tags.map((tag) => (
             <span
               key={tag}
@@ -213,7 +282,7 @@ function ProfileCard({
       )}
 
       {profile.relationship_notes && (
-        <p className="text-xs text-text-tertiary leading-relaxed border-t border-border pt-3 line-clamp-3">
+        <p className="text-xs text-text-tertiary leading-relaxed border-t border-border pt-3 line-clamp-3 relative">
           {profile.relationship_notes}
         </p>
       )}

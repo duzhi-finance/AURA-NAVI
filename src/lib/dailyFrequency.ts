@@ -1,4 +1,5 @@
 import { Moon, Sparkles, Zap, type LucideIcon } from "lucide-react";
+import { Solar } from "lunar-javascript";
 
 export interface DailyFrequency {
   key: "attack" | "rest" | "sync";
@@ -50,4 +51,22 @@ export function formatDateLabel(date: Date = new Date()): string {
     day: "numeric",
     weekday: "long",
   });
+}
+
+export function formatBilingualDateLabel(date: Date = new Date()): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  const weekday = date.toLocaleDateString("en-US", { weekday: "long" });
+
+  let lunarLabel = "";
+  try {
+    const lunar = Solar.fromDate(date).getLunar();
+    lunarLabel = `${lunar.getYearInGanZhi()}年 ${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`;
+  } catch {
+    lunarLabel = "";
+  }
+
+  const solarLabel = `${y}.${m}.${d} ${weekday}`;
+  return lunarLabel ? `${solarLabel}｜${lunarLabel}` : solarLabel;
 }

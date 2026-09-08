@@ -23,8 +23,8 @@ function writeAll(profiles: TalentProfile[]) {
 
 export function listProfiles(): TalentProfile[] {
   return readAll().sort((a, b) => {
-    if (a.profile_type === "Self" && b.profile_type !== "Self") return -1;
-    if (b.profile_type === "Self" && a.profile_type !== "Self") return 1;
+    if (a.is_self && !b.is_self) return -1;
+    if (b.is_self && !a.is_self) return 1;
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 }
@@ -34,11 +34,17 @@ export function getProfile(id: string): TalentProfile | undefined {
 }
 
 export function getSelfProfile(): TalentProfile | undefined {
-  return readAll().find((p) => p.profile_type === "Self");
+  return readAll().find((p) => p.is_self);
 }
 
 export function saveProfile(profile: TalentProfile) {
   const all = readAll();
+  // only one profile may be marked as the user's own identity at a time
+  if (profile.is_self) {
+    for (const p of all) {
+      if (p.profile_id !== profile.profile_id) p.is_self = false;
+    }
+  }
   const idx = all.findIndex((p) => p.profile_id === profile.profile_id);
   if (idx >= 0) {
     all[idx] = profile;
@@ -61,7 +67,8 @@ const SEEDED_FLAG_KEY = "aura-navi:seeded_v1";
 const DEMO_PROFILES: TalentProfile[] = [
   {
     profile_id: "demo_self_215",
-    profile_type: "Self",
+    profile_type: "自己",
+    is_self: true,
     name_alias: "自己",
     maya_kin: 215,
     maya_tone: "",
@@ -70,18 +77,6 @@ const DEMO_PROFILES: TalentProfile[] = [
     core_traits_tags: [],
     relationship_notes: "",
     created_at: new Date(2026, 0, 1).toISOString(),
-  },
-  {
-    profile_id: "demo_manager_75",
-    profile_type: "Manager",
-    name_alias: "主管",
-    maya_kin: 75,
-    maya_tone: "行星",
-    maya_totem: "藍鷹",
-    life_path_num: null,
-    core_traits_tags: [],
-    relationship_notes: "",
-    created_at: new Date(2026, 0, 2).toISOString(),
   },
 ];
 
@@ -138,6 +133,7 @@ function normalizeImportedProfile(raw: unknown): TalentProfile | null {
   return {
     profile_id: p.profile_id,
     profile_type: p.profile_type,
+    is_self: p.is_self === true,
     name_alias: p.name_alias,
     maya_kin: typeof p.maya_kin === "number" ? p.maya_kin : null,
     maya_tone: typeof p.maya_tone === "string" ? p.maya_tone : "",
@@ -178,7 +174,7 @@ export function importProfilesFromJson(fileContent: string): ImportResult {
     .filter((p): p is TalentProfile => p !== null);
 
   if (valid.length === 0) {
-    return { success: false, count: 0, error: "備份檔案中沒有可匯入的天賦檔案。" };
+    return { success: false, count: 0, error: "備份檔案中沒有可匯入的靈魂印記。" };
   }
 
   const merged = readAll();
@@ -190,6 +186,17 @@ export function importProfilesFromJson(fileContent: string): ImportResult {
       merged.push(p);
     }
   }
+
+  // keep at most one profile marked as the user's own identity
+  let sawSelf = false;
+  for (const p of merged) {
+    if (p.is_self && sawSelf) {
+      p.is_self = false;
+    } else if (p.is_self) {
+      sawSelf = true;
+    }
+  }
+
   writeAll(merged);
 
   return { success: true, count: valid.length };

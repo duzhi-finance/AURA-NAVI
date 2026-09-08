@@ -2,14 +2,14 @@ import { Compass, FolderOpen, SendHorizonal, Users } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 
 const NAV_ITEMS = [
-  { to: "/", label: "心靈地圖", Icon: Compass, end: true },
-  { to: "/relations", label: "關係翻譯館", Icon: Users, end: false },
-  { to: "/prompt-station", label: "對焦傳輸站", Icon: SendHorizonal, end: false },
-  { to: "/archive", label: "DNA Archive", Icon: FolderOpen, end: false },
+  { to: "/", label: "星軌儀表板", Icon: Compass, end: true },
+  { to: "/relations", label: "頻率藝廊", Icon: Users, end: false },
+  { to: "/prompt-station", label: "策略樞紐", Icon: SendHorizonal, end: false },
+  { to: "/archive", label: "靈魂典藏館", Icon: FolderOpen, end: false },
 ];
 
 const STORAGE_NOTICE =
-  "貼心提醒：所有天賦檔案皆安全儲存於此裝置與瀏覽器。換裝置或清除快取會導致資料遺失，請記得至 Talent DNA Archive 進行【匯出備份】。";
+  "貼心提醒：所有靈魂印記皆安全儲存於此裝置與瀏覽器。換裝置或清除快取會導致資料遺失，請記得至靈魂印記典藏館進行【匯出備份】。";
 
 export default function Layout() {
   return (

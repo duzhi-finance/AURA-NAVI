@@ -1,14 +1,8 @@
-export type ProfileType =
-  | "Self"
-  | "Partner"
-  | "Family"
-  | "Manager"
-  | "Client"
-  | "Friend";
-
 export interface TalentProfile {
   profile_id: string;
-  profile_type: ProfileType;
+  /** Free-text relationship label (e.g. 伴侶、主管、手帳裡的暱稱) rather than a fixed enum. */
+  profile_type: string;
+  is_self: boolean;
   name_alias: string;
   maya_kin: number | null;
   maya_tone: string;

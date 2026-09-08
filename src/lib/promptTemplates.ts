@@ -1,6 +1,5 @@
 import type { DailyCard } from "./dailyCard";
 import type { LifeDomain, PromptTemplate, RelationshipStatus, TalentProfile } from "../types/talent";
-import { PROFILE_TYPE_LABEL } from "./mayaOptions";
 
 export const LIFE_DOMAIN_OPTIONS: { value: LifeDomain; label: string }[] = [
   { value: "Career", label: "職場發展" },
@@ -12,8 +11,6 @@ export const LIFE_DOMAIN_OPTIONS: { value: LifeDomain; label: string }[] = [
 export const LIFE_DOMAIN_LABEL: Record<LifeDomain, string> = Object.fromEntries(
   LIFE_DOMAIN_OPTIONS.map((o) => [o.value, o.label])
 ) as Record<LifeDomain, string>;
-
-export const CONTEXT_PRESETS = ["溝通缺乏共識", "工作找不到動力", "主管不理解我", "渴望深層安全感"];
 
 export const RELATIONSHIP_STATUS_OPTIONS: { value: RelationshipStatus; label: string }[] = [
   { value: "Single", label: "單身／尋覓中" },
@@ -175,7 +172,7 @@ export function generateRelationPrompt(
   self: TalentProfile,
   target: TalentProfile
 ): string {
-  const targetRole = PROFILE_TYPE_LABEL[target.profile_type] ?? "對象";
+  const targetRole = target.profile_type.trim() || "對象";
   return RELATION_TEMPLATE_TEXT.replace("{{ Self_Name }}", fmt(self.name_alias, "我"))
     .replace("{{ Self_Kin }}", fmt(self.maya_kin))
     .replace("{{ Self_Tone }}", fmt(self.maya_tone))

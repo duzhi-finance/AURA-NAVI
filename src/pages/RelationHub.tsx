@@ -1,49 +1,62 @@
-import { Info, Plus, Users } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import CopyPromptBlock from "../components/CopyPromptBlock";
 import GeminiButton from "../components/GeminiButton";
 import PageHeader from "../components/PageHeader";
-import { PROFILE_TYPE_LABEL } from "../lib/mayaOptions";
+import TotemEmblem from "../components/TotemEmblem";
+import { MAYA_TOTEMS } from "../lib/mayaOptions";
 import { generateRelationPrompt } from "../lib/promptTemplates";
-import { listProfiles } from "../lib/store";
+import { getProfile, listProfiles } from "../lib/store";
 import type { TalentProfile } from "../types/talent";
 
+interface GalleryNavState {
+  selfId?: string;
+  targetId?: string;
+}
+
 export default function RelationHub() {
-  const [profiles, setProfiles] = useState<TalentProfile[]>([]);
-  const [selfId, setSelfId] = useState("");
-  const [targetId, setTargetId] = useState("");
+  const location = useLocation();
+  const [profileCount, setProfileCount] = useState(0);
+  const [selfProfile, setSelfProfile] = useState<TalentProfile | undefined>(undefined);
+  const [targetProfile, setTargetProfile] = useState<TalentProfile | undefined>(undefined);
 
   useEffect(() => {
     const all = listProfiles();
-    setProfiles(all);
-    const self = all.find((p) => p.profile_type === "Self");
-    if (self) setSelfId(self.profile_id);
-  }, []);
+    setProfileCount(all.length);
 
-  const selfProfile = profiles.find((p) => p.profile_id === selfId);
-  const targetProfile = profiles.find((p) => p.profile_id === targetId);
-  const targetOptions = profiles.filter((p) => p.profile_id !== selfId);
+    const state = location.state as GalleryNavState | null;
+    if (state?.selfId && state?.targetId) {
+      setSelfProfile(getProfile(state.selfId));
+      setTargetProfile(getProfile(state.targetId));
+    }
+    // only consume the incoming nav state once, on arrival
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const prompt = useMemo(() => {
     if (!selfProfile || !targetProfile) return "";
     return generateRelationPrompt(selfProfile, targetProfile);
   }, [selfProfile, targetProfile]);
 
-  if (profiles.length < 2) {
+  if (!selfProfile || !targetProfile) {
     return (
       <div>
         <PageHeader
-          eyebrow="Relation Alignment Hub"
-          title="關係解碼與翻譯館"
+          eyebrow="Frequency Resonance Gallery"
+          title="頻率共振藝廊"
           description="比對你與重要關係人的天賦頻率，看見磨合點與共鳴亮點。"
         />
         <div className="panel p-12 text-center text-text-secondary">
-          <Users size={40} strokeWidth={1.25} className="mx-auto mb-4 text-text-tertiary" />
-          <p className="mb-5">至少需要 2 個天賦檔案才能進行比對</p>
+          <Sparkles size={40} strokeWidth={1.25} className="mx-auto mb-4 text-text-tertiary" />
+          <p className="mb-5">
+            {profileCount < 2
+              ? "至少需要 2 張靈魂印記才能進行比對"
+              : "請至靈魂印記典藏館選取兩張印記進入藝廊"}
+          </p>
           <Link to="/archive" className="btn-primary">
-            <Plus size={16} strokeWidth={1.75} />
-            前往 Talent DNA Archive 新增檔案
+            前往靈魂印記典藏館選取
+            <ArrowRight size={16} strokeWidth={1.75} />
           </Link>
         </div>
       </div>
@@ -53,67 +66,41 @@ export default function RelationHub() {
   return (
     <div>
       <PageHeader
-        eyebrow="Relation Alignment Hub"
-        title="關係解碼與翻譯館"
+        eyebrow="Frequency Resonance Gallery"
+        title="頻率共振藝廊"
         description="比對你與重要關係人的天賦頻率，看見磨合點與共鳴亮點。"
       />
 
-      <div className="panel p-6 grid gap-4 sm:grid-cols-2">
-        <label className="flex flex-col gap-1.5 text-sm">
-          <span className="text-text-secondary">自己</span>
-          <select value={selfId} onChange={(e) => setSelfId(e.target.value)} className="select-base">
-            <option value="">請選擇</option>
-            {profiles.map((p) => (
-              <option key={p.profile_id} value={p.profile_id}>
-                {p.name_alias}（{PROFILE_TYPE_LABEL[p.profile_type]}）
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="flex flex-col gap-1.5 text-sm">
-          <span className="text-text-secondary">對象</span>
-          <select value={targetId} onChange={(e) => setTargetId(e.target.value)} className="select-base">
-            <option value="">請選擇</option>
-            {targetOptions.map((p) => (
-              <option key={p.profile_id} value={p.profile_id}>
-                {p.name_alias}（{PROFILE_TYPE_LABEL[p.profile_type]}）
-              </option>
-            ))}
-          </select>
-        </label>
+      <div className="grid gap-6 sm:grid-cols-2">
+        <PortraitFrame profile={selfProfile} label="自己" />
+        <PortraitFrame profile={targetProfile} label={targetProfile.profile_type || "對象"} />
       </div>
 
-      {selfProfile && targetProfile && (
-        <>
-          <div className="grid gap-4 sm:grid-cols-2 mt-6">
-            <ProfileMiniCard profile={selfProfile} />
-            <ProfileMiniCard profile={targetProfile} />
-          </div>
+      <ResonanceJunction self={selfProfile} target={targetProfile} />
 
-          <FrictionHint self={selfProfile} target={targetProfile} />
+      <div className="mt-6">
+        <CopyPromptBlock text={prompt} />
+      </div>
 
-          <div className="mt-6">
-            <CopyPromptBlock text={prompt} />
-          </div>
-
-          <div className="panel p-6 mt-6">
-            <p className="text-xs text-text-tertiary mb-4">
-              請將複製好的指令與雙方的瑪雅圖卡截圖，一併貼給 Gemini 進行深度分析。
-            </p>
-            <GeminiButton />
-          </div>
-        </>
-      )}
+      <div className="panel p-6 mt-6">
+        <p className="text-xs text-text-tertiary mb-4">
+          請將複製好的指令與雙方的瑪雅圖卡截圖，一併貼給 Gemini 進行深度分析。
+        </p>
+        <GeminiButton />
+      </div>
     </div>
   );
 }
 
-function ProfileMiniCard({ profile }: { profile: TalentProfile }) {
+function PortraitFrame({ profile, label }: { profile: TalentProfile; label: string }) {
+  const seed = MAYA_TOTEMS.indexOf(profile.maya_totem);
+
   return (
-    <div className="panel p-5">
-      <div className="text-xs text-text-tertiary">{PROFILE_TYPE_LABEL[profile.profile_type]}</div>
-      <div className="text-lg font-serif font-semibold text-text-primary mt-1">{profile.name_alias}</div>
-      <div className="mt-3 flex flex-wrap gap-2 text-xs text-text-secondary">
+    <div className="card-luxe card-halo p-8 flex flex-col items-center text-center gap-3">
+      <span className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary">{label}</span>
+      <TotemEmblem seed={seed >= 0 ? seed : 0} size={84} className="text-luxe-gold my-1" />
+      <div className="text-xl font-serif font-semibold text-text-primary">{profile.name_alias}</div>
+      <div className="flex flex-wrap justify-center gap-2 text-xs text-text-secondary mt-1">
         <span className="rounded-lg bg-bg border border-border px-2 py-1">KIN {profile.maya_kin ?? "—"}</span>
         <span className="rounded-lg bg-bg border border-border px-2 py-1">{profile.maya_totem || "圖騰未填"}</span>
         <span className="rounded-lg bg-bg border border-border px-2 py-1">{profile.maya_tone || "音調未填"}</span>
@@ -122,22 +109,32 @@ function ProfileMiniCard({ profile }: { profile: TalentProfile }) {
   );
 }
 
-function FrictionHint({ self, target }: { self: TalentProfile; target: TalentProfile }) {
+function ResonanceJunction({ self, target }: { self: TalentProfile; target: TalentProfile }) {
   const hasBoth = self.maya_totem && target.maya_totem;
   return (
-    <div className="panel p-5 mt-4 flex items-start gap-3">
-      <Info size={17} strokeWidth={1.5} className="text-text-tertiary shrink-0 mt-0.5" />
-      <p className="text-sm text-text-secondary leading-relaxed">
-        {hasBoth ? (
-          <>
-            <span className="text-text-primary">{self.maya_totem}</span> ×{" "}
-            <span className="text-text-primary">{target.maya_totem}</span>
-            　的頻率磨合點，將由下方生成的指令交由 Gemini 深度解析。
-          </>
-        ) : (
-          "建議先在 Talent DNA Archive 補齊雙方圖騰資訊，讓解析更精準。"
-        )}
-      </p>
+    <div className="my-8">
+      <div className="flex items-center gap-4">
+        <div className="flex-1 h-px bg-border" />
+        <span className="h-2.5 w-2.5 rounded-full bg-luxe-gold shrink-0" />
+        <div className="flex-1 h-px bg-border" />
+      </div>
+
+      <div className="text-center mt-4">
+        <p className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary mb-2">
+          Resonance Junction
+        </p>
+        <p className="text-sm text-text-secondary leading-relaxed max-w-md mx-auto">
+          {hasBoth ? (
+            <>
+              <span className="text-text-primary">{self.maya_totem}</span> ×{" "}
+              <span className="text-text-primary">{target.maya_totem}</span>
+              　的能量場交會點，將由下方生成的指令交由 Gemini 深度解析。
+            </>
+          ) : (
+            "建議先在靈魂印記典藏館補齊雙方圖騰資訊，讓解析更精準。"
+          )}
+        </p>
+      </div>
     </div>
   );
 }

@@ -20,6 +20,11 @@
   --color-freq-attack: #b5533c;
   --color-freq-rest: #5b7a99;
   --color-freq-sync: #a98b4a;
+
+  --color-luxe-gold: #b8935a;
+  --color-notice-bg: #f7ebeb;
+  --color-notice-border: #e8d3d5;
+  --color-notice-text: #5a4a4c;
 }
 
 html,
@@ -66,6 +71,13 @@ h3 {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 16px;
+}
+
+.notice-pink {
+  background: var(--color-notice-bg);
+  border: 1px solid var(--color-notice-border);
+  border-radius: 16px;
+  color: var(--color-notice-text);
 }
 
 .input-base,
@@ -151,5 +163,78 @@ h3 {
 @media (prefers-reduced-motion: reduce) {
   .card-flip-inner {
     transition: none;
+  }
+}
+
+.card-luxe {
+  position: relative;
+  border-radius: 20px;
+  background: linear-gradient(155deg, #fffdf8, var(--color-bg));
+  overflow: hidden;
+}
+.card-luxe::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 1.5px;
+  background: linear-gradient(135deg, #e3cd9f, var(--color-luxe-gold) 35%, #f5e6c4 55%, #96703a 82%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.card-halo {
+  position: relative;
+}
+.card-halo::after {
+  content: "";
+  position: absolute;
+  inset: -16%;
+  background: radial-gradient(closest-side, rgba(184, 147, 90, 0.22), transparent 72%);
+  filter: blur(4px);
+  z-index: -1;
+}
+
+.card-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Inside the flip scene both faces must stay absolutely positioned and stacked,
+   overriding the standalone .card-luxe/.card-shimmer relative positioning above. */
+.card-flip-face.card-luxe,
+.card-flip-face.card-shimmer {
+  position: absolute;
+}
+.card-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.65) 50%, transparent 65%);
+  transform: translateX(-130%);
+  opacity: 0;
+  pointer-events: none;
+}
+.card-flip-inner.is-flipped .card-shimmer::after {
+  animation: card-shimmer-sweep 0.8s ease forwards;
+}
+@keyframes card-shimmer-sweep {
+  0% {
+    transform: translateX(-130%);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(130%);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-flip-inner.is-flipped .card-shimmer::after {
+    animation: none;
   }
 }

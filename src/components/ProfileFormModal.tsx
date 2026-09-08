@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { ProfileType, TalentProfile } from "../types/talent";
-import { MAYA_TONES, MAYA_TOTEMS, PROFILE_TYPE_OPTIONS } from "../lib/mayaOptions";
+import type { TalentProfile } from "../types/talent";
+import { MAYA_TONES, MAYA_TOTEMS } from "../lib/mayaOptions";
 import { createProfileId } from "../lib/store";
 
 interface Props {
@@ -10,7 +10,8 @@ interface Props {
 }
 
 export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
-  const [profileType, setProfileType] = useState<ProfileType>(initial?.profile_type ?? "Partner");
+  const [profileType, setProfileType] = useState(initial?.profile_type ?? "");
+  const [isSelf, setIsSelf] = useState(initial?.is_self ?? false);
   const [nameAlias, setNameAlias] = useState(initial?.name_alias ?? "");
   const [kin, setKin] = useState(initial?.maya_kin != null ? String(initial.maya_kin) : "");
   const [tone, setTone] = useState(initial?.maya_tone ?? "");
@@ -29,7 +30,8 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
 
     const profile: TalentProfile = {
       profile_id: initial?.profile_id ?? createProfileId(),
-      profile_type: profileType,
+      profile_type: profileType.trim(),
+      is_self: isSelf,
       name_alias: nameAlias.trim(),
       maya_kin: kin.trim() ? Number(kin) : null,
       maya_tone: tone,
@@ -52,28 +54,31 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="font-serif text-xl font-semibold text-text-primary mb-6">
-          {isEditing ? "編輯天賦檔案" : "新增天賦檔案"}
+          {isEditing ? "編輯靈魂印記" : "新增靈魂印記"}
         </h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <Field label="關係類型">
-            <select
+          <Field label="類型">
+            <input
               value={profileType}
-              onChange={(e) => setProfileType(e.target.value as ProfileType)}
-              className="select-base"
-            >
-              {PROFILE_TYPE_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
+              onChange={(e) => setProfileType(e.target.value)}
+              className="input-base"
+            />
           </Field>
+
+          <label className="flex items-center gap-2.5 text-sm text-text-secondary">
+            <input
+              type="checkbox"
+              checked={isSelf}
+              onChange={(e) => setIsSelf(e.target.checked)}
+              className="h-4 w-4 accent-text-primary"
+            />
+            這是我自己的靈魂印記
+          </label>
 
           <Field label="暱稱 *">
             <input
               value={nameAlias}
               onChange={(e) => setNameAlias(e.target.value)}
-              placeholder="例如：我自己 / 阿明 / 王主管"
               className="input-base"
               required
             />
@@ -123,11 +128,10 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
             </Field>
           </div>
 
-          <Field label="個人標籤／地雷（用頓號或逗號分隔）">
+          <Field label="個人標籤／地雷">
             <input
               value={tags}
               onChange={(e) => setTags(e.target.value)}
-              placeholder="例如：討厭被催促、需要獨處充電"
               className="input-base"
             />
           </Field>
@@ -136,7 +140,6 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="記錄與這個人相處的眉角，例如：溝通時需要先給時間消化、避免在他忙碌時討論重要決定"
               className="input-base min-h-20 resize-y"
             />
           </Field>

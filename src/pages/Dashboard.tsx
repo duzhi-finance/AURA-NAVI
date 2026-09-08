@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import DailyCardDraw from "../components/DailyCardDraw";
 import PageHeader from "../components/PageHeader";
-import { formatDateLabel, getTodayFrequency } from "../lib/dailyFrequency";
+import { formatBilingualDateLabel, getTodayFrequency } from "../lib/dailyFrequency";
 import { GLOWING_URL } from "../lib/promptTemplates";
 import { getSelfProfile } from "../lib/store";
 import type { TalentProfile } from "../types/talent";
@@ -26,14 +26,14 @@ export default function Dashboard() {
   return (
     <div>
       <PageHeader
-        eyebrow="Dashboard"
-        title="星際心靈地圖"
+        eyebrow="Celestial Synastry Chronograph"
+        title="星軌共時儀表板"
         description="每天的第一站，掌握今日頻率，快速前往你需要的下一步。"
       />
 
       <div className="grid gap-5 md:grid-cols-2">
         <div className="panel p-7 flex flex-col gap-4">
-          <div className="text-xs text-text-tertiary">{formatDateLabel()}</div>
+          <div className="text-xs text-text-tertiary">{formatBilingualDateLabel()}</div>
           <div className="flex items-center gap-4">
             <frequency.Icon size={36} strokeWidth={1.25} className={frequency.colorClass} />
             <div>
@@ -75,7 +75,7 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="text-sm text-text-secondary">
-              尚未建立你的天賦檔案。
+              尚未建立你的靈魂印記。
               <Link to="/archive" className="text-text-primary underline ml-1">
                 前往建立
               </Link>
@@ -107,8 +107,8 @@ export default function Dashboard() {
           <QuickLink
             to="/archive"
             Icon={FolderOpen}
-            title="開啟 Talent DNA Archive"
-            description="管理你與關係人的天賦檔案"
+            title="開啟靈魂印記典藏館"
+            description="管理你與關係人的靈魂印記"
           />
         </div>
       </div>

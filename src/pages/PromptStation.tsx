@@ -5,7 +5,6 @@ import GeminiButton from "../components/GeminiButton";
 import PageHeader from "../components/PageHeader";
 import { getTodayCard } from "../lib/dailyCard";
 import {
-  CONTEXT_PRESETS,
   LIFE_DOMAIN_OPTIONS,
   RELATIONSHIP_STATUS_DOMAINS,
   RELATIONSHIP_STATUS_OPTIONS,
@@ -58,16 +57,13 @@ export default function PromptStation() {
 
   const step = !domain ? 1 : !context.trim() ? 2 : 3;
 
-  const presets =
-    domain === "Romance" && relationshipStatus === "Single"
-      ? [...CONTEXT_PRESETS, ...ROMANCE_SINGLE_PRESETS]
-      : CONTEXT_PRESETS;
+  const presets = domain === "Romance" && relationshipStatus === "Single" ? ROMANCE_SINGLE_PRESETS : [];
 
   return (
     <div>
       <PageHeader
-        eyebrow="Quantum Prompt Station"
-        title="高維對焦傳輸站"
+        eyebrow="Strategic Dimension Hub"
+        title="高維策略樞紐"
         description="三步驟生成專屬你的高維解析指令，複製後帶著瑪雅圖卡前往 Gemini 深度對話。"
       />
 
@@ -121,20 +117,21 @@ export default function PromptStation() {
             <textarea
               value={context}
               onChange={(e) => setContext(e.target.value)}
-              placeholder="請描述你目前的困境或想達成的目標，例如：主管不理解我"
               className="input-base mt-1 min-h-24 resize-y"
             />
-            <div className="flex flex-wrap gap-2 mt-3">
-              {presets.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setContext(s)}
-                  className="rounded-full border border-border px-3 py-1 text-xs text-text-secondary hover:border-text-primary hover:text-text-primary"
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
+            {presets.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {presets.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setContext(s)}
+                    className="rounded-full border border-border px-3 py-1 text-xs text-text-secondary hover:border-text-primary hover:text-text-primary"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            )}
           </section>
         </div>
 

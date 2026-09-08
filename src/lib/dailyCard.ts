@@ -26,7 +26,14 @@ export const CARD_DECK: DailyCard[] = [
   { name: "黃太陽", insight: "活出自己的光，溫暖也會回到你身上。" },
 ];
 
+export function cardSeedIndex(card: DailyCard): number {
+  const idx = CARD_DECK.findIndex((c) => c.name === card.name);
+  return idx >= 0 ? idx : 0;
+}
+
 const DAILY_CARD_KEY = "aura-navi:daily_card";
+const DAILY_CARD_LOG_KEY = "aura-navi:daily_card_log";
+const LOG_LIMIT = 60;
 
 function todayKey(date: Date = new Date()): string {
   const y = date.getFullYear();
@@ -36,6 +43,11 @@ function todayKey(date: Date = new Date()): string {
 }
 
 interface StoredDailyCard {
+  date: string;
+  card: DailyCard;
+}
+
+export interface DailyCardLogEntry {
   date: string;
   card: DailyCard;
 }
@@ -52,16 +64,42 @@ export function getTodayCard(): DailyCard | null {
   }
 }
 
+export function getCardLog(): DailyCardLogEntry[] {
+  try {
+    const raw = localStorage.getItem(DAILY_CARD_LOG_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.sort((a: DailyCardLogEntry, b: DailyCardLogEntry) =>
+      b.date.localeCompare(a.date)
+    );
+  } catch {
+    return [];
+  }
+}
+
+function appendToLog(entry: StoredDailyCard) {
+  try {
+    const log = getCardLog().filter((e) => e.date !== entry.date);
+    log.unshift(entry);
+    const trimmed = log.slice(0, LOG_LIMIT);
+    localStorage.setItem(DAILY_CARD_LOG_KEY, JSON.stringify(trimmed));
+  } catch {
+    // storage unavailable — skip logging silently
+  }
+}
+
 export function drawTodayCard(): DailyCard {
   const existing = getTodayCard();
   if (existing) return existing;
 
   const card = CARD_DECK[Math.floor(Math.random() * CARD_DECK.length)];
+  const entry: StoredDailyCard = { date: todayKey(), card };
   try {
-    const entry: StoredDailyCard = { date: todayKey(), card };
     localStorage.setItem(DAILY_CARD_KEY, JSON.stringify(entry));
   } catch {
     // storage unavailable — the draw still renders for this session, just won't persist
   }
+  appendToLog(entry);
   return card;
 }
