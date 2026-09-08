@@ -56,6 +56,16 @@ export default function Archive() {
     showToast("已匯出 JSON 備份檔案。");
   }
 
+  async function handleCopyTeamQuizLink() {
+    const url = `${window.location.origin}${window.location.pathname}#/team-dna`;
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast("已複製測驗連結，傳送給團隊成員吧！");
+    } catch {
+      showToast("複製失敗，請手動複製網址列連結。");
+    }
+  }
+
   function handleImportClick() {
     fileInputRef.current?.click();
   }
@@ -102,11 +112,16 @@ export default function Archive() {
         />
       </div>
 
-      <div className="inline-flex items-start gap-2 text-xs text-text-secondary mb-6">
-        <Users size={14} strokeWidth={1.75} className="text-luxe-gold shrink-0 mt-0.5" />
-        <span>
-          需要建立團隊檔案？提供「職場天賦原型輕測驗」連結給成員，輕鬆獲得天賦 KIN 碼。
-        </span>
+      <div className="flex items-start justify-between gap-3 flex-wrap text-xs text-text-secondary mb-6">
+        <div className="inline-flex items-start gap-2">
+          <Users size={14} strokeWidth={1.75} className="text-luxe-gold shrink-0 mt-0.5" />
+          <span>
+            需要建立團隊檔案？提供「職場天賦原型輕測驗」連結給成員，輕鬆獲得天賦 KIN 碼。
+          </span>
+        </div>
+        <button onClick={handleCopyTeamQuizLink} className="text-luxe-gold hover:underline shrink-0">
+          複製測驗連結
+        </button>
       </div>
 
       <div className="notice-pink px-5 py-4 mb-10 flex items-center justify-between gap-4 flex-wrap">

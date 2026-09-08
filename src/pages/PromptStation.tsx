@@ -26,6 +26,7 @@ export default function PromptStation() {
   const location = useLocation();
   const [domain, setDomain] = useState<LifeDomain | null>(null);
   const [relationshipStatus, setRelationshipStatus] = useState<RelationshipStatus | null>(null);
+  const [isManagementFocus, setIsManagementFocus] = useState(false);
   const [context, setContext] = useState("");
   const [journalToast, setJournalToast] = useState("");
   const selfProfile = useMemo(() => getSelfProfile(), []);
@@ -41,11 +42,15 @@ export default function PromptStation() {
   }, []);
 
   const showRelationshipStatus = domain !== null && RELATIONSHIP_STATUS_DOMAINS.includes(domain);
+  const showManagementFocus = domain === "Career";
 
   function handleSelectDomain(next: LifeDomain) {
     setDomain(next);
     if (!RELATIONSHIP_STATUS_DOMAINS.includes(next)) {
       setRelationshipStatus(null);
+    }
+    if (next !== "Career") {
+      setIsManagementFocus(false);
     }
   }
 
@@ -56,9 +61,19 @@ export default function PromptStation() {
       context,
       selfProfile,
       dailyCard,
-      showRelationshipStatus ? relationshipStatus : null
+      showRelationshipStatus ? relationshipStatus : null,
+      showManagementFocus ? isManagementFocus : false
     );
-  }, [domain, context, selfProfile, dailyCard, showRelationshipStatus, relationshipStatus]);
+  }, [
+    domain,
+    context,
+    selfProfile,
+    dailyCard,
+    showRelationshipStatus,
+    relationshipStatus,
+    showManagementFocus,
+    isManagementFocus,
+  ]);
 
   const step = !domain ? 1 : !context.trim() ? 2 : 3;
 
@@ -128,6 +143,22 @@ export default function PromptStation() {
                     </button>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {showManagementFocus && (
+              <div className="mb-4">
+                <div className="text-xs text-text-tertiary mb-2">視角設定</div>
+                <button
+                  onClick={() => setIsManagementFocus((v) => !v)}
+                  className={`rounded-full px-3 py-1.5 text-xs border transition-colors ${
+                    isManagementFocus
+                      ? "border-text-primary bg-bg text-text-primary font-medium"
+                      : "border-border text-text-secondary hover:border-text-tertiary"
+                  }`}
+                >
+                  我是領導/管理（管理對焦）
+                </button>
               </div>
             )}
 

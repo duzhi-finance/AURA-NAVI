@@ -36,7 +36,7 @@ export const ROMANCE_SINGLE_PRESETS = [
 const BASE_TEMPLATE_TEXT = `你現在是一位精通星際瑪雅曆（Dreamspell）、生命靈數與職場/人際心理學的「高維生命導航員」。
 
 我已經附上我從 glowing.cc 下載的個人星系印記圖卡（包含主印記、圖騰、波符、力量動物等資訊）。
-{{ Profile_Reference }}{{ Daily_Card_Reference }}{{ Relationship_Status_Guardrail }}
+{{ Profile_Reference }}{{ Daily_Card_Reference }}{{ Relationship_Status_Guardrail }}{{ Management_Focus_Block }}
 請幫我閱讀這張圖片中的所有資料，並為我進行深度解析。請依據以下四大模組輸出：
 
 ---
@@ -106,17 +106,26 @@ ${RELATIONSHIP_STATUS_FOCUS[status]}
 `;
 }
 
+function managementFocusBlock(active?: boolean): string {
+  if (!active) return "";
+  return `【管理對焦設定】
+請從高維領導學與團隊心理學的角度，解析對方的天賦圖騰，並提供：1. 最能激發其產出的派工模式；2. 如何給予無內耗的反饋；3. 溝通時應避開的引爆點。
+`;
+}
+
 export function generateNavigationPrompt(
   domain: LifeDomain,
   contextDescription: string,
   selfProfile?: TalentProfile | null,
   dailyCard?: DailyCard | null,
-  relationshipStatus?: RelationshipStatus | null
+  relationshipStatus?: RelationshipStatus | null,
+  isManagementFocus?: boolean
 ): string {
   return BASE_TEMPLATE_TEXT
     .replace("{{ Profile_Reference }}", profileReferenceLine(selfProfile))
     .replace("{{ Daily_Card_Reference }}", dailyCardReferenceLine(dailyCard))
     .replace("{{ Relationship_Status_Guardrail }}", relationshipStatusGuardrail(relationshipStatus))
+    .replace("{{ Management_Focus_Block }}", managementFocusBlock(isManagementFocus))
     .replace("{{ Life_Domain }}", LIFE_DOMAIN_LABEL[domain])
     .replace("{{ Context_Description }}", contextDescription.trim() || "（尚未填寫）")
     .replace(/\n{3,}/g, "\n\n");
