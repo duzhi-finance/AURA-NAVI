@@ -14,7 +14,11 @@ function readAll(): TalentProfile[] {
 }
 
 function writeAll(profiles: TalentProfile[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(profiles));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(profiles));
+  } catch {
+    // storage unavailable (private browsing, blocked site data, etc.) — silently no-op
+  }
 }
 
 export function listProfiles(): TalentProfile[] {
