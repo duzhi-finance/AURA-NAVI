@@ -12,12 +12,7 @@ export const LIFE_DOMAIN_LABEL: Record<LifeDomain, string> = Object.fromEntries(
   LIFE_DOMAIN_OPTIONS.map((o) => [o.value, o.label])
 ) as Record<LifeDomain, string>;
 
-export const PAIN_POINT_SUGGESTIONS: Record<LifeDomain, string[]> = {
-  Career: ["主管不理解我", "想找到天賦職涯", "工作總是提不起勁", "團隊合作常有摩擦"],
-  Romance: ["與伴侶爭吵", "不知道如何表達愛", "總是吸引到不適合的對象", "關係中缺乏安全感"],
-  Family: ["與父母價值觀衝突", "原生家庭的情緒模式影響我", "手足關係緊張", "渴望被家人理解"],
-  Interpersonal: ["容易被誤解", "社交場合感到疲憊", "難以建立深度友誼", "害怕衝突而委屈自己"],
-};
+export const CONTEXT_PRESETS = ["溝通缺乏共識", "工作找不到動力", "主管不理解我", "渴望深層安全感"];
 
 const BASE_TEMPLATE_TEXT = `你現在是一位精通星際瑪雅曆（Dreamspell）、生命靈數與職場/人際心理學的「高維生命導航員」。
 
@@ -121,22 +116,31 @@ function fmt(value: string | number | null | undefined, fallback = "未填寫"):
   return String(value);
 }
 
+function notesLine(label: string, profile: TalentProfile): string {
+  if (!profile.relationship_notes.trim()) return "";
+  return `* ${label}的相處備註：${profile.relationship_notes.trim()}\n`;
+}
+
 export function generateRelationPrompt(
   self: TalentProfile,
   target: TalentProfile
 ): string {
-  return RELATION_TEMPLATE_TEXT
-    .replace("{{ Self_Name }}", fmt(self.name_alias, "我"))
+  const targetRole = PROFILE_TYPE_LABEL[target.profile_type] ?? "對象";
+  return RELATION_TEMPLATE_TEXT.replace("{{ Self_Name }}", fmt(self.name_alias, "我"))
     .replace("{{ Self_Kin }}", fmt(self.maya_kin))
     .replace("{{ Self_Tone }}", fmt(self.maya_tone))
     .replace("{{ Self_Totem }}", fmt(self.maya_totem))
     .replace("{{ Self_LifePath }}", fmt(self.life_path_num))
-    .replace(/\{\{ Target_Role \}\}/g, PROFILE_TYPE_LABEL[target.profile_type] ?? "對象")
+    .replace(/\{\{ Target_Role \}\}/g, targetRole)
     .replace("{{ Target_Name }}", fmt(target.name_alias))
     .replace("{{ Target_Kin }}", fmt(target.maya_kin))
     .replace("{{ Target_Tone }}", fmt(target.maya_tone))
     .replace("{{ Target_Totem }}", fmt(target.maya_totem))
-    .replace("{{ Target_LifePath }}", fmt(target.life_path_num));
+    .replace("{{ Target_LifePath }}", fmt(target.life_path_num))
+    .replace(
+      "（若我附上的圖片中有更完整的資訊，例如波符、力量動物、PSI 或女神力，請一併納入你的解析。）",
+      `${notesLine("我", self)}${notesLine(targetRole, target)}（若我附上的圖片中有更完整的資訊，例如波符、力量動物、PSI 或女神力，請一併納入你的解析。）`
+    );
 }
 
 export const GEMINI_URL = "https://gemini.google.com";

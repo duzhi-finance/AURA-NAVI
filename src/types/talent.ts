@@ -15,6 +15,7 @@ export interface TalentProfile {
   maya_totem: string;
   life_path_num: number | null;
   core_traits_tags: string[];
+  relationship_notes: string;
   created_at: string;
 }
 

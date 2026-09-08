@@ -146,6 +146,12 @@ function ProfileCard({
           ))}
         </div>
       )}
+
+      {profile.relationship_notes && (
+        <p className="text-xs text-text-tertiary leading-relaxed border-t border-border pt-3 line-clamp-3">
+          {profile.relationship_notes}
+        </p>
+      )}
     </div>
   );
 }

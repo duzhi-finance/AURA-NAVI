@@ -19,6 +19,7 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
     initial?.life_path_num != null ? String(initial.life_path_num) : ""
   );
   const [tags, setTags] = useState(initial?.core_traits_tags.join("、") ?? "");
+  const [notes, setNotes] = useState(initial?.relationship_notes ?? "");
 
   const isEditing = Boolean(initial);
 
@@ -38,6 +39,7 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
         .split(/[、,，]/)
         .map((t) => t.trim())
         .filter(Boolean),
+      relationship_notes: notes.trim(),
       created_at: initial?.created_at ?? new Date().toISOString(),
     };
     onSave(profile);
@@ -127,6 +129,15 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
               onChange={(e) => setTags(e.target.value)}
               placeholder="例如：討厭被催促、需要獨處充電"
               className="input-base"
+            />
+          </Field>
+
+          <Field label="關係地雷與互動備註">
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="記錄與這個人相處的眉角，例如：溝通時需要先給時間消化、避免在他忙碌時討論重要決定"
+              className="input-base min-h-20 resize-y"
             />
           </Field>
 

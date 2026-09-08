@@ -55,3 +55,44 @@ export function deleteProfile(id: string) {
 export function createProfileId(): string {
   return `profile_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
+
+const SEEDED_FLAG_KEY = "aura-navi:seeded_v1";
+
+const DEMO_PROFILES: TalentProfile[] = [
+  {
+    profile_id: "demo_self_215",
+    profile_type: "Self",
+    name_alias: "自己",
+    maya_kin: 215,
+    maya_tone: "",
+    maya_totem: "藍鷹",
+    life_path_num: null,
+    core_traits_tags: [],
+    relationship_notes: "",
+    created_at: new Date(2026, 0, 1).toISOString(),
+  },
+  {
+    profile_id: "demo_manager_75",
+    profile_type: "Manager",
+    name_alias: "主管",
+    maya_kin: 75,
+    maya_tone: "行星",
+    maya_totem: "藍鷹",
+    life_path_num: null,
+    core_traits_tags: [],
+    relationship_notes: "",
+    created_at: new Date(2026, 0, 2).toISOString(),
+  },
+];
+
+export function ensureSeedProfiles() {
+  try {
+    if (localStorage.getItem(SEEDED_FLAG_KEY)) return;
+    if (readAll().length === 0) {
+      writeAll(DEMO_PROFILES);
+    }
+    localStorage.setItem(SEEDED_FLAG_KEY, "1");
+  } catch {
+    // storage unavailable — skip seeding silently
+  }
+}

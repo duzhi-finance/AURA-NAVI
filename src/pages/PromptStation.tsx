@@ -1,19 +1,30 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import CopyPromptBlock from "../components/CopyPromptBlock";
 import GeminiButton from "../components/GeminiButton";
 import PageHeader from "../components/PageHeader";
-import {
-  LIFE_DOMAIN_OPTIONS,
-  PAIN_POINT_SUGGESTIONS,
-  generateNavigationPrompt,
-} from "../lib/promptTemplates";
+import { CONTEXT_PRESETS, LIFE_DOMAIN_OPTIONS, generateNavigationPrompt } from "../lib/promptTemplates";
 import { getSelfProfile } from "../lib/store";
 import type { LifeDomain } from "../types/talent";
 
+interface PromptStationNavState {
+  presetContext?: string;
+}
+
 export default function PromptStation() {
+  const location = useLocation();
   const [domain, setDomain] = useState<LifeDomain | null>(null);
   const [context, setContext] = useState("");
   const selfProfile = useMemo(() => getSelfProfile(), []);
+
+  useEffect(() => {
+    const state = location.state as PromptStationNavState | null;
+    if (state?.presetContext) {
+      setContext(state.presetContext);
+    }
+    // only consume the incoming nav state once, on arrival
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const prompt = useMemo(() => {
     if (!domain) return "";
@@ -61,26 +72,24 @@ export default function PromptStation() {
               placeholder="請描述你目前的困境或想達成的目標，例如：主管不理解我"
               className="input-base mt-4 min-h-24 resize-y"
             />
-            {domain && (
-              <div className="flex flex-wrap gap-2 mt-3">
-                {PAIN_POINT_SUGGESTIONS[domain].map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setContext(s)}
-                    className="rounded-full border border-border px-3 py-1 text-xs text-text-secondary hover:border-text-primary hover:text-text-primary"
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            )}
+            <div className="flex flex-wrap gap-2 mt-3">
+              {CONTEXT_PRESETS.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setContext(s)}
+                  className="rounded-full border border-border px-3 py-1 text-xs text-text-secondary hover:border-text-primary hover:text-text-primary"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </section>
         </div>
 
         <div className="flex flex-col gap-6">
           <section>
-            <StepLabel n={3} title="複製導航指令" />
-            <div className="mt-4">
+            <StepLabel n={3} title="複製導航指令並前往 Gemini" />
+            <div className="mt-4 flex flex-col gap-4">
               {domain ? (
                 <CopyPromptBlock text={prompt} />
               ) : (
@@ -88,15 +97,14 @@ export default function PromptStation() {
                   完成步驟 1、2 後，將於此處生成完整指令
                 </div>
               )}
-            </div>
-          </section>
 
-          <section className="panel p-6">
-            <StepLabel n={4} title="快捷導向" />
-            <p className="text-xs text-text-tertiary mt-3 mb-4">
-              請將複製好的指令與你在 glowing.cc 下載的瑪雅圖卡，一併貼給 Gemini。
-            </p>
-            <GeminiButton />
+              <div className="panel p-6">
+                <p className="text-xs text-text-tertiary mb-4">
+                  請將複製好的指令與你在 glowing.cc 下載的瑪雅圖卡，一併貼給 Gemini。
+                </p>
+                <GeminiButton />
+              </div>
+            </div>
           </section>
         </div>
       </div>

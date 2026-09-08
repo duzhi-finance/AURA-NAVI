@@ -4,6 +4,9 @@ import Dashboard from "./pages/Dashboard";
 import RelationHub from "./pages/RelationHub";
 import PromptStation from "./pages/PromptStation";
 import Archive from "./pages/Archive";
+import { ensureSeedProfiles } from "./lib/store";
+
+ensureSeedProfiles();
 
 export default function App() {
   return (

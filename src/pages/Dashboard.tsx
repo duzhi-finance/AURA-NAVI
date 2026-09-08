@@ -1,6 +1,6 @@
-import { ExternalLink, FolderOpen, SendHorizonal, type LucideIcon } from "lucide-react";
+import { ArrowRight, ExternalLink, FolderOpen, SendHorizonal, type LucideIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
 import { formatDateLabel, getTodayFrequency } from "../lib/dailyFrequency";
 import { GLOWING_URL } from "../lib/promptTemplates";
@@ -8,8 +8,15 @@ import { getSelfProfile } from "../lib/store";
 import type { TalentProfile } from "../types/talent";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [selfProfile, setSelfProfile] = useState<TalentProfile | undefined>(undefined);
   const frequency = getTodayFrequency();
+
+  function handleBringTodayEnergy() {
+    navigate("/prompt-station", {
+      state: { presetContext: `今日流年：${frequency.label}` },
+    });
+  }
 
   useEffect(() => {
     setSelfProfile(getSelfProfile());
@@ -37,6 +44,13 @@ export default function Dashboard() {
               </p>
             </div>
           </div>
+          <button
+            onClick={handleBringTodayEnergy}
+            className="btn-secondary self-start border border-border"
+          >
+            帶入今日能量生成導航指令
+            <ArrowRight size={14} strokeWidth={1.75} />
+          </button>
         </div>
 
         <div className="panel p-7 flex flex-col gap-3">

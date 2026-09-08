@@ -1,4 +1,4 @@
-import { Info, Users } from "lucide-react";
+import { Info, Plus, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import CopyPromptBlock from "../components/CopyPromptBlock";
@@ -40,8 +40,9 @@ export default function RelationHub() {
         />
         <div className="panel p-12 text-center text-text-secondary">
           <Users size={40} strokeWidth={1.25} className="mx-auto mb-4 text-text-tertiary" />
-          <p>至少需要 2 個天賦檔案才能進行比對</p>
-          <Link to="/archive" className="text-text-primary underline text-sm mt-2 inline-block">
+          <p className="mb-5">至少需要 2 個天賦檔案才能進行比對</p>
+          <Link to="/archive" className="btn-primary">
+            <Plus size={16} strokeWidth={1.75} />
             前往 Talent DNA Archive 新增檔案
           </Link>
         </div>
