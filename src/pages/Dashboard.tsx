@@ -150,6 +150,11 @@ function QuickLink({
       <Icon size={22} strokeWidth={1.25} className="text-text-primary" />
       <div className="text-sm font-medium text-text-primary">{title}</div>
       <p className="text-xs text-text-secondary leading-relaxed">{description}</p>
+      {external && (
+        <p className="text-[11px] text-text-tertiary">
+          [↗ 將跳轉至外部網站 glowing.cc 進行測算]
+        </p>
+      )}
     </div>
   );
 

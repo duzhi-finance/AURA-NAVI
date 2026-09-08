@@ -190,6 +190,10 @@ export default function PromptStation() {
               {domain ? (
                 <>
                   <CopyPromptBlock text={prompt} />
+                  <div className="text-[11px] text-text-tertiary leading-relaxed -mt-2">
+                    <p>使用說明：複製指令後請貼入 Gemini（需登入 Google 帳號）。</p>
+                    <p>免責提醒：AI 生成之解讀內容僅供策略思考參考，具體人生與職場決策請自行判斷。</p>
+                  </div>
                   <button
                     onClick={handleSaveToJournal}
                     className="btn-secondary border border-border self-start"

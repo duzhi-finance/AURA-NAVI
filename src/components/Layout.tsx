@@ -1,5 +1,6 @@
 import { BookHeart, Compass, FolderOpen, SendHorizonal, Users } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
+import Footer from "./Footer";
 
 const NAV_ITEMS = [
   { to: "/", label: "星軌儀表板", Icon: Compass, end: true },
@@ -34,6 +35,7 @@ export default function Layout() {
         <main className="flex-1 min-w-0 px-5 py-8 md:px-14 md:py-14 pb-24 md:pb-14">
           <div className="mx-auto w-full max-w-5xl">
             <Outlet />
+            <Footer />
           </div>
         </main>
 

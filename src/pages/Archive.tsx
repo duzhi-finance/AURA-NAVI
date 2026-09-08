@@ -125,7 +125,9 @@ export default function Archive() {
       </div>
 
       <div className="notice-pink px-5 py-4 mb-10 flex items-center justify-between gap-4 flex-wrap">
-        <p className="text-xs">資料僅儲存於本機。更換裝置前請先備份。</p>
+        <p className="text-xs leading-relaxed max-w-2xl">
+          貼心提醒：資料僅儲存於此裝置與瀏覽器，更換裝置或清除快取會導致資料遺失，請定期匯出備份。本產品為數位商品與指令服務，一經購買或發送即完成交付，恕不接受退換貨。
+        </p>
         <div className="flex gap-2">
           <button onClick={handleExport} className="btn-secondary border border-notice-border !text-notice-text">
             <Download size={14} strokeWidth={1.75} />

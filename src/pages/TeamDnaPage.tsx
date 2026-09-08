@@ -1,6 +1,7 @@
 import { Compass, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import Footer from "../components/Footer";
 import TotemEmblem from "../components/TotemEmblem";
 import { computeKinFromBirthdate, type DreamspellResult } from "../lib/dreamspellKin";
 import { MAYA_TOTEMS } from "../lib/mayaOptions";
@@ -87,6 +88,8 @@ export default function TeamDnaPage() {
             了解更多關於 AURA-Navi
           </Link>
         </div>
+
+        <Footer />
       </div>
     </div>
   );
