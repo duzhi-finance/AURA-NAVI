@@ -1,34 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <defs>
-    <radialGradient id="bg" cx="35%" cy="28%" r="85%">
-      <stop offset="0%" stop-color="#F3E3E0"/>
-      <stop offset="55%" stop-color="#E7CFC9"/>
-      <stop offset="100%" stop-color="#D9B9B2"/>
-    </radialGradient>
-    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#D9B583"/>
-      <stop offset="50%" stop-color="#B8935A"/>
-      <stop offset="100%" stop-color="#9C7846"/>
-    </linearGradient>
-    <filter id="grain">
-      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" result="noise"/>
-      <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.04 0"/>
-      <feComposite operator="over" in2="SourceGraphic"/>
-    </filter>
-  </defs>
-
-  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#bg)"/>
-  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#bg)" filter="url(#grain)"/>
-
-  <!-- flowing "A" -->
-  <path d="M21,48 C21,48 25,26 32,15 C39,26 43,48 43,48"
-        fill="none" stroke="url(#gold)" stroke-width="2.4" stroke-linecap="round"/>
-
-  <!-- swirl crossbar -->
-  <path d="M24,37 C28,34 27,30 31,30 C35,30 34,35 30,35 C27,35 33,38 40,36"
-        fill="none" stroke="url(#gold)" stroke-width="1.6" stroke-linecap="round"/>
-
-  <!-- 4-point star accent -->
-  <path d="M32,6 L33.3,9.7 L37,11 L33.3,12.3 L32,16 L30.7,12.3 L27,11 L30.7,9.7 Z"
-        fill="#FAF7F2"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <rect x="4" y="4" width="192" height="192" rx="46" fill="#FFFFFF"/>
+  <text x="100" y="93" text-anchor="middle" font-family="'Noto Serif TC','Source Han Serif TC',serif" font-size="22" font-weight="500" letter-spacing="3" fill="#9C6B5F">AURA</text>
+  <text x="100" y="121" text-anchor="middle" font-family="'Noto Serif TC','Source Han Serif TC',serif" font-size="22" font-weight="500" letter-spacing="3" fill="#9C6B5F">NAVI</text>
 </svg>
