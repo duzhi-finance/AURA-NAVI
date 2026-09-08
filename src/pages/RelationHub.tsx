@@ -55,16 +55,21 @@ export default function RelationHub() {
           description="比對你與重要關係人的天賦頻率，看見磨合點與共鳴亮點。"
         />
         <div className="panel p-12 text-center text-text-secondary">
-          <Sparkles size={40} strokeWidth={1.25} className="mx-auto mb-4 text-text-tertiary" />
-          <p className="mb-5">
-            {profileCount < 2
-              ? "至少需要 2 張靈魂印記才能進行比對"
-              : "請至靈魂印記典藏館選取兩張印記進入藝廊"}
-          </p>
-          <Link to="/archive" className="btn-primary">
-            前往靈魂印記典藏館選取
-            <ArrowRight size={16} strokeWidth={1.75} />
-          </Link>
+          <Sparkles size={40} strokeWidth={1.25} className="mx-auto mb-6 text-text-tertiary" />
+          <div className="inline-flex items-center gap-3 rounded-full px-5 py-2.5 mb-6 bg-bg-subtle/60 border border-border">
+            <ResonanceRingsIcon size={18} className="text-luxe-gold shrink-0" />
+            <span className="font-serif text-sm text-text-secondary tracking-[0.02em]">
+              {profileCount < 2
+                ? "至少需要 2 張靈魂印記才能進行比對"
+                : "請至靈魂印記典藏館選取兩張印記進入藝廊"}
+            </span>
+          </div>
+          <div>
+            <Link to="/archive" className="btn-primary">
+              前往靈魂印記典藏館選取
+              <ArrowRight size={16} strokeWidth={1.75} />
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -106,6 +111,15 @@ export default function RelationHub() {
         <GeminiButton />
       </div>
     </div>
+  );
+}
+
+function ResonanceRingsIcon({ size = 18, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+      <circle cx="9" cy="12" r="7" stroke="currentColor" strokeWidth="1" />
+      <circle cx="15" cy="12" r="7" stroke="currentColor" strokeWidth="1" />
+    </svg>
   );
 }
 

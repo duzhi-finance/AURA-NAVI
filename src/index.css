@@ -142,6 +142,24 @@
   color: var(--color-text-primary);
 }
 
+.btn-invite {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid #e2d8d8;
+  border-radius: 999px;
+  padding: 0.6rem 1.15rem;
+  font-size: 0.75rem;
+  color: var(--color-luxe-gold);
+  background: var(--color-surface);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+}
+.btn-invite:hover {
+  border-color: var(--color-luxe-gold);
+  box-shadow: 0 0 0 3px rgba(184, 147, 90, 0.14);
+  transform: translateY(-1px);
+}
+
 .card-flip-scene {
   perspective: 1200px;
 }

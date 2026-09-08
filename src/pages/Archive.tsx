@@ -1,4 +1,4 @@
-import { ArrowRight, Check, Download, Pencil, Plus, Sparkles, Trash2, Upload, Users } from "lucide-react";
+import { ArrowRight, Check, ClipboardList, Download, Pencil, Plus, Sparkles, Trash2, Upload, Users } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
@@ -112,40 +112,31 @@ export default function Archive() {
         />
       </div>
 
-      <div className="flex items-start justify-between gap-3 flex-wrap text-xs text-text-secondary mb-6">
-        <div className="inline-flex items-start gap-2">
-          <Users size={14} strokeWidth={1.75} className="text-luxe-gold shrink-0 mt-0.5" />
-          <span>
-            需要建立團隊檔案？提供「職場天賦原型輕測驗」連結給成員，輕鬆獲得天賦 KIN 碼。
+      <div className="card-luxe card-hover p-6 mb-10 flex items-center justify-between gap-4 flex-wrap">
+        <div className="inline-flex items-start gap-3">
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-bg border border-border shrink-0">
+            <Users size={15} strokeWidth={1.5} className="text-luxe-gold" />
           </span>
+          <div>
+            <div className="text-sm font-serif text-text-primary">需要建立團隊檔案？</div>
+            <p className="text-xs text-text-secondary mt-1 max-w-sm leading-relaxed">
+              提供「職場天賦原型輕測驗」連結給成員，輕鬆獲得天賦 KIN 碼。
+            </p>
+          </div>
         </div>
-        <button onClick={handleCopyTeamQuizLink} className="text-luxe-gold hover:underline shrink-0">
-          複製測驗連結
+        <button onClick={handleCopyTeamQuizLink} className="btn-invite shrink-0">
+          <ClipboardList size={14} strokeWidth={1.75} />
+          複製測驗邀請連結
         </button>
       </div>
 
-      <div className="notice-pink px-5 py-4 mb-10 flex items-center justify-between gap-4 flex-wrap">
-        <p className="text-xs leading-relaxed max-w-2xl">
-          貼心提醒：資料僅儲存於此裝置與瀏覽器，更換裝置或清除快取會導致資料遺失，請定期匯出備份。本產品為數位商品與指令服務，一經購買或發送即完成交付，恕不接受退換貨。
-        </p>
-        <div className="flex gap-2">
-          <button onClick={handleExport} className="btn-secondary border border-notice-border !text-notice-text">
-            <Download size={14} strokeWidth={1.75} />
-            匯出 JSON 備份
-          </button>
-          <button onClick={handleImportClick} className="btn-secondary border border-notice-border !text-notice-text">
-            <Upload size={14} strokeWidth={1.75} />
-            匯入備份檔案
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="application/json"
-            onChange={handleImportFile}
-            className="hidden"
-          />
-        </div>
-      </div>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="application/json"
+        onChange={handleImportFile}
+        className="hidden"
+      />
 
       <button
         onClick={() => {
@@ -183,6 +174,22 @@ export default function Archive() {
           ))}
         </div>
       )}
+
+      <div className="notice-pink px-5 py-4 mt-10 flex items-center justify-between gap-4 flex-wrap">
+        <p className="text-xs leading-relaxed max-w-2xl">
+          貼心提醒：資料僅儲存於此裝置與瀏覽器，更換裝置或清除快取會導致資料遺失，請定期匯出備份。本產品為數位商品與指令服務，一經購買或發送即完成交付，恕不接受退換貨。
+        </p>
+        <div className="flex gap-2">
+          <button onClick={handleExport} className="btn-secondary border border-notice-border !text-notice-text">
+            <Download size={14} strokeWidth={1.75} />
+            匯出 JSON 備份
+          </button>
+          <button onClick={handleImportClick} className="btn-secondary border border-notice-border !text-notice-text">
+            <Upload size={14} strokeWidth={1.75} />
+            匯入備份檔案
+          </button>
+        </div>
+      </div>
 
       {selectedIds.length === 2 && (
         <div className="fixed bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-20">

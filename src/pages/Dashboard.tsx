@@ -126,6 +126,10 @@ export default function Dashboard() {
           />
         </div>
       </div>
+
+      <p className="mt-10 text-xs text-text-tertiary leading-relaxed">
+        貼心提醒：所有靈魂印記皆安全儲存於此裝置與瀏覽器。換裝置或清除快取會導致資料遺失，請記得至靈魂印記典藏館進行【匯出備份】。
+      </p>
     </div>
   );
 }
@@ -148,13 +152,17 @@ function QuickLink({
   const content = (
     <div className="panel card-hover p-6 h-full flex flex-col gap-3 transition-all hover:bg-surface-hover">
       <Icon size={22} strokeWidth={1.25} className="text-text-primary" />
-      <div className="text-sm font-medium text-text-primary">{title}</div>
-      <p className="text-xs text-text-secondary leading-relaxed">{description}</p>
+      <div className="text-sm font-serif font-medium text-text-primary tracking-[0.05em]">
+        {title}
+      </div>
       {external && (
-        <p className="text-[11px] text-text-tertiary">
-          [↗ 將跳轉至外部網站 glowing.cc 進行測算]
-        </p>
+        <span className="inline-flex self-start rounded-full border border-border px-2.5 py-0.5 text-[10px] text-text-tertiary">
+          [↗ 將跳轉至外部網站 glowing.cc]
+        </span>
       )}
+      <p className="text-xs font-serif text-text-secondary leading-relaxed tracking-[0.05em]">
+        {description}
+      </p>
     </div>
   );
 
