@@ -142,6 +142,20 @@
   color: var(--color-text-primary);
 }
 
+.desc-text {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  letter-spacing: 0.06em;
+}
+
+.title-metallic {
+  background: linear-gradient(135deg, #2c2c2a 0%, #7a7571 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
 .btn-invite {
   display: inline-flex;
   align-items: center;

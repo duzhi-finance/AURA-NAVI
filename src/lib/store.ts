@@ -76,6 +76,12 @@ const DEMO_PROFILES: TalentProfile[] = [
     life_path_num: null,
     core_traits_tags: [],
     relationship_notes: "",
+    core_resonance_nuance: "",
+    hidden_personality: "",
+    totem_animal: "",
+    hidden_push_psi: "",
+    wavespell: "",
+    support_challenge_energy: "",
     created_at: new Date(2026, 0, 1).toISOString(),
   },
 ];
@@ -141,6 +147,13 @@ function normalizeImportedProfile(raw: unknown): TalentProfile | null {
     life_path_num: typeof p.life_path_num === "number" ? p.life_path_num : null,
     core_traits_tags: Array.isArray(p.core_traits_tags) ? p.core_traits_tags : [],
     relationship_notes: typeof p.relationship_notes === "string" ? p.relationship_notes : "",
+    core_resonance_nuance: typeof p.core_resonance_nuance === "string" ? p.core_resonance_nuance : "",
+    hidden_personality: typeof p.hidden_personality === "string" ? p.hidden_personality : "",
+    totem_animal: typeof p.totem_animal === "string" ? p.totem_animal : "",
+    hidden_push_psi: typeof p.hidden_push_psi === "string" ? p.hidden_push_psi : "",
+    wavespell: typeof p.wavespell === "string" ? p.wavespell : "",
+    support_challenge_energy:
+      typeof p.support_challenge_energy === "string" ? p.support_challenge_energy : "",
     created_at: typeof p.created_at === "string" ? p.created_at : new Date().toISOString(),
   };
 }

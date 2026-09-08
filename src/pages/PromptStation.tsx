@@ -190,7 +190,7 @@ export default function PromptStation() {
               {domain ? (
                 <>
                   <CopyPromptBlock text={prompt} />
-                  <div className="text-[11px] text-text-tertiary leading-relaxed -mt-2">
+                  <div className="desc-text text-[11px] text-text-tertiary leading-relaxed -mt-2">
                     <p>使用說明：複製指令後請貼入 Gemini（需登入 Google 帳號）。</p>
                     <p>免責提醒：AI 生成之解讀內容僅供策略思考參考，具體人生與職場決策請自行判斷。</p>
                   </div>
@@ -209,7 +209,7 @@ export default function PromptStation() {
               )}
 
               <div className="panel p-6">
-                <p className="text-xs text-text-tertiary mb-4">
+                <p className="desc-text text-xs text-text-tertiary mb-4">
                   請將複製好的指令與你在 glowing.cc 下載的瑪雅圖卡，一併貼給 Gemini。
                 </p>
                 <GeminiButton />

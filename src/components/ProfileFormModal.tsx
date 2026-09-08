@@ -21,6 +21,16 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
   );
   const [tags, setTags] = useState(initial?.core_traits_tags.join("、") ?? "");
   const [notes, setNotes] = useState(initial?.relationship_notes ?? "");
+  const [coreResonanceNuance, setCoreResonanceNuance] = useState(
+    initial?.core_resonance_nuance ?? ""
+  );
+  const [hiddenPersonality, setHiddenPersonality] = useState(initial?.hidden_personality ?? "");
+  const [totemAnimal, setTotemAnimal] = useState(initial?.totem_animal ?? "");
+  const [hiddenPushPsi, setHiddenPushPsi] = useState(initial?.hidden_push_psi ?? "");
+  const [wavespell, setWavespell] = useState(initial?.wavespell ?? "");
+  const [supportChallengeEnergy, setSupportChallengeEnergy] = useState(
+    initial?.support_challenge_energy ?? ""
+  );
 
   const isEditing = Boolean(initial);
 
@@ -42,6 +52,12 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
         .map((t) => t.trim())
         .filter(Boolean),
       relationship_notes: notes.trim(),
+      core_resonance_nuance: coreResonanceNuance.trim(),
+      hidden_personality: hiddenPersonality.trim(),
+      totem_animal: totemAnimal.trim(),
+      hidden_push_psi: hiddenPushPsi.trim(),
+      wavespell: wavespell.trim(),
+      support_challenge_energy: supportChallengeEnergy.trim(),
       created_at: initial?.created_at ?? new Date().toISOString(),
     };
     onSave(profile);
@@ -143,6 +159,56 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
               className="input-base min-h-20 resize-y"
             />
           </Field>
+
+          <details className="group rounded-xl border border-border px-4 py-3">
+            <summary className="cursor-pointer text-sm text-text-secondary select-none">
+              瑪雅深度天賦模組（選填）
+            </summary>
+            <div className="flex flex-col gap-4 mt-4">
+              <Field label="核心共鳴與性格細微差異">
+                <textarea
+                  value={coreResonanceNuance}
+                  onChange={(e) => setCoreResonanceNuance(e.target.value)}
+                  className="input-base min-h-16 resize-y"
+                />
+              </Field>
+              <Field label="對方的隱藏性格">
+                <textarea
+                  value={hiddenPersonality}
+                  onChange={(e) => setHiddenPersonality(e.target.value)}
+                  className="input-base min-h-16 resize-y"
+                />
+              </Field>
+              <Field label="力量動物（Totem Animal）">
+                <input
+                  value={totemAnimal}
+                  onChange={(e) => setTotemAnimal(e.target.value)}
+                  className="input-base"
+                />
+              </Field>
+              <Field label="隱藏推動（PSI / Hidden Push）">
+                <input
+                  value={hiddenPushPsi}
+                  onChange={(e) => setHiddenPushPsi(e.target.value)}
+                  className="input-base"
+                />
+              </Field>
+              <Field label="波符（Wavespell）">
+                <input
+                  value={wavespell}
+                  onChange={(e) => setWavespell(e.target.value)}
+                  className="input-base"
+                />
+              </Field>
+              <Field label="支持能量與挑戰擴展（Analog & Antipodal Energy）">
+                <textarea
+                  value={supportChallengeEnergy}
+                  onChange={(e) => setSupportChallengeEnergy(e.target.value)}
+                  className="input-base min-h-16 resize-y"
+                />
+              </Field>
+            </div>
+          </details>
 
           <div className="flex justify-end gap-2 mt-2">
             <button type="button" onClick={onClose} className="btn-secondary">

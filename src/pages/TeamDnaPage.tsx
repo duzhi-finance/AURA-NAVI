@@ -29,7 +29,7 @@ export default function TeamDnaPage() {
 
         <div className="text-center mb-10">
           <h1 className="text-3xl font-light text-text-primary">高維天賦圖譜</h1>
-          <p className="mt-3 text-sm text-text-secondary leading-relaxed">
+          <p className="desc-text mt-3 text-sm text-text-secondary leading-relaxed">
             你的職場天賦原型與能量指南
           </p>
         </div>
@@ -67,7 +67,7 @@ export default function TeamDnaPage() {
               </span>
             </div>
 
-            <p className="text-xs text-text-tertiary leading-relaxed mt-4 pt-4 border-t border-border">
+            <p className="desc-text text-xs text-text-tertiary leading-relaxed mt-4 pt-4 border-t border-border">
               將此圖卡截圖傳送給你的主管或 HR，即可完成天賦建檔。
             </p>
 

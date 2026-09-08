@@ -29,6 +29,7 @@ export default function Dashboard() {
         eyebrow="Celestial Synastry Chronograph"
         title="星軌共時儀表板"
         description="每天的第一站，掌握今日頻率，快速前往你需要的下一步。"
+        titleGradient
       />
 
       <div className="grid gap-5 md:grid-cols-2">
@@ -40,7 +41,7 @@ export default function Dashboard() {
               <div className={`text-2xl font-serif font-normal ${frequency.colorClass}`}>
                 {frequency.label}
               </div>
-              <p className="text-sm text-text-secondary mt-1.5 max-w-xs leading-relaxed">
+              <p className="desc-text text-sm text-text-secondary mt-1.5 max-w-xs leading-relaxed">
                 {frequency.description}
               </p>
             </div>
@@ -97,7 +98,7 @@ export default function Dashboard() {
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-lg font-serif text-text-primary">前往靈魂共振日記</div>
-          <p className="text-sm text-text-secondary mt-0.5">查看你的歷程觀照</p>
+          <p className="desc-text text-sm text-text-secondary mt-0.5">查看你的歷程觀照</p>
         </div>
         <ChevronRight size={20} strokeWidth={1.5} className="text-text-tertiary shrink-0" />
       </Link>
@@ -127,7 +128,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <p className="mt-10 text-xs text-text-tertiary leading-relaxed">
+      <p className="desc-text mt-6 text-[11px] text-text-tertiary leading-[1.5]">
         貼心提醒：所有靈魂印記皆安全儲存於此裝置與瀏覽器。換裝置或清除快取會導致資料遺失，請記得至靈魂印記典藏館進行【匯出備份】。
       </p>
     </div>
@@ -160,7 +161,7 @@ function QuickLink({
           [↗ 將跳轉至外部網站 glowing.cc]
         </span>
       )}
-      <p className="text-xs font-serif text-text-secondary leading-relaxed tracking-[0.05em]">
+      <p className="desc-text text-xs text-text-secondary leading-relaxed">
         {description}
       </p>
     </div>

@@ -10,6 +10,18 @@ export interface TalentProfile {
   life_path_num: number | null;
   core_traits_tags: string[];
   relationship_notes: string;
+  /** 核心共鳴與性格細微差異：同圖騰因調性不同產生的微觀性格差異 */
+  core_resonance_nuance: string;
+  /** 對方的隱藏性格：合盤視角下未顯化在表面的防衛機制與潛意識需求 */
+  hidden_personality: string;
+  /** 力量動物（Totem Animal）：13 調性對應的靈魂圖騰 */
+  totem_animal: string;
+  /** 隱藏推動（PSI / Hidden Push） */
+  hidden_push_psi: string;
+  /** 波符（Wavespell）：13 天靈魂使命藍圖 */
+  wavespell: string;
+  /** 支持能量與挑戰擴展（Analog & Antipodal Energy） */
+  support_challenge_energy: string;
   created_at: string;
 }
 

@@ -53,7 +53,7 @@ export default function DailyCardDraw() {
               <>
                 <TotemEmblem seed={cardSeedIndex(card)} size={56} className="text-luxe-gold" />
                 <div className="text-xl font-serif font-normal text-text-primary mt-1">{card.name}</div>
-                <p className="text-sm text-text-secondary leading-relaxed max-w-[240px] italic">
+                <p className="desc-text text-sm text-text-secondary leading-relaxed max-w-[240px] italic">
                   {card.insight}
                 </p>
               </>
@@ -62,7 +62,7 @@ export default function DailyCardDraw() {
         </div>
       </div>
 
-      <p className="text-xs text-text-tertiary mt-4">
+      <p className="desc-text text-xs text-text-tertiary mt-4">
         {card
           ? "今日已完成抽牌，明天將重新開啟新的一輪。"
           : "每天限抽一張，抽出後將維持顯示一整天。"}

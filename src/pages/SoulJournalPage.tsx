@@ -35,7 +35,7 @@ export default function SoulJournalPage() {
         <div className="panel p-12 text-center text-text-secondary">
           <BookHeart size={40} strokeWidth={1.25} className="mx-auto mb-4 text-text-tertiary" />
           <p className="mb-1.5">日誌還是空的</p>
-          <p className="text-sm text-text-tertiary">
+          <p className="desc-text text-sm text-text-tertiary">
             前往
             <Link to="/prompt-station" className="text-text-primary underline mx-1">
               高維策略樞紐

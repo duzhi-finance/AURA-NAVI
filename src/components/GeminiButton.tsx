@@ -8,7 +8,7 @@ export default function GeminiButton({ label = "開啟 Gemini 進行深度分析
         {label}
         <ArrowUpRight size={16} strokeWidth={1.75} />
       </a>
-      <p className="text-xs text-text-tertiary">需要 Google 帳號登入 Gemini 才能使用</p>
+      <p className="desc-text text-xs text-text-tertiary">需要 Google 帳號登入 Gemini 才能使用</p>
     </div>
   );
 }

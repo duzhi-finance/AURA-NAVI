@@ -71,6 +71,17 @@ export function buildPromptTemplates(): PromptTemplate[] {
   }));
 }
 
+function deepTalentParts(profile: TalentProfile): string[] {
+  const parts: string[] = [];
+  if (profile.core_resonance_nuance) parts.push(`核心共鳴與性格細微差異：${profile.core_resonance_nuance}`);
+  if (profile.hidden_personality) parts.push(`隱藏性格：${profile.hidden_personality}`);
+  if (profile.totem_animal) parts.push(`力量動物：${profile.totem_animal}`);
+  if (profile.hidden_push_psi) parts.push(`隱藏推動（PSI）：${profile.hidden_push_psi}`);
+  if (profile.wavespell) parts.push(`波符：${profile.wavespell}`);
+  if (profile.support_challenge_energy) parts.push(`支持能量與挑戰擴展：${profile.support_challenge_energy}`);
+  return parts;
+}
+
 function profileReferenceLine(selfProfile?: TalentProfile | null): string {
   if (!selfProfile) return "";
   const parts: string[] = [];
@@ -78,6 +89,7 @@ function profileReferenceLine(selfProfile?: TalentProfile | null): string {
   if (selfProfile.maya_tone) parts.push(`音調：${selfProfile.maya_tone}`);
   if (selfProfile.maya_totem) parts.push(`圖騰：${selfProfile.maya_totem}`);
   if (selfProfile.life_path_num != null) parts.push(`生命靈數：${selfProfile.life_path_num}`);
+  parts.push(...deepTalentParts(selfProfile));
   if (parts.length === 0) return "";
   return `（我在系統中預先典藏的資料供你參考核對：${parts.join("、")}）\n`;
 }
@@ -177,6 +189,12 @@ function notesLine(label: string, profile: TalentProfile): string {
   return `* ${label}的相處備註：${profile.relationship_notes.trim()}\n`;
 }
 
+function deepTalentLine(label: string, profile: TalentProfile): string {
+  const parts = deepTalentParts(profile);
+  if (parts.length === 0) return "";
+  return `* ${label}的深度天賦資料：${parts.join("；")}\n`;
+}
+
 export function generateRelationPrompt(
   self: TalentProfile,
   target: TalentProfile
@@ -195,7 +213,7 @@ export function generateRelationPrompt(
     .replace("{{ Target_LifePath }}", fmt(target.life_path_num))
     .replace(
       "（若我附上的圖片中有更完整的資訊，例如波符、力量動物、PSI 或女神力，請一併納入你的解析。）",
-      `${notesLine("我", self)}${notesLine(targetRole, target)}（若我附上的圖片中有更完整的資訊，例如波符、力量動物、PSI 或女神力，請一併納入你的解析。）`
+      `${notesLine("我", self)}${notesLine(targetRole, target)}${deepTalentLine("我", self)}${deepTalentLine(targetRole, target)}（若我附上的圖片中有更完整的資訊，例如波符、力量動物、PSI 或女神力，請一併納入你的解析。）`
     );
 }
 

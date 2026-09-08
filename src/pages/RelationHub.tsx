@@ -1,4 +1,4 @@
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import CopyPromptBlock from "../components/CopyPromptBlock";
@@ -55,10 +55,9 @@ export default function RelationHub() {
           description="比對你與重要關係人的天賦頻率，看見磨合點與共鳴亮點。"
         />
         <div className="panel p-12 text-center text-text-secondary">
-          <Sparkles size={40} strokeWidth={1.25} className="mx-auto mb-6 text-text-tertiary" />
+          <ResonanceRingsIcon size={48} strokeWidth={0.75} className="mx-auto mb-6 text-luxe-gold" />
           <div className="inline-flex items-center gap-3 rounded-full px-5 py-2.5 mb-6 bg-bg-subtle/60 border border-border">
-            <ResonanceRingsIcon size={18} className="text-luxe-gold shrink-0" />
-            <span className="font-serif text-sm text-text-secondary tracking-[0.02em]">
+            <span className="desc-text text-sm text-text-secondary">
               {profileCount < 2
                 ? "至少需要 2 張靈魂印記才能進行比對"
                 : "請至靈魂印記典藏館選取兩張印記進入藝廊"}
@@ -93,7 +92,7 @@ export default function RelationHub() {
           <p className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary mb-1">
             Frequency Radar
           </p>
-          <p className="text-sm text-text-secondary mb-4">四維能量相容度</p>
+          <p className="desc-text text-sm text-text-secondary mb-4">四維能量相容度</p>
           <FrequencyRadar axes={radarAxes} size={280} />
         </div>
       )}
@@ -105,7 +104,7 @@ export default function RelationHub() {
       </div>
 
       <div className="panel p-6 mt-6">
-        <p className="text-xs text-text-tertiary mb-4">
+        <p className="desc-text text-xs text-text-tertiary mb-4">
           請將複製好的指令與雙方的瑪雅圖卡截圖，一併貼給 Gemini 進行深度分析。
         </p>
         <GeminiButton />
@@ -114,11 +113,19 @@ export default function RelationHub() {
   );
 }
 
-function ResonanceRingsIcon({ size = 18, className = "" }: { size?: number; className?: string }) {
+function ResonanceRingsIcon({
+  size = 18,
+  strokeWidth = 1,
+  className = "",
+}: {
+  size?: number;
+  strokeWidth?: number;
+  className?: string;
+}) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
-      <circle cx="9" cy="12" r="7" stroke="currentColor" strokeWidth="1" />
-      <circle cx="15" cy="12" r="7" stroke="currentColor" strokeWidth="1" />
+      <circle cx="9" cy="12" r="7" stroke="currentColor" strokeWidth={strokeWidth} />
+      <circle cx="15" cy="12" r="7" stroke="currentColor" strokeWidth={strokeWidth} />
     </svg>
   );
 }
@@ -154,7 +161,7 @@ function ResonanceJunction({ self, target }: { self: TalentProfile; target: Tale
         <p className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary mb-2">
           Resonance Junction
         </p>
-        <p className="text-sm text-text-secondary leading-relaxed max-w-md mx-auto">
+        <p className="desc-text text-sm text-text-secondary leading-relaxed max-w-md mx-auto">
           {hasBoth ? (
             <>
               <span className="text-text-primary">{self.maya_totem}</span> ×{" "}

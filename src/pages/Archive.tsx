@@ -119,7 +119,7 @@ export default function Archive() {
           </span>
           <div>
             <div className="text-sm font-serif text-text-primary">需要建立團隊檔案？</div>
-            <p className="text-xs text-text-secondary mt-1 max-w-sm leading-relaxed">
+            <p className="desc-text text-xs text-text-secondary mt-1 max-w-sm leading-relaxed">
               提供「職場天賦原型輕測驗」連結給成員，輕鬆獲得天賦 KIN 碼。
             </p>
           </div>
@@ -153,7 +153,7 @@ export default function Archive() {
         <div className="panel p-12 text-center text-text-secondary">
           <Sparkles size={40} strokeWidth={1.25} className="mx-auto mb-4 text-text-tertiary" />
           <p>還沒有任何靈魂印記</p>
-          <p className="text-sm text-text-tertiary mt-1.5">
+          <p className="desc-text text-sm text-text-tertiary mt-1.5">
             先建立「自己」的印記，再逐步新增伴侶、家人、主管等重要關係人。
           </p>
         </div>
@@ -175,17 +175,17 @@ export default function Archive() {
         </div>
       )}
 
-      <div className="notice-pink px-5 py-4 mt-10 flex items-center justify-between gap-4 flex-wrap">
-        <p className="text-xs leading-relaxed max-w-2xl">
+      <div className="notice-pink px-[14px] py-[11px] mt-10 flex items-center justify-between gap-3 flex-wrap">
+        <p className="desc-text text-[11px] leading-[1.5] max-w-2xl">
           貼心提醒：資料僅儲存於此裝置與瀏覽器，更換裝置或清除快取會導致資料遺失，請定期匯出備份。本產品為數位商品與指令服務，一經購買或發送即完成交付，恕不接受退換貨。
         </p>
         <div className="flex gap-2">
-          <button onClick={handleExport} className="btn-secondary border border-notice-border !text-notice-text">
-            <Download size={14} strokeWidth={1.75} />
+          <button onClick={handleExport} className="btn-secondary !px-2.5 !py-1.5 border border-notice-border !text-notice-text">
+            <Download size={13} strokeWidth={1.75} />
             匯出 JSON 備份
           </button>
-          <button onClick={handleImportClick} className="btn-secondary border border-notice-border !text-notice-text">
-            <Upload size={14} strokeWidth={1.75} />
+          <button onClick={handleImportClick} className="btn-secondary !px-2.5 !py-1.5 border border-notice-border !text-notice-text">
+            <Upload size={13} strokeWidth={1.75} />
             匯入備份檔案
           </button>
         </div>
@@ -282,7 +282,7 @@ function ProfileCard({
 
       <div className="relative">
         <h3 className="text-lg font-serif font-normal text-text-primary">{profile.name_alias}</h3>
-        <p className="text-xs text-text-tertiary mt-1">
+        <p className="desc-text text-xs text-text-tertiary mt-1">
           {profile.maya_totem ? `圖騰：${profile.maya_totem}` : "尚未填寫圖騰"}
         </p>
       </div>
@@ -313,10 +313,45 @@ function ProfileCard({
       )}
 
       {profile.relationship_notes && (
-        <p className="text-xs text-text-tertiary leading-relaxed border-t border-border pt-3 line-clamp-3 relative">
+        <p className="desc-text text-xs text-text-tertiary leading-relaxed border-t border-border pt-3 line-clamp-3 relative">
           {profile.relationship_notes}
         </p>
       )}
+
+      <DeepTalentFields profile={profile} />
     </div>
+  );
+}
+
+const DEEP_TALENT_FIELDS: { key: keyof TalentProfile; label: string }[] = [
+  { key: "core_resonance_nuance", label: "核心共鳴與性格細微差異" },
+  { key: "hidden_personality", label: "對方的隱藏性格" },
+  { key: "totem_animal", label: "力量動物" },
+  { key: "hidden_push_psi", label: "隱藏推動（PSI）" },
+  { key: "wavespell", label: "波符" },
+  { key: "support_challenge_energy", label: "支持能量與挑戰擴展" },
+];
+
+function DeepTalentFields({ profile }: { profile: TalentProfile }) {
+  const populated = DEEP_TALENT_FIELDS.filter((f) => String(profile[f.key] ?? "").trim());
+  if (populated.length === 0) return null;
+
+  return (
+    <details
+      className="border-t border-border pt-3 relative"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <summary className="desc-text cursor-pointer text-[11px] text-luxe-gold select-none">
+        瑪雅深度天賦模組
+      </summary>
+      <div className="flex flex-col gap-2 mt-3">
+        {populated.map((f) => (
+          <div key={f.key} className="text-xs text-text-tertiary">
+            <span className="text-text-secondary">{f.label}：</span>
+            <span className="desc-text">{String(profile[f.key])}</span>
+          </div>
+        ))}
+      </div>
+    </details>
   );
 }
