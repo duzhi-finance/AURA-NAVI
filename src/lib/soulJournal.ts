@@ -47,10 +47,30 @@ export function addSoulJournalEntry(
   return full;
 }
 
+export function deleteSoulJournalEntry(id: string) {
+  try {
+    localStorage.setItem(JOURNAL_KEY, JSON.stringify(readAll().filter((e) => e.id !== id)));
+  } catch {
+    // storage unavailable — no-op
+  }
+}
+
 export function formatJournalDate(iso: string): string {
   const d = new Date(iso);
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
+}
+
+const WEEKDAY_ZH = ["日", "一", "二", "三", "四", "五", "六"];
+
+export function formatJournalDiaryDate(iso: string): { month: string; day: string; weekday: string; year: number } {
+  const d = new Date(iso);
+  return {
+    month: String(d.getMonth() + 1).padStart(2, "0"),
+    day: String(d.getDate()).padStart(2, "0"),
+    weekday: WEEKDAY_ZH[d.getDay()],
+    year: d.getFullYear(),
+  };
 }

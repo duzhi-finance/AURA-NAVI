@@ -1,10 +1,11 @@
-import { Compass, FolderOpen, SendHorizonal, Users } from "lucide-react";
+import { BookHeart, Compass, FolderOpen, SendHorizonal, Users } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 
 const NAV_ITEMS = [
   { to: "/", label: "星軌儀表板", Icon: Compass, end: true },
   { to: "/relations", label: "頻率藝廊", Icon: Users, end: false },
   { to: "/prompt-station", label: "策略樞紐", Icon: SendHorizonal, end: false },
+  { to: "/journal", label: "靈魂日誌", Icon: BookHeart, end: false },
   { to: "/archive", label: "靈魂典藏館", Icon: FolderOpen, end: false },
 ];
 
