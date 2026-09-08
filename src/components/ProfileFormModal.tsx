@@ -44,12 +44,12 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/70 p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-30 flex items-center justify-center bg-text-primary/40 p-4" onClick={onClose}>
       <div
-        className="glass-card w-full max-w-lg rounded-2xl p-6 max-h-[90vh] overflow-y-auto"
+        className="bg-bg border border-border w-full max-w-lg rounded-2xl p-7 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-lg font-semibold text-ink-100 mb-4">
+        <h2 className="font-serif text-xl font-semibold text-text-primary mb-6">
           {isEditing ? "編輯天賦檔案" : "新增天賦檔案"}
         </h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -130,18 +130,11 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
             />
           </Field>
 
-          <div className="flex justify-end gap-3 mt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-lg px-4 py-2 text-sm text-ink-300 hover:text-ink-100"
-            >
+          <div className="flex justify-end gap-2 mt-2">
+            <button type="button" onClick={onClose} className="btn-secondary">
               取消
             </button>
-            <button
-              type="submit"
-              className="rounded-lg bg-eagle-blue px-5 py-2 text-sm font-semibold text-space-black hover:opacity-90"
-            >
+            <button type="submit" className="btn-primary">
               儲存
             </button>
           </div>
@@ -154,7 +147,7 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5 text-sm">
-      <span className="text-ink-300">{label}</span>
+      <span className="text-text-secondary">{label}</span>
       {children}
     </label>
   );

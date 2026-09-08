@@ -1,23 +1,24 @@
+import { Compass, FolderOpen, SendHorizonal, Users } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 
 const NAV_ITEMS = [
-  { to: "/", label: "心靈地圖", icon: "🌌", end: true },
-  { to: "/relations", label: "關係翻譯館", icon: "🔮", end: false },
-  { to: "/prompt-station", label: "對焦傳輸站", icon: "🛰️", end: false },
-  { to: "/archive", label: "DNA Archive", icon: "📂", end: false },
+  { to: "/", label: "心靈地圖", Icon: Compass, end: true },
+  { to: "/relations", label: "關係翻譯館", Icon: Users, end: false },
+  { to: "/prompt-station", label: "對焦傳輸站", Icon: SendHorizonal, end: false },
+  { to: "/archive", label: "DNA Archive", Icon: FolderOpen, end: false },
 ];
 
 export default function Layout() {
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
-      <aside className="hidden md:flex md:w-60 md:flex-col md:border-r md:border-white/5 md:p-6 md:gap-8">
+    <div className="min-h-screen flex flex-col md:flex-row bg-bg">
+      <aside className="hidden md:flex md:w-64 md:flex-col md:border-r md:border-border md:p-7 md:gap-10">
         <Brand />
-        <nav className="flex flex-col gap-2">
+        <nav className="flex flex-col gap-1">
           {NAV_ITEMS.map((item) => (
             <NavItem key={item.to} {...item} />
           ))}
         </nav>
-        <div className="mt-auto text-xs text-ink-500 leading-relaxed">
+        <div className="mt-auto text-xs text-text-tertiary leading-relaxed">
           AURA-Navi
           <br />
           全人天賦與關係翻譯 AI 系統
@@ -25,17 +26,17 @@ export default function Layout() {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="md:hidden flex items-center justify-between px-4 py-4 border-b border-white/5">
+        <header className="md:hidden flex items-center justify-between px-5 py-5 border-b border-border">
           <Brand compact />
         </header>
 
-        <main className="flex-1 min-w-0 px-4 py-6 md:px-10 md:py-10 pb-24 md:pb-10">
+        <main className="flex-1 min-w-0 px-5 py-8 md:px-14 md:py-14 pb-24 md:pb-14">
           <div className="mx-auto w-full max-w-5xl">
             <Outlet />
           </div>
         </main>
 
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-20 glass-card border-t border-white/10 rounded-none">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-20 bg-bg border-t border-border">
           <div className="flex justify-around py-2">
             {NAV_ITEMS.map((item) => (
               <MobileNavItem key={item.to} {...item} />
@@ -49,49 +50,73 @@ export default function Layout() {
 
 function Brand({ compact }: { compact?: boolean }) {
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-2xl">🧭</span>
-      <div className={compact ? "text-sm" : ""}>
-        <div className="font-semibold text-gradient-aura text-lg leading-tight">AURA-Navi</div>
+    <div className="flex items-center gap-2.5">
+      <Compass size={22} strokeWidth={1.5} className="text-text-primary" />
+      <div>
+        <div className={`font-serif font-semibold text-text-primary leading-tight ${compact ? "text-base" : "text-lg"}`}>
+          AURA-Navi
+        </div>
         {!compact && (
-          <div className="text-[11px] text-ink-500 leading-tight">星際天賦與全人關係導航系統</div>
+          <div className="text-[11px] text-text-tertiary leading-tight mt-0.5">
+            星際天賦與全人關係導航系統
+          </div>
         )}
       </div>
     </div>
   );
 }
 
-function NavItem({ to, label, icon, end }: { to: string; label: string; icon: string; end: boolean }) {
+function NavItem({
+  to,
+  label,
+  Icon,
+  end,
+}: {
+  to: string;
+  label: string;
+  Icon: typeof Compass;
+  end: boolean;
+}) {
   return (
     <NavLink
       to={to}
       end={end}
       className={({ isActive }) =>
-        `flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-colors ${
+        `flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm border-l-2 transition-colors ${
           isActive
-            ? "bg-eagle-blue/15 text-eagle-blue glow-eagle"
-            : "text-ink-300 hover:bg-white/5 hover:text-ink-100"
+            ? "border-text-primary bg-surface text-text-primary font-medium"
+            : "border-transparent text-text-secondary hover:bg-bg-subtle hover:text-text-primary"
         }`
       }
     >
-      <span className="text-lg">{icon}</span>
+      <Icon size={17} strokeWidth={1.5} />
       <span>{label}</span>
     </NavLink>
   );
 }
 
-function MobileNavItem({ to, label, icon, end }: { to: string; label: string; icon: string; end: boolean }) {
+function MobileNavItem({
+  to,
+  label,
+  Icon,
+  end,
+}: {
+  to: string;
+  label: string;
+  Icon: typeof Compass;
+  end: boolean;
+}) {
   return (
     <NavLink
       to={to}
       end={end}
       className={({ isActive }) =>
-        `flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg text-[10px] ${
-          isActive ? "text-eagle-blue" : "text-ink-500"
+        `flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg text-[10px] ${
+          isActive ? "text-text-primary" : "text-text-tertiary"
         }`
       }
     >
-      <span className="text-lg">{icon}</span>
+      <Icon size={19} strokeWidth={1.5} />
       <span>{label}</span>
     </NavLink>
   );

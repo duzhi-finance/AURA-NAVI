@@ -1,3 +1,4 @@
+import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 
 export default function CopyPromptBlock({ text }: { text: string }) {
@@ -14,17 +15,17 @@ export default function CopyPromptBlock({ text }: { text: string }) {
   }
 
   return (
-    <div className="glass-card rounded-2xl p-4 md:p-5">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs uppercase tracking-wider text-ink-500">Navigation Prompt</span>
-        <button
-          onClick={handleCopy}
-          className="rounded-lg bg-eagle-blue/15 px-3 py-1.5 text-xs font-medium text-eagle-blue hover:bg-eagle-blue/25 transition-colors"
-        >
-          {copied ? "✅ 已複製" : "📋 複製指令"}
+    <div className="panel p-5 md:p-6">
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary">
+          Navigation Prompt
+        </span>
+        <button onClick={handleCopy} className="btn-secondary !px-3 !py-1.5 border border-border">
+          {copied ? <Check size={14} strokeWidth={1.75} /> : <Copy size={14} strokeWidth={1.75} />}
+          {copied ? "已複製" : "複製指令"}
         </button>
       </div>
-      <pre className="whitespace-pre-wrap break-words text-sm leading-relaxed text-ink-100 max-h-[420px] overflow-y-auto font-sans">
+      <pre className="whitespace-pre-wrap break-words text-sm leading-loose text-text-primary max-h-[420px] overflow-y-auto font-sans">
         {text}
       </pre>
     </div>

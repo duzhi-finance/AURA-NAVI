@@ -1,7 +1,9 @@
+import { Moon, Sparkles, Zap, type LucideIcon } from "lucide-react";
+
 export interface DailyFrequency {
   key: "attack" | "rest" | "sync";
   label: string;
-  emoji: string;
+  Icon: LucideIcon;
   description: string;
   colorClass: string;
 }
@@ -10,23 +12,23 @@ const FREQUENCIES: DailyFrequency[] = [
   {
     key: "attack",
     label: "進攻日",
-    emoji: "⚡",
+    Icon: Zap,
     description: "能量高漲，適合主動出擊、表達自我、推進重要決策。",
-    colorClass: "text-earth-pink",
+    colorClass: "text-freq-attack",
   },
   {
     key: "rest",
     label: "沉澱日",
-    emoji: "🌙",
+    Icon: Moon,
     description: "頻率內收，適合休息、覆盤與整理內在，避免衝動決定。",
-    colorClass: "text-eagle-blue",
+    colorClass: "text-freq-rest",
   },
   {
     key: "sync",
     label: "共時日",
-    emoji: "✨",
+    Icon: Sparkles,
     description: "同步性強，容易遇見巧合與關鍵訊息，適合連結與溝通。",
-    colorClass: "text-star-gold",
+    colorClass: "text-freq-sync",
   },
 ];
 

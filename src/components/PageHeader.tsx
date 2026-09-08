@@ -8,10 +8,12 @@ export default function PageHeader({
   description?: string;
 }) {
   return (
-    <div className="mb-8">
-      <div className="text-xs uppercase tracking-[0.2em] text-eagle-blue/80 mb-2">{eyebrow}</div>
-      <h1 className="text-2xl md:text-3xl font-semibold text-ink-100">{title}</h1>
-      {description && <p className="mt-2 text-sm text-ink-300 max-w-2xl">{description}</p>}
+    <div className="mb-10">
+      <div className="text-[11px] uppercase tracking-[0.2em] text-text-tertiary mb-3">{eyebrow}</div>
+      <h1 className="text-3xl md:text-[2.25rem] font-semibold text-text-primary">{title}</h1>
+      {description && (
+        <p className="mt-3 text-sm text-text-secondary max-w-2xl leading-relaxed">{description}</p>
+      )}
     </div>
   );
 }

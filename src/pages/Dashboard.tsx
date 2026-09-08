@@ -1,3 +1,4 @@
+import { ExternalLink, FolderOpen, SendHorizonal, type LucideIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
@@ -23,38 +24,44 @@ export default function Dashboard() {
       />
 
       <div className="grid gap-5 md:grid-cols-2">
-        <div className="glass-card glow-eagle rounded-2xl p-6 flex flex-col gap-4">
-          <div className="text-xs text-ink-500">{formatDateLabel()}</div>
+        <div className="panel p-7 flex flex-col gap-4">
+          <div className="text-xs text-text-tertiary">{formatDateLabel()}</div>
           <div className="flex items-center gap-4">
-            <span className="text-5xl animate-pulse-slow">{frequency.emoji}</span>
+            <frequency.Icon size={36} strokeWidth={1.25} className={frequency.colorClass} />
             <div>
-              <div className={`text-2xl font-semibold ${frequency.colorClass}`}>{frequency.label}</div>
-              <p className="text-sm text-ink-300 mt-1 max-w-xs">{frequency.description}</p>
+              <div className={`text-2xl font-serif font-semibold ${frequency.colorClass}`}>
+                {frequency.label}
+              </div>
+              <p className="text-sm text-text-secondary mt-1.5 max-w-xs leading-relaxed">
+                {frequency.description}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="glass-card rounded-2xl p-6 flex flex-col gap-3">
-          <div className="text-xs text-ink-500">今日瑪雅印記小卡</div>
+        <div className="panel p-7 flex flex-col gap-3">
+          <div className="text-xs text-text-tertiary">今日瑪雅印記小卡</div>
           {selfProfile ? (
             <div>
-              <div className="text-lg font-semibold text-ink-100">{selfProfile.name_alias}</div>
-              <div className="mt-2 grid grid-cols-3 gap-2 text-xs text-ink-300">
-                <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center">
+              <div className="text-lg font-serif font-semibold text-text-primary">
+                {selfProfile.name_alias}
+              </div>
+              <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-text-secondary">
+                <div className="rounded-lg bg-bg border border-border px-2 py-2 text-center">
                   KIN {selfProfile.maya_kin ?? "—"}
                 </div>
-                <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center">
+                <div className="rounded-lg bg-bg border border-border px-2 py-2 text-center">
                   {selfProfile.maya_tone || "音調未填"}
                 </div>
-                <div className="rounded-lg bg-white/5 px-2 py-1.5 text-center">
+                <div className="rounded-lg bg-bg border border-border px-2 py-2 text-center">
                   {selfProfile.maya_totem || "圖騰未填"}
                 </div>
               </div>
             </div>
           ) : (
-            <div className="text-sm text-ink-300">
+            <div className="text-sm text-text-secondary">
               尚未建立你的天賦檔案。
-              <Link to="/archive" className="text-eagle-blue underline ml-1">
+              <Link to="/archive" className="text-text-primary underline ml-1">
                 前往建立
               </Link>
             </div>
@@ -62,30 +69,27 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="mt-8">
-        <h2 className="text-sm font-medium text-ink-300 mb-3">快捷引導</h2>
+      <div className="mt-10">
+        <h2 className="text-sm font-medium text-text-secondary mb-4">快捷引導</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <QuickLink
             href={GLOWING_URL}
             external
-            icon="🪞"
+            Icon={ExternalLink}
             title="取得我的瑪雅印記"
             description="前往 glowing.cc 輸入生日生成圖卡"
-            accent="glow-gold"
           />
           <QuickLink
             to="/prompt-station"
-            icon="⚡"
+            Icon={SendHorizonal}
             title="一鍵生成 Gemini 導航指令"
             description="合成高維對焦 Prompt"
-            accent="glow-eagle"
           />
           <QuickLink
             to="/archive"
-            icon="📂"
+            Icon={FolderOpen}
             title="開啟 Talent DNA Archive"
             description="管理你與關係人的天賦檔案"
-            accent="glow-pink"
           />
         </div>
       </div>
@@ -97,24 +101,22 @@ function QuickLink({
   to,
   href,
   external,
-  icon,
+  Icon,
   title,
   description,
-  accent,
 }: {
   to?: string;
   href?: string;
   external?: boolean;
-  icon: string;
+  Icon: LucideIcon;
   title: string;
   description: string;
-  accent: string;
 }) {
   const content = (
-    <div className={`glass-card ${accent} rounded-2xl p-5 h-full flex flex-col gap-2 transition-transform hover:-translate-y-0.5`}>
-      <span className="text-2xl">{icon}</span>
-      <div className="text-sm font-semibold text-ink-100">{title}</div>
-      <p className="text-xs text-ink-300">{description}</p>
+    <div className="panel p-6 h-full flex flex-col gap-3 transition-colors hover:bg-surface-hover">
+      <Icon size={22} strokeWidth={1.25} className="text-text-primary" />
+      <div className="text-sm font-medium text-text-primary">{title}</div>
+      <p className="text-xs text-text-secondary leading-relaxed">{description}</p>
     </div>
   );
 

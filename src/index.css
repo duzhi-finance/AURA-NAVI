@@ -1,17 +1,25 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Noto Sans TC", system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Noto Serif TC", "Songti TC", "STSong", serif;
+  --font-sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
 
-  --color-space-black: #0b0c10;
-  --color-deep-navy: #1f2833;
-  --color-eagle-blue: #45a29e;
-  --color-earth-pink: #ff007f;
-  --color-star-gold: #c5a059;
+  --color-bg: #ffffff;
+  --color-bg-subtle: #f9f9f7;
+  --color-surface: #f2f2f0;
+  --color-surface-hover: #eaeae7;
+  --color-border: #e4e3df;
 
-  --color-ink-100: #eef1f3;
-  --color-ink-300: #b9c2c9;
-  --color-ink-500: #8592a0;
+  --color-text-primary: #222222;
+  --color-text-secondary: #888888;
+  --color-text-tertiary: #a0a0a0;
+
+  --color-accent: #1a1a1a;
+  --color-accent-contrast: #ffffff;
+
+  --color-freq-attack: #b5533c;
+  --color-freq-rest: #5b7a99;
+  --color-freq-sync: #a98b4a;
 }
 
 html,
@@ -22,11 +30,11 @@ body,
 
 body {
   margin: 0;
-  background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(69, 162, 158, 0.18), transparent),
-    radial-gradient(ellipse 60% 50% at 90% 10%, rgba(255, 0, 127, 0.12), transparent),
-    var(--color-space-black);
-  color: var(--color-ink-100);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
   font-family: var(--font-sans);
+  font-weight: 400;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -34,70 +42,85 @@ body {
   box-sizing: border-box;
 }
 
+h1,
+h2,
+h3 {
+  font-family: var(--font-serif);
+  text-wrap: balance;
+  letter-spacing: 0.01em;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(69, 162, 158, 0.4);
+  background: var(--color-border);
   border-radius: 8px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.glass-card {
-  background: linear-gradient(160deg, rgba(31, 40, 51, 0.65), rgba(11, 12, 16, 0.55));
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(69, 162, 158, 0.25);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-.glow-eagle {
-  box-shadow: 0 0 0 1px rgba(69, 162, 158, 0.4), 0 0 24px rgba(69, 162, 158, 0.25);
-}
-.glow-pink {
-  box-shadow: 0 0 0 1px rgba(255, 0, 127, 0.4), 0 0 24px rgba(255, 0, 127, 0.25);
-}
-.glow-gold {
-  box-shadow: 0 0 0 1px rgba(197, 160, 89, 0.4), 0 0 24px rgba(197, 160, 89, 0.2);
-}
-
-.text-gradient-aura {
-  background: linear-gradient(90deg, var(--color-eagle-blue), var(--color-star-gold));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
 }
 
 .input-base,
 .select-base {
   width: 100%;
-  border-radius: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(11, 12, 16, 0.5);
-  padding: 0.6rem 0.9rem;
-  color: var(--color-ink-100);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  padding: 0.65rem 0.95rem;
+  color: var(--color-text-primary);
   outline: none;
   transition: border-color 0.15s ease;
+  font-family: var(--font-sans);
 }
 .input-base::placeholder {
-  color: var(--color-ink-500);
+  color: var(--color-text-tertiary);
 }
 .input-base:focus,
 .select-base:focus {
-  border-color: var(--color-eagle-blue);
+  border-color: var(--color-text-primary);
 }
 .select-base option {
-  background: var(--color-deep-navy);
-  color: var(--color-ink-100);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
 }
 
-@keyframes pulse-slow {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  border-radius: 12px;
+  padding: 0.7rem 1.3rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: opacity 0.15s ease;
 }
-.animate-pulse-slow {
-  animation: pulse-slow 3s ease-in-out infinite;
+.btn-primary:hover {
+  opacity: 0.85;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-radius: 12px;
+  padding: 0.65rem 1.1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.btn-secondary:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
 }

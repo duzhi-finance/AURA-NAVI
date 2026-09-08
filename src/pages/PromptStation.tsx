@@ -34,17 +34,17 @@ export default function PromptStation() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
         <div className="flex flex-col gap-6">
-          <section className="glass-card rounded-2xl p-5">
+          <section className="panel p-6">
             <StepLabel n={1} title="選擇生命領域" />
-            <div className="grid grid-cols-2 gap-3 mt-3">
+            <div className="grid grid-cols-2 gap-3 mt-4">
               {LIFE_DOMAIN_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
                   onClick={() => setDomain(opt.value)}
-                  className={`rounded-xl px-4 py-3 text-sm font-medium border transition-colors ${
+                  className={`rounded-xl px-4 py-3 text-sm border transition-colors ${
                     domain === opt.value
-                      ? "border-eagle-blue bg-eagle-blue/15 text-eagle-blue"
-                      : "border-white/10 text-ink-300 hover:border-white/20"
+                      ? "border-text-primary bg-bg text-text-primary font-medium"
+                      : "border-border text-text-secondary hover:border-text-tertiary"
                   }`}
                 >
                   {opt.label}
@@ -53,13 +53,13 @@ export default function PromptStation() {
             </div>
           </section>
 
-          <section className={`glass-card rounded-2xl p-5 ${!domain ? "opacity-50 pointer-events-none" : ""}`}>
+          <section className={`panel p-6 ${!domain ? "opacity-50 pointer-events-none" : ""}`}>
             <StepLabel n={2} title="選擇目前痛點與目標" />
             <textarea
               value={context}
               onChange={(e) => setContext(e.target.value)}
               placeholder="請描述你目前的困境或想達成的目標，例如：主管不理解我"
-              className="input-base mt-3 min-h-24 resize-y"
+              className="input-base mt-4 min-h-24 resize-y"
             />
             {domain && (
               <div className="flex flex-wrap gap-2 mt-3">
@@ -67,7 +67,7 @@ export default function PromptStation() {
                   <button
                     key={s}
                     onClick={() => setContext(s)}
-                    className="rounded-full border border-white/10 px-3 py-1 text-xs text-ink-300 hover:border-star-gold/50 hover:text-star-gold"
+                    className="rounded-full border border-border px-3 py-1 text-xs text-text-secondary hover:border-text-primary hover:text-text-primary"
                   >
                     {s}
                   </button>
@@ -80,20 +80,20 @@ export default function PromptStation() {
         <div className="flex flex-col gap-6">
           <section>
             <StepLabel n={3} title="複製導航指令" />
-            <div className="mt-3">
+            <div className="mt-4">
               {domain ? (
                 <CopyPromptBlock text={prompt} />
               ) : (
-                <div className="glass-card rounded-2xl p-8 text-center text-sm text-ink-500">
+                <div className="panel p-8 text-center text-sm text-text-tertiary">
                   完成步驟 1、2 後，將於此處生成完整指令
                 </div>
               )}
             </div>
           </section>
 
-          <section className="glass-card rounded-2xl p-5">
+          <section className="panel p-6">
             <StepLabel n={4} title="快捷導向" />
-            <p className="text-xs text-ink-500 mt-2 mb-3">
+            <p className="text-xs text-text-tertiary mt-3 mb-4">
               請將複製好的指令與你在 glowing.cc 下載的瑪雅圖卡，一併貼給 Gemini。
             </p>
             <GeminiButton />
@@ -106,24 +106,24 @@ export default function PromptStation() {
 
 function StepLabel({ n, title }: { n: number; title: string }) {
   return (
-    <div className="flex items-center gap-2">
-      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-star-gold/20 text-xs font-semibold text-star-gold">
+    <div className="flex items-center gap-2.5">
+      <span className="flex h-6 w-6 items-center justify-center rounded-full border border-border text-xs text-text-secondary">
         {n}
       </span>
-      <h3 className="text-sm font-semibold text-ink-100">{title}</h3>
+      <h3 className="text-sm font-medium text-text-primary">{title}</h3>
     </div>
   );
 }
 
 function StepIndicator({ current }: { current: number }) {
   return (
-    <div className="flex items-center gap-2 text-xs text-ink-500">
+    <div className="flex items-center gap-2 text-xs text-text-tertiary">
       {[1, 2, 3].map((n) => (
         <div key={n} className="flex items-center gap-2">
           <span
-            className={`h-2 w-2 rounded-full ${n <= current ? "bg-eagle-blue" : "bg-white/15"}`}
+            className={`h-2 w-2 rounded-full ${n <= current ? "bg-text-primary" : "bg-border"}`}
           />
-          {n < 3 && <span className="w-6 h-px bg-white/15" />}
+          {n < 3 && <span className="w-6 h-px bg-border" />}
         </div>
       ))}
     </div>
