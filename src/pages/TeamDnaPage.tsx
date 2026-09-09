@@ -112,9 +112,9 @@ export default function TeamDnaPage() {
               href={LINE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-luxe-cta mt-1 w-full"
+              className="btn-luxe-cta mt-1 !text-xs !py-2 !px-4"
             >
-              <MessageCircle size={16} strokeWidth={1.75} />
+              <MessageCircle size={13} strokeWidth={1.75} />
               準不準？到 LINE 跟我分享你的結果
             </a>
 
