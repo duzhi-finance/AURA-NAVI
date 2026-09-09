@@ -146,50 +146,122 @@ function GlowingGuideCard() {
     <details className="group mt-4 rounded-xl border border-border bg-[#F5F5F3] px-5 py-4">
       <summary className="desc-text cursor-pointer text-[12px] text-[#7A7571] select-none flex items-center gap-2">
         <Sparkles size={13} strokeWidth={1.5} className="shrink-0" />
-        glowing.cc 3 秒快速擷取指引
+        glowing.cc 生日密碼計算機操作指南
       </summary>
 
-      <div className="mt-4 flex flex-col gap-4">
-        <ol className="flex flex-col gap-2.5">
-          <GuideStep n={1}>進入 glowing.cc 輸入您的「出生年月日」並點擊測算。</GuideStep>
-          <GuideStep n={2}>
-            無視密密麻麻的文字，直接尋找畫面上帶有「五色圖騰卡片」且寫有「KIN 數字」（如 KIN 215）的視覺圖卡。
-          </GuideStep>
-          <GuideStep n={3}>
-            直接「手機螢幕截圖」儲存，返回 AURA-Navi 輸入該 KIN 號碼即可完成高維對焦。
-          </GuideStep>
-        </ol>
+      <div className="mt-4 flex flex-col gap-6">
+        <GuideStepBlock
+          n={1}
+          title="進入計算機 & 獲取雙曆紀元"
+          instructions={[
+            "點擊上方連結進入 glowing.cc 生日密碼計算機。",
+            "輸入你的出生年月日並點擊測算。",
+            "系統會顯示雙曆紀元畫面，請截圖保存。",
+          ]}
+          mockLabel="雙曆紀元"
+          mockValue="NS 1.16.3.6"
+          mockSub="光譜白巫師年．電力鹿月"
+          seed={2}
+          color="#8FA9C9"
+        />
+        <GuideStepBlock
+          n={2}
+          title="找到共鳴主印記"
+          instructions={[
+            "在同一頁面往下滑動。",
+            "找到你的「共鳴主印記」區塊。",
+            "畫面會顯示 KIN 碼與主印記資訊，請截圖保存。",
+          ]}
+          mockLabel="共鳴主印記"
+          mockValue="KIN.215"
+          mockSub="共鳴．藍鷹"
+          seed={5}
+          color="#D98FA0"
+        />
+        <GuideStepBlock
+          n={3}
+          title="探索隱藏推動力（PSI）"
+          instructions={[
+            "在同一頁面繼續往下滑動。",
+            "點擊「隱藏推動（PSI）」選項。",
+            "畫面會跳轉至 PSI 資訊頁面，請截圖保存。",
+          ]}
+          mockLabel="隱藏推動 PSI"
+          mockValue="KIN.58"
+          mockSub="韻律．白鏡"
+          seed={8}
+          color="#8FA9C9"
+        />
+        <GuideStepBlock
+          n={4}
+          title="連結內在女神力"
+          instructions={[
+            "返回剛剛的共鳴主印記頁面。",
+            "點擊「內在女神力」選項。",
+            "畫面會跳轉至內在女神力資訊頁面，請截圖保存。",
+          ]}
+          mockLabel="內在女神力"
+          mockValue="KIN.217"
+          mockSub="太陽．紅地球"
+          seed={11}
+          color="#D6B15A"
+        />
 
-        <div className="rounded-lg border border-dashed border-[#C9C2B8] bg-surface p-4">
-          <div className="desc-text text-[10px] text-text-tertiary mb-2.5">
-            範例：請截圖此類圖卡畫面
-          </div>
-          <div className="rounded-md border border-border bg-bg p-3 flex flex-col items-center gap-2">
-            <div className="flex items-center justify-center gap-2">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <TotemEmblem key={i} seed={i} size={20} className="text-luxe-gold/70" />
-              ))}
-            </div>
-            <span className="border-2 border-red-500 rounded px-2 py-0.5 text-[11px] font-serif text-text-primary">
-              KIN 215
-            </span>
-          </div>
-        </div>
-
-        <p className="desc-text text-[10px] text-text-tertiary">
-          畫面來源：glowing.cc 測算介面示意
+        <p className="desc-text text-[10px] text-text-tertiary border-t border-border pt-4">
+          畫面為示意重製，非官方實際介面｜資料計算來源：glowing.cc，正式測算請以官網顯示結果為準。
         </p>
       </div>
     </details>
   );
 }
 
-function GuideStep({ n, children }: { n: number; children: React.ReactNode }) {
+function GuideStepBlock({
+  n,
+  title,
+  instructions,
+  mockLabel,
+  mockValue,
+  mockSub,
+  seed,
+  color,
+}: {
+  n: number;
+  title: string;
+  instructions: string[];
+  mockLabel: string;
+  mockValue: string;
+  mockSub: string;
+  seed: number;
+  color: string;
+}) {
   return (
-    <li className="flex items-start gap-2.5 desc-text text-[12px] text-[#7A7571] leading-relaxed">
-      <span className="shrink-0 text-luxe-gold">Step {n}</span>
-      <span>{children}</span>
-    </li>
+    <div className="flex flex-col gap-2.5">
+      <div className="desc-text text-[12px] text-[#7A7571]">
+        <span className="text-luxe-gold">Step {n}</span>{" "}
+        <span className="text-text-primary font-medium">{title}</span>
+      </div>
+      <ol className="flex flex-col gap-1.5">
+        {instructions.map((t, i) => (
+          <li key={i} className="desc-text text-[11.5px] text-[#8A857C] leading-relaxed flex gap-2">
+            <span className="text-[#C9C2B8] shrink-0">—</span>
+            <span>{t}</span>
+          </li>
+        ))}
+      </ol>
+      <div className="rounded-lg bg-[#3A3936] p-4 flex flex-col gap-1.5">
+        <div className="text-[10px] tracking-wide text-[#B9B3A9]">{mockLabel}</div>
+        <div className="font-serif text-lg font-semibold tracking-wide text-[#F2EFE9]">
+          {mockValue}
+        </div>
+        <div className="text-[11px] text-[#D9D3C8] font-light">{mockSub}</div>
+        <div className="mt-1 flex items-center gap-2">
+          <span style={{ color }}>
+            <TotemEmblem seed={seed} size={28} />
+          </span>
+          <span className="text-[10px] text-[#8F887E]">示意畫面</span>
+        </div>
+      </div>
+    </div>
   );
 }
 
