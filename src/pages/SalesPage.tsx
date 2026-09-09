@@ -110,7 +110,7 @@ export default function SalesPage() {
           <div className="mt-8 grid gap-6 sm:grid-cols-3">
             {PAIN_POINTS.map((p) => (
               <div key={p.title} className="card-glass p-7">
-                <h3 className="font-serif text-base font-medium text-text-primary tracking-[0.03em]">
+                <h3 className="font-serif text-base font-semibold text-text-primary tracking-[0.03em]">
                   {p.title}
                 </h3>
                 <p className="desc-text text-sm text-text-secondary leading-relaxed mt-3">
@@ -135,11 +135,13 @@ export default function SalesPage() {
             AURA-Navi 是一套結合星際瑪雅曆與現代策略的 AI 導航樞紐。我們將你內在的神秘學特質，精準翻譯成世俗看得懂的「商業策略、溝通話術與客製化提案」：
           </p>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <div className="mt-8 grid gap-5 sm:grid-cols-3">
             {TRANSLATION_FEATURES.map((f) => (
-              <div key={f.title} className="card-luxe card-hover p-6 flex flex-col gap-2">
-                <span className="text-luxe-gold">✦</span>
-                <div className="text-sm font-medium text-text-primary">{f.title}</div>
+              <div key={f.title} className="card-glass p-6 flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-luxe-gold text-sm shrink-0">✦</span>
+                  <div className="font-serif text-sm font-semibold text-text-primary">{f.title}</div>
+                </div>
                 <p className="desc-text text-xs text-text-secondary leading-relaxed">
                   {f.description}
                 </p>
@@ -161,7 +163,7 @@ export default function SalesPage() {
               <div key={d.title} className="card-glass p-6 flex flex-col gap-2 text-left">
                 <div className="flex items-center gap-2">
                   <span className="text-luxe-gold text-sm shrink-0">✦</span>
-                  <div className="font-serif text-sm font-medium text-text-primary">{d.title}</div>
+                  <div className="font-serif text-sm font-semibold text-text-primary">{d.title}</div>
                 </div>
                 <p className="desc-text text-xs text-text-secondary leading-relaxed">
                   {d.description}
@@ -179,7 +181,7 @@ export default function SalesPage() {
             {QUALITY_PROMISES.map(({ Icon, title, description }) => (
               <div key={title} className="card-glass p-6 flex flex-col gap-2">
                 <Icon size={18} strokeWidth={1.25} className="text-text-primary" />
-                <div className="font-serif text-sm font-medium text-text-primary">{title}</div>
+                <div className="font-serif text-sm font-semibold text-text-primary">{title}</div>
                 <p className="desc-text text-xs text-text-secondary leading-relaxed">
                   {description}
                 </p>
