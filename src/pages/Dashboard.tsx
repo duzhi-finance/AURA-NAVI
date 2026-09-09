@@ -1,4 +1,4 @@
-import { ArrowRight, BookHeart, Check, ChevronRight, Copy, ExternalLink, FolderOpen, SendHorizonal, Sparkles, type LucideIcon } from "lucide-react";
+import { ArrowRight, BookHeart, Check, ChevronRight, Copy, ExternalLink, FolderOpen, Layers, SendHorizonal, Sparkles, type LucideIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import DailyCardDraw from "../components/DailyCardDraw";
@@ -10,6 +10,11 @@ import { computeKinFromBirthdate } from "../lib/dreamspellKin";
 import { buildFullProfileSummary, GLOWING_URL } from "../lib/promptTemplates";
 import { getSelfProfile } from "../lib/store";
 import { MAYA_TOTEMS } from "../lib/mayaOptions";
+import {
+  computeDailyStrategy,
+  computeYearlyKin,
+  parseBirthMonthDay,
+} from "../lib/yearlyFlow";
 import type { TalentProfile } from "../types/talent";
 
 const COPY_FEEDBACK_MS = 1500;
@@ -18,10 +23,15 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [selfProfile, setSelfProfile] = useState<TalentProfile | undefined>(undefined);
   const [copiedSummary, setCopiedSummary] = useState(false);
+  const [copiedDailyFocus, setCopiedDailyFocus] = useState(false);
   const frequency = getTodayFrequency();
   const now = new Date();
   const todayKin = computeKinFromBirthdate(now.getFullYear(), now.getMonth() + 1, now.getDate());
   const todaySeed = MAYA_TOTEMS.indexOf(todayKin.totem);
+
+  const birthMonthDay = selfProfile?.birth_date ? parseBirthMonthDay(selfProfile.birth_date) : null;
+  const yearlyKin = birthMonthDay ? computeYearlyKin(birthMonthDay.month, birthMonthDay.day) : null;
+  const dailyStrategy = yearlyKin ? computeDailyStrategy(yearlyKin.kin, todayKin.kin) : null;
 
   function handleBringTodayEnergy() {
     const presetContext = selfProfile?.maya_totem
@@ -38,6 +48,20 @@ export default function Dashboard() {
       setTimeout(() => setCopiedSummary(false), COPY_FEEDBACK_MS);
     } catch {
       setCopiedSummary(false);
+    }
+  }
+
+  async function handleCopyDailyFocus() {
+    if (!selfProfile || !yearlyKin || !dailyStrategy) return;
+    const text = `我的本命是「${selfProfile.maya_totem}」（KIN ${selfProfile.maya_kin}），今年流年是「${yearlyKin.totem}」（KIN ${yearlyKin.kin}），今天的日流是「${todayKin.totem}」（KIN ${todayKin.kin}）。
+今天判定為「${dailyStrategy.label}」：${dailyStrategy.description}
+請根據以上疊加的能量屬性，給我今天在職場上最適合採取的具體行動與應對策略。`;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedDailyFocus(true);
+      setTimeout(() => setCopiedDailyFocus(false), COPY_FEEDBACK_MS);
+    } catch {
+      setCopiedDailyFocus(false);
     }
   }
 
@@ -76,6 +100,35 @@ export default function Dashboard() {
               {todayKin.totem}．{todayKin.tone}
             </span>
           </div>
+
+          {yearlyKin && dailyStrategy ? (
+            <div className="rounded-xl border border-border bg-bg-subtle/40 px-4 py-3 flex flex-col gap-1.5">
+              <div className="text-[11px] text-text-tertiary">
+                今年流年：<span className="font-serif font-semibold text-text-primary">KIN {yearlyKin.kin}</span> {yearlyKin.totem}．{yearlyKin.tone}
+              </div>
+              <div className="text-[11px] text-text-tertiary">
+                今日商業策略：<span className="font-serif font-semibold text-luxe-gold">{dailyStrategy.label}</span>
+              </div>
+              <p className="desc-text text-xs text-text-secondary leading-relaxed">
+                {dailyStrategy.description}
+              </p>
+              <button
+                onClick={handleCopyDailyFocus}
+                className="btn-secondary self-start border border-border mt-1 !text-xs"
+              >
+                {copiedDailyFocus ? <Check size={13} strokeWidth={1.75} /> : <Copy size={13} strokeWidth={1.75} />}
+                {copiedDailyFocus ? "已複製" : "一鍵複製今日對焦 Prompt"}
+              </button>
+            </div>
+          ) : selfProfile ? (
+            <p className="desc-text text-[11px] text-text-tertiary">
+              補上你的出生年月日，即可解鎖流年疊加的每日商業策略對焦。
+              <Link to="/app/archive" className="text-text-primary underline ml-1">
+                前往補填
+              </Link>
+            </p>
+          ) : null}
+
           <button
             onClick={handleBringTodayEnergy}
             className="btn-secondary self-start border border-border"
@@ -147,7 +200,7 @@ export default function Dashboard() {
 
       <div className="mt-10">
         <h2 className="text-sm font-medium text-text-secondary mb-4">快捷引導</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <QuickLink
             href={GLOWING_URL}
             external
@@ -166,6 +219,12 @@ export default function Dashboard() {
             Icon={FolderOpen}
             title="開啟靈魂印記典藏館"
             description="管理你與關係人的靈魂印記"
+          />
+          <QuickLink
+            to="/app/deep-dive"
+            Icon={Layers}
+            title="深度星軌模組"
+            description="13 年生命大運與脈輪對應卡"
           />
         </div>
 

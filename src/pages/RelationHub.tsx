@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Check, Copy } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import CopyPromptBlock from "../components/CopyPromptBlock";
@@ -8,9 +8,17 @@ import PageHeader from "../components/PageHeader";
 import TotemEmblem from "../components/TotemEmblem";
 import { computeCompatibility } from "../lib/compatibility";
 import { MAYA_TOTEMS } from "../lib/mayaOptions";
-import { generateRelationPrompt } from "../lib/promptTemplates";
+import { buildGuardPrompt, generateRelationPrompt } from "../lib/promptTemplates";
 import { getProfile, listProfiles } from "../lib/store";
+import {
+  classifyRelationshipRole,
+  computeCompositeKin,
+  RELATIONSHIP_ROLE_GUIDE,
+  RELATIONSHIP_ROLE_LABEL,
+} from "../lib/synastry";
 import type { TalentProfile } from "../types/talent";
+
+const COPY_FEEDBACK_MS = 1500;
 
 interface GalleryNavState {
   selfId?: string;
@@ -22,6 +30,7 @@ export default function RelationHub() {
   const [profileCount, setProfileCount] = useState(0);
   const [selfProfile, setSelfProfile] = useState<TalentProfile | undefined>(undefined);
   const [targetProfile, setTargetProfile] = useState<TalentProfile | undefined>(undefined);
+  const [copiedGuard, setCopiedGuard] = useState(false);
 
   useEffect(() => {
     const all = listProfiles();
@@ -45,6 +54,32 @@ export default function RelationHub() {
     if (!selfProfile || !targetProfile) return null;
     return computeCompatibility(selfProfile, targetProfile);
   }, [selfProfile, targetProfile]);
+
+  const synastry = useMemo(() => {
+    if (!selfProfile?.maya_kin || !targetProfile?.maya_kin) return null;
+    const composite = computeCompositeKin(selfProfile.maya_kin, targetProfile.maya_kin);
+    const role = classifyRelationshipRole(selfProfile.maya_kin, targetProfile.maya_kin);
+    return { composite, role };
+  }, [selfProfile, targetProfile]);
+
+  async function handleCopyGuardPrompt() {
+    if (!selfProfile || !targetProfile || !synastry) return;
+    const text = buildGuardPrompt(
+      selfProfile,
+      targetProfile,
+      RELATIONSHIP_ROLE_LABEL[synastry.role],
+      RELATIONSHIP_ROLE_GUIDE[synastry.role],
+      synastry.composite.kin,
+      synastry.composite.totem
+    );
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedGuard(true);
+      setTimeout(() => setCopiedGuard(false), COPY_FEEDBACK_MS);
+    } catch {
+      setCopiedGuard(false);
+    }
+  }
 
   if (!selfProfile || !targetProfile) {
     return (
@@ -98,6 +133,35 @@ export default function RelationHub() {
       )}
 
       <ResonanceJunction self={selfProfile} target={targetProfile} />
+
+      {synastry && (
+        <div className="card-glass p-6 mt-6 flex flex-col gap-3">
+          <p className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary">
+            Synastry ｜ 雙人合盤診斷
+          </p>
+          <div className="flex flex-wrap items-center gap-2 text-xs text-text-secondary">
+            <span className="rounded-lg bg-bg border border-border px-2.5 py-1.5 font-serif font-semibold">
+              合相印記 KIN {synastry.composite.kin}
+            </span>
+            <span className="rounded-lg bg-bg border border-border px-2.5 py-1.5">
+              {synastry.composite.totem}．{synastry.composite.tone}
+            </span>
+            <span className="rounded-full bg-luxe-gold/15 border border-border-gold px-3 py-1.5 font-serif font-semibold text-text-primary">
+              {RELATIONSHIP_ROLE_LABEL[synastry.role]}
+            </span>
+          </div>
+          <p className="desc-text text-sm text-text-secondary leading-relaxed">
+            {RELATIONSHIP_ROLE_GUIDE[synastry.role]}
+          </p>
+          <button
+            onClick={handleCopyGuardPrompt}
+            className="btn-secondary self-start border border-border !text-xs"
+          >
+            {copiedGuard ? <Check size={13} strokeWidth={1.75} /> : <Copy size={13} strokeWidth={1.75} />}
+            {copiedGuard ? "已複製" : "生成主管／客戶溝通攻心 Prompt"}
+          </button>
+        </div>
+      )}
 
       <div className="mt-6">
         <CopyPromptBlock text={prompt} />

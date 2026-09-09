@@ -14,9 +14,12 @@ import {
   RELATIONSHIP_STATUS_OPTIONS,
   ROMANCE_SINGLE_PRESETS,
   generateNavigationPrompt,
+  type DeepDiveContext,
 } from "../lib/promptTemplates";
 import { addSoulJournalEntry } from "../lib/soulJournal";
 import { getSelfProfile } from "../lib/store";
+import { computePsiKin, computeGoddessKin } from "../lib/dreamspellKin";
+import { computeYearlyKin, parseBirthMonthDay } from "../lib/yearlyFlow";
 import type { LifeDomain, RelationshipStatus } from "../types/talent";
 
 const DEEP_DIVE_ICONS = [Briefcase, FileText, Wind, CalendarDays];
@@ -34,6 +37,20 @@ export default function PromptStation() {
   const [journalToast, setJournalToast] = useState("");
   const selfProfile = useMemo(() => getSelfProfile(), []);
   const dailyCard = useMemo(() => getTodayCard(), []);
+
+  const deepDiveContext = useMemo<DeepDiveContext>(() => {
+    const kin = selfProfile?.maya_kin ?? null;
+    const birthMonthDay = selfProfile?.birth_date ? parseBirthMonthDay(selfProfile.birth_date) : null;
+    const yearly = birthMonthDay ? computeYearlyKin(birthMonthDay.month, birthMonthDay.day) : null;
+    return {
+      totem: selfProfile?.maya_totem ?? "",
+      kin,
+      psiKin: kin ? computePsiKin(kin) : null,
+      goddessKin: kin ? computeGoddessKin(kin) : null,
+      yearlyKin: yearly?.kin ?? null,
+      yearlyTotem: yearly?.totem ?? "",
+    };
+  }, [selfProfile]);
 
   useEffect(() => {
     const state = location.state as PromptStationNavState | null;
@@ -218,7 +235,7 @@ export default function PromptStation() {
                 <GeminiButton />
               </div>
 
-              {domain && <DeepDivePrompts totem={selfProfile?.maya_totem ?? ""} />}
+              {domain && <DeepDivePrompts ctx={deepDiveContext} />}
             </div>
           </section>
         </div>
@@ -231,7 +248,7 @@ export default function PromptStation() {
 
 const DEEP_DIVE_COPY_MS = 1500;
 
-function DeepDivePrompts({ totem }: { totem: string }) {
+function DeepDivePrompts({ ctx }: { ctx: DeepDiveContext }) {
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
 
   async function handleCopy(idx: number, text: string) {
@@ -256,7 +273,7 @@ function DeepDivePrompts({ totem }: { totem: string }) {
           return (
             <button
               key={item.title}
-              onClick={() => handleCopy(idx, item.buildText(totem))}
+              onClick={() => handleCopy(idx, item.buildText(ctx))}
               className="rounded-xl border border-border-gold bg-surface/70 p-4 text-left transition-colors hover:border-luxe-gold"
             >
               <div className="flex items-center justify-between gap-2">
@@ -273,7 +290,7 @@ function DeepDivePrompts({ totem }: { totem: string }) {
                 )}
               </div>
               <p className="desc-text text-xs text-text-secondary leading-relaxed mt-2">
-                {copied ? "已複製，請貼到 Gemini 對話中" : item.buildText(totem)}
+                {copied ? "已複製，請貼到 Gemini 對話中" : item.buildText(ctx)}
               </p>
             </button>
           );

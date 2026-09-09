@@ -4,6 +4,8 @@ export interface TalentProfile {
   profile_type: string;
   is_self: boolean;
   name_alias: string;
+  /** Birth date as YYYY-MM-DD, empty string if unknown. Needed for yearly-KIN and life-cycle-year modules. */
+  birth_date: string;
   maya_kin: number | null;
   maya_tone: string;
   maya_totem: string;

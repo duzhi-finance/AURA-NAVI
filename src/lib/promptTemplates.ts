@@ -217,6 +217,29 @@ export function generateRelationPrompt(
     );
 }
 
+export function buildGuardPrompt(
+  self: TalentProfile,
+  target: TalentProfile,
+  roleLabel: string,
+  roleGuide: string,
+  compositeKin: number,
+  compositeTotem: string
+): string {
+  const targetRole = target.profile_type.trim() || "對象";
+  return `你現在是一位精通星際瑪雅曆（Dreamspell）與職場人際心理學的「高維關係翻譯官」。
+
+我要跟「${targetRole}｜${fmt(target.name_alias)}」（KIN ${fmt(target.maya_kin)}．${fmt(target.maya_totem)}）互動，我自己是 KIN ${fmt(self.maya_kin)}．${fmt(self.maya_totem)}。
+
+雙方的合相印記（Composite KIN）為 KIN ${compositeKin}．${compositeTotem}，判定關係屬性為「${roleLabel}」：${roleGuide}
+
+請根據以上資訊，給我一份「${targetRole}溝通攻心大綱」，包含：
+1. 與對方互動時最容易踩到的地雷與誤解來源。
+2. 最能打動對方、建立信任的溝通切入點。
+3. 面對意見分歧時，最有效的化解與說服策略。
+
+請用溫暖、精準、具備洞察力且落地的繁體中文回答，避免空泛的星座式描述。`;
+}
+
 export function buildFullProfileSummary(profile: TalentProfile): string {
   const lines: string[] = [];
   lines.push("✦ AURA-Navi 星軌檔案 ✦");
@@ -230,22 +253,40 @@ export function buildFullProfileSummary(profile: TalentProfile): string {
   return lines.join("\n").replace(/\n{3,}/g, "\n\n");
 }
 
-export const DEEP_DIVE_PROMPTS: { title: string; buildText: (totem: string) => string }[] = [
+export interface DeepDiveContext {
+  totem: string;
+  kin: number | null;
+  psiKin: number | null;
+  goddessKin: number | null;
+  yearlyKin: number | null;
+  yearlyTotem: string;
+}
+
+export const DEEP_DIVE_PROMPTS: { title: string; buildText: (ctx: DeepDiveContext) => string }[] = [
   {
     title: "職場加薪／定位",
-    buildText: () => "請根據我的天賦圖譜，分析我最適合的職場突破點與加薪策略。",
+    buildText: (ctx) =>
+      `請根據我的天賦圖譜（KIN ${ctx.kin ?? "—"}．${ctx.totem || "天賦圖騰"}${
+        ctx.psiKin ? `，PSI 隱藏推動 KIN ${ctx.psiKin}` : ""
+      }），分析我最適合的職場突破點與加薪策略。`,
   },
   {
     title: "履歷與提案優化",
-    buildText: (totem) => `幫我寫一份符合我「${totem || "天賦圖騰"}」洞察力特質的商業提案大綱。`,
+    buildText: (ctx) => `幫我寫一份符合我「${ctx.totem || "天賦圖騰"}」洞察力特質的商業提案大綱。`,
   },
   {
     title: "內耗排解",
-    buildText: () => "當我覺得直覺被質疑、與團隊不對頻時，我該如何進行心理調頻？",
+    buildText: (ctx) =>
+      `當我覺得直覺被質疑、與團隊不對頻時，我該如何進行心理調頻？${
+        ctx.goddessKin ? `（我的內在女神力為 KIN ${ctx.goddessKin}，請納入修復建議。）` : ""
+      }`,
   },
   {
-    title: "重要決策日選取",
-    buildText: () => "請告訴我接下來這個月，最適合我進行重要商業談判的流年日期。",
+    title: "本月談判與加薪黃金日",
+    buildText: (ctx) =>
+      `請告訴我接下來這個月，最適合我進行重要商業談判與加薪協商的流年黃金日期。${
+        ctx.yearlyKin ? `（我今年的流年主印記為 KIN ${ctx.yearlyKin}．${ctx.yearlyTotem}）` : ""
+      }`,
   },
 ];
 

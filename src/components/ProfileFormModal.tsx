@@ -33,7 +33,7 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
   const [profileType, setProfileType] = useState(initial?.profile_type ?? "");
   const [isSelf, setIsSelf] = useState(initial?.is_self ?? false);
   const [nameAlias, setNameAlias] = useState(initial?.name_alias ?? "");
-  const [birthdate, setBirthdate] = useState("");
+  const [birthdate, setBirthdate] = useState(initial?.birth_date ?? "");
   const [kin, setKin] = useState(initial?.maya_kin != null ? String(initial.maya_kin) : "");
   const [tone, setTone] = useState(initial?.maya_tone ?? "");
   const [totem, setTotem] = useState(initial?.maya_totem ?? "");
@@ -69,6 +69,7 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
       profile_type: profileType.trim(),
       is_self: isSelf,
       name_alias: nameAlias.trim(),
+      birth_date: birthdate,
       maya_kin: kin.trim() ? Number(kin) : null,
       maya_tone: tone,
       maya_totem: totem,

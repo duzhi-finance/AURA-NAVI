@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import RelationHub from "./pages/RelationHub";
 import PromptStation from "./pages/PromptStation";
 import Archive from "./pages/Archive";
+import DeepDivePage from "./pages/DeepDivePage";
 import SoulJournalPage from "./pages/SoulJournalPage";
 import TeamDnaPage from "./pages/TeamDnaPage";
 import SalesPage from "./pages/SalesPage";
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="relations" element={<RelationHub />} />
           <Route path="prompt-station" element={<PromptStation />} />
           <Route path="archive" element={<Archive />} />
+          <Route path="deep-dive" element={<DeepDivePage />} />
           <Route path="journal" element={<SoulJournalPage />} />
         </Route>
       </Routes>
