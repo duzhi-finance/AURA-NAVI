@@ -1,4 +1,4 @@
-import { ArrowRight, BookHeart, ChevronRight, ExternalLink, FolderOpen, SendHorizonal, Sparkles, type LucideIcon } from "lucide-react";
+import { ArrowRight, BookHeart, Check, ChevronRight, Copy, ExternalLink, FolderOpen, SendHorizonal, Sparkles, type LucideIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import DailyCardDraw from "../components/DailyCardDraw";
@@ -6,19 +6,39 @@ import { PullQuote, VerticalMicrocopy } from "../components/Editorial";
 import PageHeader from "../components/PageHeader";
 import TotemEmblem from "../components/TotemEmblem";
 import { formatBilingualDateLabel, getTodayFrequency } from "../lib/dailyFrequency";
-import { GLOWING_URL } from "../lib/promptTemplates";
+import { computeKinFromBirthdate } from "../lib/dreamspellKin";
+import { buildFullProfileSummary, GLOWING_URL } from "../lib/promptTemplates";
 import { getSelfProfile } from "../lib/store";
+import { MAYA_TOTEMS } from "../lib/mayaOptions";
 import type { TalentProfile } from "../types/talent";
+
+const COPY_FEEDBACK_MS = 1500;
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [selfProfile, setSelfProfile] = useState<TalentProfile | undefined>(undefined);
+  const [copiedSummary, setCopiedSummary] = useState(false);
   const frequency = getTodayFrequency();
+  const now = new Date();
+  const todayKin = computeKinFromBirthdate(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  const todaySeed = MAYA_TOTEMS.indexOf(todayKin.totem);
 
   function handleBringTodayEnergy() {
-    navigate("/app/prompt-station", {
-      state: { presetContext: `今日流年：${frequency.label}` },
-    });
+    const presetContext = selfProfile?.maya_totem
+      ? `我今天是「${selfProfile.maya_totem}」，面對今天的「${todayKin.totem}」能量（KIN ${todayKin.kin}．${todayKin.tone}），我的提案／溝通策略該如何調頻？`
+      : `今日能量：KIN ${todayKin.kin}．${todayKin.totem}（${frequency.label}）`;
+    navigate("/app/prompt-station", { state: { presetContext } });
+  }
+
+  async function handleCopySummary() {
+    if (!selfProfile) return;
+    try {
+      await navigator.clipboard.writeText(buildFullProfileSummary(selfProfile));
+      setCopiedSummary(true);
+      setTimeout(() => setCopiedSummary(false), COPY_FEEDBACK_MS);
+    } catch {
+      setCopiedSummary(false);
+    }
   }
 
   useEffect(() => {
@@ -49,20 +69,27 @@ export default function Dashboard() {
               </p>
             </div>
           </div>
+          <div className="inline-flex items-center gap-2 self-start rounded-full border border-border-gold bg-bg-subtle/60 px-3 py-1.5 text-xs text-text-secondary">
+            <TotemEmblem seed={todaySeed >= 0 ? todaySeed : 0} size={16} className="text-luxe-gold shrink-0" />
+            <span>
+              今日能量：<span className="font-serif font-semibold text-text-primary">KIN {todayKin.kin}</span>{" "}
+              {todayKin.totem}．{todayKin.tone}
+            </span>
+          </div>
           <button
             onClick={handleBringTodayEnergy}
             className="btn-secondary self-start border border-border"
           >
-            帶入今日能量生成導航指令
+            開啟今日職場策略對話
             <ArrowRight size={14} strokeWidth={1.75} />
           </button>
         </div>
 
         <div className="panel p-7 flex flex-col gap-3">
-          <div className="text-xs text-text-tertiary">今日瑪雅印記小卡</div>
           {selfProfile ? (
             <div>
-              <div className="text-lg font-serif font-medium text-text-primary">
+              <div className="text-xs text-text-tertiary">歡迎回來</div>
+              <div className="text-lg font-serif font-medium text-text-primary mt-1">
                 {selfProfile.name_alias}
               </div>
               <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-text-secondary">
@@ -76,6 +103,13 @@ export default function Dashboard() {
                   {selfProfile.maya_totem || "圖騰未填"}
                 </div>
               </div>
+              <button
+                onClick={handleCopySummary}
+                className="btn-secondary self-start border border-border mt-3 !text-xs"
+              >
+                {copiedSummary ? <Check size={13} strokeWidth={1.75} /> : <Copy size={13} strokeWidth={1.75} />}
+                {copiedSummary ? "已複製" : "複製完整星軌檔案"}
+              </button>
             </div>
           ) : (
             <div className="text-sm text-text-secondary">

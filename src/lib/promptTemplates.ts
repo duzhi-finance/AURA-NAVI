@@ -217,6 +217,38 @@ export function generateRelationPrompt(
     );
 }
 
+export function buildFullProfileSummary(profile: TalentProfile): string {
+  const lines: string[] = [];
+  lines.push("✦ AURA-Navi 星軌檔案 ✦");
+  lines.push(`${fmt(profile.name_alias, "我")}｜KIN ${fmt(profile.maya_kin)}`);
+  lines.push(`主印記：${fmt(profile.maya_totem)}．${fmt(profile.maya_tone)}`);
+  if (profile.life_path_num != null) lines.push(`生命靈數：${profile.life_path_num}`);
+  lines.push("");
+  lines.push(...deepTalentParts(profile));
+  lines.push("");
+  lines.push("—— 由 AURA-Navi 星軌導航系統生成");
+  return lines.join("\n").replace(/\n{3,}/g, "\n\n");
+}
+
+export const DEEP_DIVE_PROMPTS: { title: string; buildText: (totem: string) => string }[] = [
+  {
+    title: "職場加薪／定位",
+    buildText: () => "請根據我的天賦圖譜，分析我最適合的職場突破點與加薪策略。",
+  },
+  {
+    title: "履歷與提案優化",
+    buildText: (totem) => `幫我寫一份符合我「${totem || "天賦圖騰"}」洞察力特質的商業提案大綱。`,
+  },
+  {
+    title: "內耗排解",
+    buildText: () => "當我覺得直覺被質疑、與團隊不對頻時，我該如何進行心理調頻？",
+  },
+  {
+    title: "重要決策日選取",
+    buildText: () => "請告訴我接下來這個月，最適合我進行重要商業談判的流年日期。",
+  },
+];
+
 export const GEMINI_URL = "https://gemini.google.com";
 export const GLOWING_URL = "https://glowing.cc";
 export const LINE_URL = "https://line.me/R/ti/p/@799vhtvj";

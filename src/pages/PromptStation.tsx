@@ -1,4 +1,4 @@
-import { BookHeart } from "lucide-react";
+import { BookHeart, Briefcase, CalendarDays, Check, Copy, FileText, Wind } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import CopyPromptBlock from "../components/CopyPromptBlock";
@@ -7,6 +7,7 @@ import PageHeader from "../components/PageHeader";
 import Toast from "../components/Toast";
 import { getTodayCard } from "../lib/dailyCard";
 import {
+  DEEP_DIVE_PROMPTS,
   LIFE_DOMAIN_LABEL,
   LIFE_DOMAIN_OPTIONS,
   RELATIONSHIP_STATUS_DOMAINS,
@@ -17,6 +18,8 @@ import {
 import { addSoulJournalEntry } from "../lib/soulJournal";
 import { getSelfProfile } from "../lib/store";
 import type { LifeDomain, RelationshipStatus } from "../types/talent";
+
+const DEEP_DIVE_ICONS = [Briefcase, FileText, Wind, CalendarDays];
 
 interface PromptStationNavState {
   presetContext?: string;
@@ -214,12 +217,68 @@ export default function PromptStation() {
                 </p>
                 <GeminiButton />
               </div>
+
+              {domain && <DeepDivePrompts totem={selfProfile?.maya_totem ?? ""} />}
             </div>
           </section>
         </div>
       </div>
 
       <Toast message={journalToast} show={Boolean(journalToast)} />
+    </div>
+  );
+}
+
+const DEEP_DIVE_COPY_MS = 1500;
+
+function DeepDivePrompts({ totem }: { totem: string }) {
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+
+  async function handleCopy(idx: number, text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedIdx(idx);
+      setTimeout(() => setCopiedIdx((v) => (v === idx ? null : v)), DEEP_DIVE_COPY_MS);
+    } catch {
+      setCopiedIdx(null);
+    }
+  }
+
+  return (
+    <div className="card-glass p-6">
+      <p className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary mb-4">
+        深化對話｜情境式追問
+      </p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {DEEP_DIVE_PROMPTS.map((item, idx) => {
+          const Icon = DEEP_DIVE_ICONS[idx];
+          const copied = copiedIdx === idx;
+          return (
+            <button
+              key={item.title}
+              onClick={() => handleCopy(idx, item.buildText(totem))}
+              className="rounded-xl border border-border-gold bg-surface/70 p-4 text-left transition-colors hover:border-luxe-gold"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Icon size={15} strokeWidth={1.5} className="text-luxe-gold shrink-0" />
+                  <span className="font-serif text-sm font-medium text-text-primary">
+                    {item.title}
+                  </span>
+                </div>
+                {copied ? (
+                  <Check size={13} strokeWidth={1.75} className="text-luxe-gold shrink-0" />
+                ) : (
+                  <Copy size={13} strokeWidth={1.75} className="text-text-tertiary shrink-0" />
+                )}
+              </div>
+              <p className="desc-text text-xs text-text-secondary leading-relaxed mt-2">
+                {copied ? "已複製，請貼到 Gemini 對話中" : item.buildText(totem)}
+              </p>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
