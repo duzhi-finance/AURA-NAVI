@@ -41,7 +41,7 @@ export default function Dashboard() {
           <div className="flex items-center gap-4">
             <frequency.Icon size={36} strokeWidth={1.25} className={frequency.colorClass} />
             <div>
-              <div className={`text-2xl font-serif font-normal ${frequency.colorClass}`}>
+              <div className={`text-2xl font-serif font-semibold ${frequency.colorClass}`}>
                 {frequency.label}
               </div>
               <p className="desc-text text-sm text-text-secondary mt-1.5 max-w-xs leading-relaxed">
@@ -62,11 +62,11 @@ export default function Dashboard() {
           <div className="text-xs text-text-tertiary">今日瑪雅印記小卡</div>
           {selfProfile ? (
             <div>
-              <div className="text-lg font-serif font-normal text-text-primary">
+              <div className="text-lg font-serif font-semibold text-text-primary">
                 {selfProfile.name_alias}
               </div>
               <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-text-secondary">
-                <div className="rounded-lg bg-bg border border-border px-2 py-2 text-center font-serif">
+                <div className="rounded-lg bg-bg border border-border px-2 py-2 text-center font-serif font-semibold">
                   KIN {selfProfile.maya_kin ?? "—"}
                 </div>
                 <div className="rounded-lg bg-bg border border-border px-2 py-2 text-center">

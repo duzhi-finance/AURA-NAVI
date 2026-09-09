@@ -1,4 +1,4 @@
-import { Compass, Sparkles } from "lucide-react";
+import { Compass, MessageCircle, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { IssueLabel } from "../components/Editorial";
@@ -7,6 +7,7 @@ import TotemEmblem from "../components/TotemEmblem";
 import { TONE_COMMUNICATION_STYLE, TONE_NUANCE, TONE_RECHARGE_MODE } from "../lib/deepTalent";
 import { computeKinFromBirthdate, type DreamspellResult } from "../lib/dreamspellKin";
 import { MAYA_TONES, MAYA_TOTEMS } from "../lib/mayaOptions";
+import { LINE_URL } from "../lib/promptTemplates";
 
 export default function TeamDnaPage() {
   const [nickname, setNickname] = useState("");
@@ -87,9 +88,9 @@ export default function TeamDnaPage() {
               <div className="text-sm text-text-secondary">{nickname.trim()}</div>
             )}
             <TotemEmblem seed={totemSeed >= 0 ? totemSeed : 0} size={96} className="text-luxe-gold my-2" />
-            <div className="text-2xl font-serif font-normal text-text-primary">{result.totem}</div>
+            <div className="text-2xl font-serif font-semibold text-text-primary">{result.totem}</div>
             <div className="flex flex-wrap justify-center gap-2 text-xs text-text-secondary mt-1">
-              <span className="rounded-lg bg-bg border border-border px-2.5 py-1 font-serif">
+              <span className="rounded-lg bg-bg border border-border px-2.5 py-1 font-serif font-semibold">
                 KIN {result.kin}
               </span>
               <span className="rounded-lg bg-bg border border-border px-2.5 py-1">
@@ -107,12 +108,22 @@ export default function TeamDnaPage() {
               將此圖卡截圖傳送給你的主管或 HR，即可完成天賦建檔。
             </p>
 
+            <a
+              href={LINE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-luxe-cta mt-1 w-full"
+            >
+              <MessageCircle size={16} strokeWidth={1.75} />
+              準不準？到 LINE 跟我分享你的結果
+            </a>
+
             <button
               onClick={() => {
                 setResult(null);
                 setBirthdate("");
               }}
-              className="btn-secondary border border-border mt-1"
+              className="btn-secondary border border-border"
             >
               重新測驗
             </button>

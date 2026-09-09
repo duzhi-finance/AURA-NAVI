@@ -219,3 +219,4 @@ export function generateRelationPrompt(
 
 export const GEMINI_URL = "https://gemini.google.com";
 export const GLOWING_URL = "https://glowing.cc";
+export const LINE_URL = "https://line.me/R/ti/p/@799vhtvj";

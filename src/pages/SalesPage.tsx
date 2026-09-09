@@ -2,6 +2,7 @@ import {
   Compass,
   Gem,
   Lock,
+  MessageCircle,
   Radar,
   Sparkles,
   type LucideIcon,
@@ -9,6 +10,7 @@ import {
 import { Link } from "react-router-dom";
 import { ChapterLabel, IssueLabel, PullQuote, VerticalMicrocopy } from "../components/Editorial";
 import Footer from "../components/Footer";
+import { LINE_URL } from "../lib/promptTemplates";
 
 const PAIN_POINTS: { title: string; description: string }[] = [
   {
@@ -61,7 +63,7 @@ export default function SalesPage() {
     <div className="min-h-screen bg-bg">
       <div className="mx-auto w-full max-w-3xl px-6 py-16 md:py-24">
         {/* Header */}
-        <header className="text-center mb-20">
+        <header className="text-center mb-24">
           <IssueLabel
             text="AURA-Navi Journal ── SPECIAL EDITION / VOL.01"
             className="justify-center inline-flex mb-5"
@@ -78,10 +80,10 @@ export default function SalesPage() {
         </header>
 
         {/* Cover Story / Hero */}
-        <section className="relative mb-24 text-center overflow-hidden">
+        <section className="relative mb-28 text-center overflow-hidden">
           <VerticalMicrocopy text="HIGH-DIMENSION COMPASS" className="top-0 right-0 hidden md:block" />
           <ChapterLabel number="00" title="封面宣言" className="justify-center flex mb-6" />
-          <h1 className="font-serif text-3xl md:text-4xl font-light text-text-primary leading-relaxed tracking-[0.04em]">
+          <h1 className="font-serif text-3xl md:text-4xl font-semibold text-text-primary leading-relaxed tracking-[0.04em]">
             告別世俗的笨方法。
             <br />
             你不是不夠努力，你只是不必再抹滅天賦。
@@ -97,9 +99,9 @@ export default function SalesPage() {
         </section>
 
         {/* Chapter 01 -- Pain Points */}
-        <section className="mb-24">
+        <section className="mb-28">
           <ChapterLabel number="01" title="痛點解構" className="mb-5" />
-          <h2 className="font-serif text-xl md:text-2xl font-light text-text-primary tracking-[0.04em] leading-relaxed">
+          <h2 className="font-serif text-xl md:text-2xl font-medium text-text-primary tracking-[0.04em] leading-relaxed">
             宇宙小孩的世俗卡點：你擁有一流的遠見，卻苦於笨拙的翻譯。
           </h2>
           <p className="desc-text text-sm text-text-secondary leading-relaxed mt-4 max-w-lg">
@@ -123,9 +125,9 @@ export default function SalesPage() {
         </section>
 
         {/* Chapter 02 -- Translation Mechanism */}
-        <section className="mb-24">
+        <section className="mb-28">
           <ChapterLabel number="02" title="翻譯機制" className="mb-5" />
-          <h2 className="font-serif text-xl md:text-2xl font-light text-text-primary tracking-[0.04em] leading-relaxed">
+          <h2 className="font-serif text-xl md:text-2xl font-medium text-text-primary tracking-[0.04em] leading-relaxed">
             不懂神秘學沒關係，我們替你講出商業世界聽得懂的語言。
           </h2>
           <p className="desc-text text-sm text-text-secondary leading-relaxed mt-4 max-w-lg">
@@ -146,10 +148,10 @@ export default function SalesPage() {
         </section>
 
         {/* Chapter 03 -- Six Dimensions */}
-        <section className="mb-24 relative overflow-hidden">
+        <section className="mb-28 relative overflow-hidden">
           <VerticalMicrocopy text="SIX DIMENSIONS OF SOUL" className="top-0 right-0 hidden md:block" />
           <ChapterLabel number="03" title="深度天賦圖譜" className="mb-5" />
-          <h2 className="font-serif text-xl md:text-2xl font-light text-text-primary tracking-[0.04em] leading-relaxed">
+          <h2 className="font-serif text-xl md:text-2xl font-medium text-text-primary tracking-[0.04em] leading-relaxed">
             拒絕標籤化，直擊靈魂最細微的性格紋理。
           </h2>
 
@@ -188,6 +190,16 @@ export default function SalesPage() {
             <Sparkles size={16} strokeWidth={1.75} />
             開啟你的 AURA-Navi 星軌導航
           </Link>
+
+          <a
+            href={LINE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 mt-5 text-xs text-text-tertiary hover:text-text-secondary transition-colors"
+          >
+            <MessageCircle size={14} strokeWidth={1.5} />
+            測完了嗎？加入官方 LINE @799vhtvj，跟我分享你的結果準不準
+          </a>
 
           <p className="desc-text text-[11px] text-text-tertiary leading-[1.5] mt-6 max-w-md mx-auto">
             本產品為數位天賦導航軟體與指令內容，一經發送交付即可享受完整高維對焦體驗。

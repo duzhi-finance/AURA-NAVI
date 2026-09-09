@@ -297,7 +297,7 @@ function ProfileCard({
       </div>
 
       <div className="relative">
-        <h3 className="text-lg font-serif font-normal text-text-primary">{profile.name_alias}</h3>
+        <h3 className="text-lg font-serif font-semibold text-text-primary">{profile.name_alias}</h3>
         <p className="desc-text text-xs text-text-tertiary mt-1">
           {profile.maya_totem ? `圖騰：${profile.maya_totem}` : "尚未填寫圖騰"}
         </p>
