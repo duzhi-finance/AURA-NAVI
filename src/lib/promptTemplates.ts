@@ -240,8 +240,38 @@ export function buildGuardPrompt(
 請用溫暖、精準、具備洞察力且落地的繁體中文回答，避免空泛的星座式描述。`;
 }
 
-/** 同 buildGuardPrompt，但用於尚未存檔的臨時合盤對象（僅有姓名與生日推算出的資料）。 */
-export function buildAdHocGuardPrompt(params: {
+export interface SynastryTopicGroup {
+  key: string;
+  label: string;
+  questions: string[];
+}
+
+/** 合盤對焦的多面向問題選單：職場／感情／家庭人際／商業合夥，各附 2 道預設深度問題。 */
+export const SYNASTRY_TOPIC_GROUPS: SynastryTopicGroup[] = [
+  {
+    key: "career",
+    label: "職場",
+    questions: ["對方潛意識的溝通地雷是什麼？", "如何用對方聽得懂的語言提案？"],
+  },
+  {
+    key: "romance",
+    label: "感情",
+    questions: ["我們在親密關係中的核心磨合點在哪？", "如何給予對方安全感？"],
+  },
+  {
+    key: "family",
+    label: "家庭／人際",
+    questions: ["面對家人的期待與情緒勒索，我該如何劃清界線？", "如何用不傷感情的方式表達自己的立場？"],
+  },
+  {
+    key: "partnership",
+    label: "商業合夥",
+    questions: ["我們適合合作創業或投資嗎？", "財務分工上，我們彼此的互補點在哪？"],
+  },
+];
+
+/** 合盤區的「生成專屬合盤 Gemini 深度解讀 Prompt」：打包自己+對方 KIN、合相結果，與挑選/自訂的問題。 */
+export function buildSynastryQuestionPrompt(params: {
   selfKin: number;
   selfTotem: string;
   partnerName: string;
@@ -251,76 +281,137 @@ export function buildAdHocGuardPrompt(params: {
   roleGuide: string;
   compositeKin: number;
   compositeTotem: string;
+  questions: string[];
+  customQuestion: string;
 }): string {
-  const { selfKin, selfTotem, partnerName, partnerKin, partnerTotem, roleLabel, roleGuide, compositeKin, compositeTotem } =
-    params;
-  const name = partnerName.trim() || "對方";
-  return `你現在是一位精通星際瑪雅曆（Dreamspell）與職場人際心理學的「高維關係翻譯官」。
+  const name = params.partnerName.trim() || "對方";
+  const items = [...params.questions];
+  if (params.customQuestion.trim()) items.push(params.customQuestion.trim());
+  const questionList =
+    items.length > 0
+      ? items.map((q, i) => `${i + 1}. ${q}`).join("\n")
+      : "1. 請針對我們之間的合盤結果，給我最重要的相處建議。";
 
-我要跟「${name}」（KIN ${partnerKin}．${partnerTotem}）互動，我自己是 KIN ${selfKin}．${selfTotem}。
+  return `你現在是一位精通星際瑪雅曆（Dreamspell）與人際關係心理學的「高維關係翻譯官」。
 
-雙方的合相印記（Composite KIN）為 KIN ${compositeKin}．${compositeTotem}，判定關係屬性為「${roleLabel}」：${roleGuide}
+我要跟「${name}」（KIN ${params.partnerKin}．${params.partnerTotem}）互動，我自己是 KIN ${params.selfKin}．${params.selfTotem}。
+雙方的合相印記（Composite KIN）為 KIN ${params.compositeKin}．${params.compositeTotem}，判定關係屬性為「${params.roleLabel}」：${params.roleGuide}
 
-請根據以上資訊，給我一份「與${name}溝通攻心大綱」，包含：
-1. 與對方互動時最容易踩到的地雷與誤解來源。
-2. 最能打動對方、建立信任的溝通切入點。
-3. 面對意見分歧時，最有效的化解與說服策略。
+我想請你深入回答以下問題：
+${questionList}
 
-請用溫暖、精準、具備洞察力且落地的繁體中文回答，避免空泛的星座式描述。`;
+請用溫暖、精準、具備洞察力且落地的繁體中文回答，避免空泛的星座式描述，並在回答最後主動提出 2 個能幫助我更理解這段關係的追問問題。`;
 }
 
-export function buildYearTransitionPrompt(params: {
-  selfKin: number;
-  selfTotem: string;
-  cycleYear: number;
-  yearTone: string;
-  yearTotem: string;
-  yearKin: number;
-  coreLesson: string;
-  breakthrough: string;
-}): string {
-  const { selfKin, selfTotem, cycleYear, yearTone, yearTotem, yearKin, coreLesson, breakthrough } = params;
-  return `你現在是一位精通星際瑪雅曆（Dreamspell）13 年生命大運週期的「高維生涯策略顧問」。
-
-我的本命是 KIN ${selfKin}．${selfTotem}。我正在檢視我 13 年生命大運週期中的第 ${cycleYear} 年：調性「${yearTone}」、圖騰「${yearTotem}」（KIN ${yearKin}）。
-這一年的核心學習課題是：${coreLesson}
-這一年的突破亮點是：${breakthrough}
-
-請根據以上資訊，給我一份「第 ${cycleYear} 年轉型關鍵策略」，包含：
-1. 這一年最適合我在職場上主動推進的方向。
-2. 這一年容易讓我卡關、內耗的情境，以及該如何提早避開。
-3. 一個具體、可以立刻開始執行的階段性行動建議。
-
-請用溫暖、精準、具備洞察力且落地的繁體中文回答，避免空泛的星座式描述。`;
+export interface ScenarioCategory {
+  key: string;
+  label: string;
+  questions: string[];
 }
 
-export interface DailyScenarioContext {
+/** 全方位情境追問區的 5 大面向，各附 4-5 道深度問題。 */
+export const SCENARIO_CATEGORIES: ScenarioCategory[] = [
+  {
+    key: "career",
+    label: "職場商業",
+    questions: [
+      "這份提案要如何包裝，才能讓主管一聽就買單？",
+      "我該如何為自己爭取加薪或升遷的黃金時機？",
+      "面對辦公室政治與競爭，我該如何守住自己的位置？",
+      "我適合現在轉職或創業嗎？該注意什麼？",
+      "如何在會議中用最有效的方式展現我的專業？",
+    ],
+  },
+  {
+    key: "romance",
+    label: "感情親密",
+    questions: [
+      "我在親密關係中最容易卡關的模式是什麼？",
+      "如何讓伴侶感受到我真正的愛意與需求？",
+      "面對關係中的冷戰或衝突，我該如何主動破冰？",
+      "我適合現在進入一段新關係嗎？",
+      "如何辨別這段關係是否值得我繼續投入？",
+    ],
+  },
+  {
+    key: "family",
+    label: "家庭關係",
+    questions: [
+      "面對家人的期待與情緒勒索，我該如何劃清界線？",
+      "如何用不傷感情的方式表達自己的立場？",
+      "我該如何修復與家人之間長期的心結？",
+      "面對手足或伴侶家庭的比較壓力，我該如何自處？",
+    ],
+  },
+  {
+    key: "wealth",
+    label: "金錢財富",
+    questions: [
+      "我目前最適合的財富累積策略是什麼？",
+      "我容易在什麼情況下做出衝動的財務決定？",
+      "我適合投資還是穩健儲蓄？該注意什麼盲點？",
+      "如何提升我對「談錢」這件事的自在度？",
+    ],
+  },
+  {
+    key: "burnout",
+    label: "自我內耗",
+    questions: [
+      "我今天內耗、心累的根源可能是什麼？",
+      "如何快速把自己拉回中心、停止過度思考？",
+      "我該如何練習不把別人的情緒照單全收？",
+      "有什麼日常儀式能幫我重新充電？",
+    ],
+  },
+];
+
+/** 情境追問區的 Prompt 引擎：打包自己+今日流日 KIN、選定面向與挑選/自訂的問題，並要求 Gemini 主動追問。 */
+export function buildScenarioPrompt(params: {
   selfKin: number;
   selfTotem: string;
   todayKin: number;
   todayTotem: string;
+  categoryLabel: string;
+  questions: string[];
+  customQuestion: string;
+}): string {
+  const items = [...params.questions];
+  if (params.customQuestion.trim()) items.push(params.customQuestion.trim());
+  const questionList =
+    items.length > 0
+      ? items.map((q, i) => `${i + 1}. ${q}`).join("\n")
+      : "1. 請根據我今天的能量狀態，給我最重要的提醒。";
+
+  return `你現在是一位精通星際瑪雅曆（Dreamspell）的「高維生命導航員」。
+
+我今天是「${params.selfTotem}」（KIN ${params.selfKin}），今天的日流能量是「${params.todayTotem}」（KIN ${params.todayKin}）。
+我目前的情境面向是：${params.categoryLabel}。
+
+我想請你根據這兩股能量疊加，深入回答以下問題：
+${questionList}
+
+請用溫暖、精準、具備洞察力且落地的繁體中文回答。回答完畢後，請主動提出 3 個更深入的追問問題，邀請我繼續與你交流。`;
 }
 
-export const DAILY_SCENARIO_TABS: { key: string; label: string; buildText: (ctx: DailyScenarioContext) => string }[] = [
-  {
-    key: "presentation",
-    label: "今日要簡報提案",
-    buildText: (ctx) =>
-      `我今天是「${ctx.selfTotem}」（KIN ${ctx.selfKin}），今天的日流能量是「${ctx.todayTotem}」（KIN ${ctx.todayKin}）。我今天要進行簡報提案，請根據這兩股能量疊加，給我今天最適合的簡報切入角度、語氣拿捏，以及最容易說服聽眾的表達策略。`,
-  },
-  {
-    key: "negotiation",
-    label: "今日要談判／爭取權益",
-    buildText: (ctx) =>
-      `我今天是「${ctx.selfTotem}」（KIN ${ctx.selfKin}），今天的日流能量是「${ctx.todayTotem}」（KIN ${ctx.todayKin}）。我今天要進行談判或爭取權益，請根據這兩股能量疊加，給我今天的談判時機判斷、可以強硬與該退讓的界線，以及爭取權益時最有力的切入點。`,
-  },
-  {
-    key: "burnout",
-    label: "今日遇到職場內耗",
-    buildText: (ctx) =>
-      `我今天是「${ctx.selfTotem}」（KIN ${ctx.selfKin}），今天的日流能量是「${ctx.todayTotem}」（KIN ${ctx.todayKin}）。我今天在職場上感到內耗、與人不對頻，請根據這兩股能量疊加，分析我今天內耗的可能來源，並給我一個能快速回到中心、重新聚焦的心理調頻方法。`,
-  },
-];
+/** 三維脈輪卡的「脈輪能量堵塞排解與自我對話」引導 Prompt。 */
+export function buildChakraGuidancePrompt(params: {
+  role: string;
+  kin: number;
+  totem: string;
+  chakra: string;
+  trait: string;
+}): string {
+  return `你現在是一位精通脈輪能量療癒與身心靈自我對話的引導師。
+
+我的「${params.role}」對應 KIN ${params.kin}．${params.totem}，能量中心落在「${params.chakra}」：${params.trait}
+
+請帶領我進行一段「${params.chakra}能量堵塞排解與自我對話」引導，包含：
+1. 這個脈輪堵塞時，我在生活與職場中會出現的具體徵兆。
+2. 一段簡短的自我覺察提問，幫我釐清目前堵塞的根源。
+3. 一個現在就能做的身體、呼吸或語言練習，幫我疏通這股能量。
+
+請用溫暖、有畫面感、具體可執行的繁體中文回答。`;
+}
 
 export function buildFullProfileSummary(profile: TalentProfile): string {
   const lines: string[] = [];

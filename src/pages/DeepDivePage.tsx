@@ -1,4 +1,4 @@
-import { Check, Copy, RotateCcw, Users } from "lucide-react";
+import { Briefcase, Check, Copy, Handshake, Heart, Home, Coins, Sparkles, Users, Wind } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
@@ -7,9 +7,11 @@ import { buildChakraCard } from "../lib/chakraMap";
 import { computeKinFromBirthdate } from "../lib/dreamspellKin";
 import { MAYA_TOTEMS } from "../lib/mayaOptions";
 import {
-  buildAdHocGuardPrompt,
-  buildYearTransitionPrompt,
-  DAILY_SCENARIO_TABS,
+  buildChakraGuidancePrompt,
+  buildScenarioPrompt,
+  buildSynastryQuestionPrompt,
+  SCENARIO_CATEGORIES,
+  SYNASTRY_TOPIC_GROUPS,
 } from "../lib/promptTemplates";
 import { getSelfProfile } from "../lib/store";
 import {
@@ -18,15 +20,13 @@ import {
   RELATIONSHIP_ROLE_GUIDE,
   RELATIONSHIP_ROLE_LABEL,
 } from "../lib/synastry";
-import {
-  computeCurrentCycleYear,
-  computeWavespellYears,
-  cycleYearForCalendarYear,
-  wavespellName,
-} from "../lib/wavespellCycle";
+import { computeCurrentCycleYear, computeWavespellYears, cycleYearReminder, wavespellName } from "../lib/wavespellCycle";
 import type { TalentProfile } from "../types/talent";
 
 const COPY_FEEDBACK_MS = 1500;
+
+const SCENARIO_ICONS = [Briefcase, Heart, Home, Coins, Wind];
+const SYNASTRY_TOPIC_ICONS = [Briefcase, Heart, Home, Handshake];
 
 export default function DeepDivePage() {
   const [selfProfile, setSelfProfile] = useState<TalentProfile | undefined>(undefined);
@@ -43,6 +43,10 @@ export default function DeepDivePage() {
     () => (selfProfile?.maya_kin ? buildChakraCard(selfProfile.maya_kin) : []),
     [selfProfile]
   );
+  const currentCycleYear = useMemo(
+    () => (selfProfile?.birth_date ? computeCurrentCycleYear(selfProfile.birth_date) : null),
+    [selfProfile]
+  );
 
   if (!selfProfile?.maya_kin) {
     return (
@@ -50,7 +54,7 @@ export default function DeepDivePage() {
         <PageHeader
           eyebrow="13-Year Cycle & Chakra Atlas"
           title="深度星軌模組"
-          description="雙人合盤對焦、13 年生命大運時間軸，與身心靈三維脈輪卡。"
+          description="雙人合盤對焦、13 年生命大運提醒，與身心靈三維脈輪卡。"
         />
         <div className="panel p-12 text-center text-text-secondary">
           <p>尚未建立你的靈魂印記。</p>
@@ -67,53 +71,87 @@ export default function DeepDivePage() {
       <PageHeader
         eyebrow="13-Year Cycle & Chakra Atlas"
         title="深度星軌模組"
-        description="雙人合盤對焦、13 年生命大運時間軸，與身心靈三維脈輪卡。"
+        description="雙人合盤對焦、13 年生命大運提醒，與身心靈三維脈輪卡。"
       />
 
       <SynastryCard selfProfile={selfProfile} />
 
-      <DailyScenarioCard selfProfile={selfProfile} />
+      <ScenarioFocusCard selfProfile={selfProfile} />
 
       <section className="mb-10">
-        <h2 className="text-sm font-medium text-text-secondary mb-1">
+        <h2 className="text-sm font-medium text-text-secondary mb-4">
           13 年生命大運波符｜{wavespellName(selfProfile.maya_kin)}
         </h2>
-        <WavespellTimeline selfProfile={selfProfile} years={years} />
+        <CycleYearReminder years={years} currentCycleYear={currentCycleYear} hasBirthDate={Boolean(selfProfile.birth_date)} />
       </section>
 
       <section>
         <h2 className="text-sm font-medium text-text-secondary mb-1">身心靈三維脈輪卡</h2>
         <p className="desc-text text-xs text-text-tertiary mb-4">
-          本命 KIN、PSI 隱藏推動與內在女神力，各自對應的脈輪與地球家族。
+          本命 KIN、PSI 隱藏推動與內在女神力，各自對應的脈輪、日常調頻建議，與能量堵塞排解引導。
         </p>
 
         <div className="flex flex-col gap-4">
           {chakraRows.map((row) => {
             const seed = MAYA_TOTEMS.indexOf(row.totem);
-            return (
-              <div key={row.role} className="card-glass p-6 flex flex-col gap-2">
-                <div className="flex items-center gap-3">
-                  <TotemEmblem seed={seed >= 0 ? seed : 0} size={32} className="text-luxe-gold shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="font-serif text-sm font-semibold text-text-primary">
-                      {row.role}
-                    </div>
-                    <div className="text-[11px] text-text-tertiary mt-0.5">
-                      KIN {row.kin}．{row.totem}｜{row.chakra}｜{row.earthFamily}
-                    </div>
-                  </div>
-                </div>
-                <p className="desc-text text-xs text-text-secondary leading-relaxed mt-1">
-                  {row.trait}
-                </p>
-                <p className="desc-text text-xs text-text-tertiary leading-relaxed border-t border-border pt-2 mt-1">
-                  {row.roleContext}
-                </p>
-              </div>
-            );
+            return <ChakraRowCard key={row.role} seed={seed >= 0 ? seed : 0} row={row} />;
           })}
         </div>
       </section>
+    </div>
+  );
+}
+
+function ChakraRowCard({ seed, row }: { seed: number; row: ReturnType<typeof buildChakraCard>[number] }) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    const text = buildChakraGuidancePrompt({
+      role: row.role,
+      kin: row.kin,
+      totem: row.totem,
+      chakra: row.chakra,
+      trait: row.trait,
+    });
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), COPY_FEEDBACK_MS);
+    } catch {
+      setCopied(false);
+    }
+  }
+
+  return (
+    <div className="card-glass p-6 flex flex-col gap-3">
+      <div className="flex items-center gap-3">
+        <TotemEmblem seed={seed} size={32} className="text-luxe-gold shrink-0" />
+        <div className="flex-1 min-w-0">
+          <div className="font-serif text-sm font-semibold text-text-primary">{row.role}</div>
+          <div className="text-[11px] text-text-tertiary mt-0.5">
+            KIN {row.kin}．{row.totem}｜{row.chakra}｜{row.earthFamily}
+          </div>
+        </div>
+      </div>
+      <p className="desc-text text-xs text-text-secondary leading-relaxed">{row.trait}</p>
+      <p className="desc-text text-xs text-text-tertiary leading-relaxed border-t border-border pt-2">
+        {row.roleContext}
+      </p>
+
+      <div className="rounded-xl border border-border-gold bg-bg-subtle/40 p-4 flex flex-col gap-2 mt-1">
+        <p className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary">脈輪能量調頻</p>
+        <div className="flex flex-wrap gap-2 text-xs text-text-secondary">
+          <span className="rounded-lg bg-bg border border-border px-2.5 py-1.5">香氛｜{row.attunement.scent}</span>
+          <span className="rounded-lg bg-bg border border-border px-2.5 py-1.5">水晶｜{row.attunement.crystal}</span>
+        </div>
+        <p className="desc-text text-xs text-text-secondary leading-relaxed italic">
+          肯定句：「{row.attunement.affirmation}」
+        </p>
+        <button onClick={handleCopy} className="btn-secondary self-start border border-border !text-xs mt-1">
+          {copied ? <Check size={13} strokeWidth={1.75} /> : <Sparkles size={13} strokeWidth={1.75} />}
+          {copied ? "已複製" : `請 Gemini 為我進行「${row.chakra}能量堵塞排解與自我對話」引導`}
+        </button>
+      </div>
     </div>
   );
 }
@@ -130,6 +168,8 @@ function SynastryCard({ selfProfile }: { selfProfile: TalentProfile }) {
     compositeTone: string;
     role: ReturnType<typeof classifyRelationshipRole>;
   } | null>(null);
+  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+  const [customQuestion, setCustomQuestion] = useState("");
   const [copied, setCopied] = useState(false);
 
   function handleStart() {
@@ -148,12 +188,19 @@ function SynastryCard({ selfProfile }: { selfProfile: TalentProfile }) {
       compositeTone: composite.tone,
       role,
     });
+    setSelectedQuestions([]);
+    setCustomQuestion("");
+    setCopied(false);
+  }
+
+  function toggleQuestion(q: string) {
+    setSelectedQuestions((prev) => (prev.includes(q) ? prev.filter((item) => item !== q) : [...prev, q]));
     setCopied(false);
   }
 
   async function handleCopy() {
     if (!result || !selfProfile.maya_kin || !selfProfile.maya_totem) return;
-    const text = buildAdHocGuardPrompt({
+    const text = buildSynastryQuestionPrompt({
       selfKin: selfProfile.maya_kin,
       selfTotem: selfProfile.maya_totem,
       partnerName,
@@ -163,6 +210,8 @@ function SynastryCard({ selfProfile }: { selfProfile: TalentProfile }) {
       roleGuide: RELATIONSHIP_ROLE_GUIDE[result.role],
       compositeKin: result.compositeKin,
       compositeTotem: result.compositeTotem,
+      questions: selectedQuestions,
+      customQuestion,
     });
     try {
       await navigator.clipboard.writeText(text);
@@ -207,61 +256,100 @@ function SynastryCard({ selfProfile }: { selfProfile: TalentProfile }) {
       </div>
 
       {result && (
-        <div className="rounded-xl border border-border-gold bg-bg-subtle/40 p-5 flex flex-col gap-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <TotemEmblem seed={partnerSeed >= 0 ? partnerSeed : 0} size={28} className="text-luxe-gold shrink-0" />
-            <div className="text-xs text-text-secondary">
-              <span className="text-text-tertiary">{partnerName.trim() || "對方"}的本命：</span>
-              <span className="font-serif font-semibold text-text-primary">KIN {result.kin}</span> {result.totem}．{result.tone}
-            </div>
-          </div>
-
+        <div className="rounded-xl border border-border-gold bg-bg-subtle/40 p-5 flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2 text-xs text-text-secondary">
-            <TotemEmblem seed={compositeSeed >= 0 ? compositeSeed : 0} size={18} className="text-luxe-gold shrink-0" />
+            <TotemEmblem seed={partnerSeed >= 0 ? partnerSeed : 0} size={22} className="text-luxe-gold shrink-0" />
             <span className="rounded-lg bg-bg border border-border px-2.5 py-1.5 font-serif font-semibold">
-              合相印記 KIN {result.compositeKin}
+              {partnerName.trim() || "對方"}｜KIN {result.kin}
             </span>
-            <span className="rounded-lg bg-bg border border-border px-2.5 py-1.5">
-              {result.compositeTotem}．{result.compositeTone}
+            <TotemEmblem seed={compositeSeed >= 0 ? compositeSeed : 0} size={18} className="text-luxe-gold shrink-0 ml-1" />
+            <span className="rounded-lg bg-bg border border-border px-2.5 py-1.5 font-serif font-semibold">
+              合相 KIN {result.compositeKin}
             </span>
             <span className="rounded-full bg-luxe-gold/15 border border-border-gold px-3 py-1.5 font-serif font-semibold text-text-primary">
               {RELATIONSHIP_ROLE_LABEL[result.role]}
             </span>
           </div>
 
-          <p className="desc-text text-sm text-text-secondary leading-relaxed">
-            {RELATIONSHIP_ROLE_GUIDE[result.role]}
-          </p>
-
-          <button onClick={handleCopy} className="btn-secondary self-start border border-border !text-xs">
-            {copied ? <Check size={13} strokeWidth={1.75} /> : <Copy size={13} strokeWidth={1.75} />}
-            {copied ? "已複製" : "一鍵複製：職場溝通防雷與攻心 Prompt"}
-          </button>
+          <div className="flex flex-col gap-3 border-t border-border pt-4">
+            <p className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary">想深入了解哪個面向？</p>
+            {SYNASTRY_TOPIC_GROUPS.map((group, idx) => {
+              const Icon = SYNASTRY_TOPIC_ICONS[idx];
+              return (
+                <div key={group.key} className="flex flex-wrap items-center gap-2">
+                  <span className="flex items-center gap-1 text-xs text-text-tertiary shrink-0 whitespace-nowrap">
+                    <Icon size={13} strokeWidth={1.5} className="text-luxe-gold" />
+                    {group.label}
+                  </span>
+                  {group.questions.map((q) => (
+                    <button
+                      key={q}
+                      onClick={() => toggleQuestion(q)}
+                      className={`rounded-full px-3 py-1.5 text-xs border transition-colors ${
+                        selectedQuestions.includes(q)
+                          ? "border-text-primary bg-bg text-text-primary font-medium"
+                          : "border-border text-text-secondary hover:border-text-tertiary"
+                      }`}
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              );
+            })}
+            <input
+              value={customQuestion}
+              onChange={(e) => {
+                setCustomQuestion(e.target.value);
+                setCopied(false);
+              }}
+              placeholder="自訂想要詢問的問題"
+              className="input-base"
+            />
+            <button onClick={handleCopy} className="btn-secondary self-start border border-border !text-xs">
+              {copied ? <Check size={13} strokeWidth={1.75} /> : <Copy size={13} strokeWidth={1.75} />}
+              {copied ? "已複製" : "生成專屬合盤 Gemini 深度解讀 Prompt"}
+            </button>
+          </div>
         </div>
       )}
     </section>
   );
 }
 
-function DailyScenarioCard({ selfProfile }: { selfProfile: TalentProfile }) {
-  const [activeKey, setActiveKey] = useState<string | null>(null);
+function ScenarioFocusCard({ selfProfile }: { selfProfile: TalentProfile }) {
+  const [activeCategoryKey, setActiveCategoryKey] = useState(SCENARIO_CATEGORIES[0].key);
+  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+  const [customQuestion, setCustomQuestion] = useState("");
   const [copied, setCopied] = useState(false);
+
   const now = new Date();
   const todayKin = computeKinFromBirthdate(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  const activeCategory = SCENARIO_CATEGORIES.find((c) => c.key === activeCategoryKey) ?? SCENARIO_CATEGORIES[0];
 
-  const activeTab = DAILY_SCENARIO_TABS.find((t) => t.key === activeKey) ?? null;
-  const text =
-    activeTab && selfProfile.maya_kin && selfProfile.maya_totem
-      ? activeTab.buildText({
-          selfKin: selfProfile.maya_kin,
-          selfTotem: selfProfile.maya_totem,
-          todayKin: todayKin.kin,
-          todayTotem: todayKin.totem,
-        })
-      : "";
+  function handleSelectCategory(key: string) {
+    setActiveCategoryKey(key);
+    setSelectedQuestions([]);
+    setCustomQuestion("");
+    setCopied(false);
+  }
+
+  function toggleQuestion(q: string) {
+    setSelectedQuestions((prev) => (prev.includes(q) ? prev.filter((item) => item !== q) : [...prev, q]));
+    setCopied(false);
+  }
 
   async function handleCopy() {
-    if (!text) return;
+    if (!selfProfile.maya_kin || !selfProfile.maya_totem) return;
+    const text = buildScenarioPrompt({
+      selfKin: selfProfile.maya_kin,
+      selfTotem: selfProfile.maya_totem,
+      todayKin: todayKin.kin,
+      todayTotem: todayKin.totem,
+      categoryLabel: activeCategory.label,
+      questions: selectedQuestions,
+      customQuestion,
+    });
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
@@ -273,161 +361,114 @@ function DailyScenarioCard({ selfProfile }: { selfProfile: TalentProfile }) {
 
   return (
     <section className="card-glass p-6 mb-10 flex flex-col gap-4">
-      <h2 className="font-serif text-sm font-semibold text-text-primary">今日情境與流日對焦</h2>
+      <h2 className="font-serif text-sm font-semibold text-text-primary">全方位情境追問</h2>
+      <p className="desc-text text-xs text-text-tertiary -mt-2">
+        選擇你目前最想釐清的面向，挑選問題或自訂困境，讓 Gemini 陪你持續深聊。
+      </p>
+
       <div className="flex flex-wrap gap-2">
-        {DAILY_SCENARIO_TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => {
-              setActiveKey(tab.key);
-              setCopied(false);
-            }}
-            className={`rounded-full px-3.5 py-1.5 text-xs border transition-colors ${
-              activeKey === tab.key
-                ? "border-text-primary bg-bg text-text-primary font-medium"
-                : "border-border text-text-secondary hover:border-text-tertiary"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+        {SCENARIO_CATEGORIES.map((cat, idx) => {
+          const Icon = SCENARIO_ICONS[idx];
+          return (
+            <button
+              key={cat.key}
+              onClick={() => handleSelectCategory(cat.key)}
+              className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs border transition-colors ${
+                activeCategoryKey === cat.key
+                  ? "border-text-primary bg-bg text-text-primary font-medium"
+                  : "border-border text-text-secondary hover:border-text-tertiary"
+              }`}
+            >
+              <Icon size={13} strokeWidth={1.5} />
+              {cat.label}
+            </button>
+          );
+        })}
       </div>
 
-      {activeTab && (
-        <div className="rounded-xl border border-border bg-bg-subtle/40 p-4 flex flex-col gap-3">
-          <p className="desc-text text-sm text-text-secondary leading-relaxed">{text}</p>
-          <button onClick={handleCopy} className="btn-secondary self-start border border-border !text-xs">
-            {copied ? <Check size={13} strokeWidth={1.75} /> : <Copy size={13} strokeWidth={1.75} />}
-            {copied ? "已複製" : "複製 Gemini 導航指令"}
-          </button>
+      <div className="rounded-xl border border-border bg-bg-subtle/40 p-4 flex flex-col gap-3">
+        <div className="flex flex-wrap gap-2">
+          {activeCategory.questions.map((q) => (
+            <button
+              key={q}
+              onClick={() => toggleQuestion(q)}
+              className={`rounded-full px-3 py-1.5 text-xs border transition-colors ${
+                selectedQuestions.includes(q)
+                  ? "border-text-primary bg-bg text-text-primary font-medium"
+                  : "border-border text-text-secondary hover:border-text-tertiary"
+              }`}
+            >
+              {q}
+            </button>
+          ))}
         </div>
-      )}
+        <input
+          value={customQuestion}
+          onChange={(e) => {
+            setCustomQuestion(e.target.value);
+            setCopied(false);
+          }}
+          placeholder="輸入自訂困境與疑問"
+          className="input-base"
+        />
+        <button onClick={handleCopy} className="btn-secondary self-start border border-border !text-xs">
+          {copied ? <Check size={13} strokeWidth={1.75} /> : <Copy size={13} strokeWidth={1.75} />}
+          {copied ? "已複製" : "複製 Gemini 深度對話指令"}
+        </button>
+      </div>
     </section>
   );
 }
 
-function WavespellTimeline({
-  selfProfile,
+function CycleYearReminder({
   years,
+  currentCycleYear,
+  hasBirthDate,
 }: {
-  selfProfile: TalentProfile;
   years: ReturnType<typeof computeWavespellYears>;
+  currentCycleYear: number | null;
+  hasBirthDate: boolean;
 }) {
-  const defaultYear = useMemo(
-    () => (selfProfile.birth_date ? computeCurrentCycleYear(selfProfile.birth_date) : null),
-    [selfProfile.birth_date]
-  );
-  const currentCalendarYear = new Date().getFullYear();
-  const [calendarYear, setCalendarYear] = useState(currentCalendarYear);
-  const [copiedYear, setCopiedYear] = useState<number | null>(null);
-
-  const selectedCycleYear = selfProfile.birth_date
-    ? cycleYearForCalendarYear(selfProfile.birth_date, calendarYear)
-    : defaultYear;
-
-  async function handleCopyYearPrompt(y: (typeof years)[number]) {
-    if (!selfProfile.maya_kin || !selfProfile.maya_totem) return;
-    const text = buildYearTransitionPrompt({
-      selfKin: selfProfile.maya_kin,
-      selfTotem: selfProfile.maya_totem,
-      cycleYear: y.year,
-      yearTone: y.tone,
-      yearTotem: y.totem,
-      yearKin: y.kin,
-      coreLesson: y.coreLesson,
-      breakthrough: y.breakthrough,
-    });
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopiedYear(y.year);
-      setTimeout(() => setCopiedYear((v) => (v === y.year ? null : v)), COPY_FEEDBACK_MS);
-    } catch {
-      setCopiedYear(null);
-    }
+  if (!hasBirthDate || currentCycleYear === null) {
+    return (
+      <p className="desc-text text-xs text-text-tertiary">
+        補上完整出生年月日即可看見你目前所在的生命大運年份。
+        <Link to="/app/archive" className="text-text-primary underline ml-1">
+          前往補填
+        </Link>
+      </p>
+    );
   }
 
-  return (
-    <>
-      {selfProfile.birth_date ? (
-        <div className="flex items-center gap-2 mb-4">
-          <label className="desc-text text-xs text-text-tertiary" htmlFor="cycle-year-input">
-            選擇西元年份
-          </label>
-          <input
-            id="cycle-year-input"
-            type="number"
-            value={calendarYear}
-            onChange={(e) => setCalendarYear(Number(e.target.value) || currentCalendarYear)}
-            className="input-base !w-28 !py-1.5"
-          />
-          <button
-            onClick={() => setCalendarYear(currentCalendarYear)}
-            className="btn-secondary border border-border !text-xs"
-          >
-            <RotateCcw size={12} strokeWidth={1.75} />
-            回到目前個人流年
-          </button>
-        </div>
-      ) : (
-        <p className="desc-text text-xs text-text-tertiary mb-4">
-          補上完整出生年月日即可選擇年份查看你所在的位置。
-          <Link to="/app/archive" className="text-text-primary underline ml-1">
-            前往補填
-          </Link>
-        </p>
-      )}
+  const current = years.find((y) => y.year === currentCycleYear) ?? years[0];
 
-      <div className="flex flex-col gap-2.5">
-        {years.map((y) => {
-          const seed = MAYA_TOTEMS.indexOf(y.totem);
-          const isSelected = selectedCycleYear === y.year;
-          return (
-            <details
-              key={y.year}
-              open={isSelected}
-              className={`rounded-xl border px-4 py-3 ${
-                isSelected ? "border-luxe-gold bg-bg-subtle/50" : "border-border"
-              }`}
-            >
-              <summary className="cursor-pointer select-none flex items-center gap-3">
-                <span
-                  className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-serif font-semibold shrink-0 ${
-                    isSelected ? "bg-luxe-gold text-white" : "bg-bg border border-border text-text-secondary"
-                  }`}
-                >
-                  {y.year}
-                </span>
-                <TotemEmblem seed={seed >= 0 ? seed : 0} size={20} className="text-luxe-gold shrink-0" />
-                <span className="text-sm text-text-primary font-medium flex-1">
-                  第 {y.year} 年｜{y.tone}．{y.totem}
-                </span>
-                <span className="text-[11px] text-text-tertiary font-serif">KIN {y.kin}</span>
-              </summary>
-              <div className="mt-3 pl-11 flex flex-col gap-2.5">
-                <div className="text-xs">
-                  <span className="text-text-tertiary">核心學習課題：</span>
-                  <span className="desc-text text-text-secondary">{y.coreLesson}</span>
-                </div>
-                <div className="text-xs">
-                  <span className="text-text-tertiary">突破亮點：</span>
-                  <span className="desc-text text-text-secondary">{y.breakthrough}</span>
-                </div>
-                <button
-                  onClick={() => handleCopyYearPrompt(y)}
-                  className="btn-secondary self-start border border-border !text-xs mt-1"
-                >
-                  {copiedYear === y.year ? (
-                    <Check size={13} strokeWidth={1.75} />
-                  ) : (
-                    <Copy size={13} strokeWidth={1.75} />
-                  )}
-                  {copiedYear === y.year ? "已複製" : "生成該年度轉型關鍵策略 Prompt"}
-                </button>
-              </div>
-            </details>
-          );
-        })}
+  return (
+    <div className="card-glass p-6 flex flex-col items-center text-center gap-3">
+      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-luxe-gold text-white font-serif text-lg font-semibold shrink-0">
+        {current.year}
+      </span>
+      <p className="text-sm text-text-primary font-medium">
+        你正處於 13 年生命大運中的第 {current.year} 年｜{current.tone}．{current.totem}
+      </p>
+      <p className="desc-text text-sm text-text-secondary leading-relaxed max-w-md">
+        {cycleYearReminder(current.year)}
+      </p>
+
+      <div className="flex items-center gap-1.5 mt-2">
+        {years.map((y) => (
+          <span
+            key={y.year}
+            title={`第 ${y.year} 年｜${y.tone}．${y.totem}`}
+            className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-serif shrink-0 ${
+              y.year === current.year
+                ? "bg-luxe-gold text-white font-semibold"
+                : "border border-border text-text-tertiary"
+            }`}
+          >
+            {y.year}
+          </span>
+        ))}
       </div>
-    </>
+    </div>
   );
 }

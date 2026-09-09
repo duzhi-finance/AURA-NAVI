@@ -29,6 +29,30 @@ export function chakraTraitOf(totemIdx0: number): string {
   return CHAKRA_TRAITS[totemIdx0 % 7];
 }
 
+export interface ChakraAttunement {
+  /** 建議精油／香氛氣味。 */
+  scent: string;
+  /** 建議水晶。 */
+  crystal: string;
+  /** 自我肯定句。 */
+  affirmation: string;
+}
+
+/** 每個脈輪的日常調頻建議（香氛、水晶、肯定句），依 CHAKRAS 順序排列。 */
+const CHAKRA_ATTUNEMENTS: ChakraAttunement[] = [
+  { scent: "乳香", crystal: "紫水晶", affirmation: "我信任生命的更高安排。" },
+  { scent: "薰衣草", crystal: "靛藍螢石", affirmation: "我清晰看見自己的方向。" },
+  { scent: "薄荷／尤加利", crystal: "藍晶石", affirmation: "我可以誠實且安全地表達真相。" },
+  { scent: "玫瑰", crystal: "粉晶", affirmation: "我值得被愛，也願意柔軟地愛人。" },
+  { scent: "檸檬／薑", crystal: "黃虎眼石", affirmation: "我有力量，也有能力承擔。" },
+  { scent: "橙花", crystal: "橙色瑪瑙", affirmation: "我允許自己享受創造與連結的喜悅。" },
+  { scent: "岩蘭草", crystal: "紅碧玉", affirmation: "我在此時此地，是安全且被支持的。" },
+];
+
+export function chakraAttunementOf(totemIdx0: number): ChakraAttunement {
+  return CHAKRA_ATTUNEMENTS[totemIdx0 % 7];
+}
+
 export interface ChakraCardRow {
   role: "本命 KIN" | "PSI 隱藏推動" | "內在女神力";
   kin: number;
@@ -37,6 +61,7 @@ export interface ChakraCardRow {
   earthFamily: string;
   trait: string;
   roleContext: string;
+  attunement: ChakraAttunement;
 }
 
 const ROLE_CONTEXT: Record<ChakraCardRow["role"], string> = {
@@ -66,6 +91,7 @@ export function buildChakraCard(birthKin: number): ChakraCardRow[] {
       earthFamily: earthFamilyOf(totemIdx0),
       trait: chakraTraitOf(totemIdx0),
       roleContext: ROLE_CONTEXT[role],
+      attunement: chakraAttunementOf(totemIdx0),
     };
   });
 }

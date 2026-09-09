@@ -57,12 +57,23 @@ export function computeCurrentCycleYear(birthDate: string, today: Date = new Dat
   return (age % 13) + 1;
 }
 
-/** 指定西元年份時，使用者處於 13 年生命週期的第幾年（1-13）。以年齡概算，不考慮月日。 */
-export function cycleYearForCalendarYear(birthDate: string, targetYear: number): number | null {
-  const parts = birthDate.split("-").map(Number);
-  if (parts.length !== 3 || parts.some((n) => Number.isNaN(n))) return null;
-  const [birthYear] = parts;
-  let age = targetYear - birthYear;
-  if (age < 0) age = 0;
-  return (age % 13) + 1;
+/** 13 年生命大運週期中，每一年的簡短提醒警語（索引 0 = 第 1 年）。 */
+export const CYCLE_YEAR_REMINDER: string[] = [
+  "發起 —— 新循環的起點，適合播種與嘗試新方向，別怕從零開始。",
+  "挑戰 —— 考驗接踵而來，這是鍛鍊耐力與決心的一年。",
+  "覺察 —— 開始看清模式與盲點，適合調整策略、修正方向。",
+  "穩定 —— 打好根基的一年，扎實累積比衝刺更重要。",
+  "覺醒 —— 靈感與機會湧現，適合大膽表達自己。",
+  "責任 —— 承擔更多角色與責任，也是被信任、被託付的一年。",
+  "反思 —— 適合沉澱盤點，重新校準你真正想要的方向。",
+  "收穫 —— 努力開始有回報，適合展現成果、爭取應得的。",
+  "完成 —— 一個階段收尾，適合放下不再適合的人事物。",
+  "顯化 —— 力量具體成形，適合落地執行大型計畫。",
+  "釋放 —— 打破舊有框架，允許自己蛻變成新的樣子。",
+  "合作 —— 人際與團隊能量旺盛，適合結盟與共創。",
+  "圓滿 —— 整個週期的高峰與收成，為下一輪循環鋪路。",
+];
+
+export function cycleYearReminder(year: number): string {
+  return CYCLE_YEAR_REMINDER[((year - 1) % 13 + 13) % 13];
 }
