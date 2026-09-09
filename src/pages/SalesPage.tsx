@@ -187,20 +187,18 @@ export default function SalesPage() {
             ))}
           </div>
 
-          <Link to="/app" className="btn-cta-pill justify-center mt-12 mx-auto">
-            <Sparkles size={16} strokeWidth={1.75} />
-            開啟你的 AURA-Navi 星軌導航
-          </Link>
-
-          <a
-            href={LINE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 mt-5 text-xs text-text-tertiary hover:text-text-secondary transition-colors"
-          >
-            <MessageCircle size={14} strokeWidth={1.5} />
-            測完了嗎？加入官方 LINE @799vhtvj，跟我分享你的結果準不準
-          </a>
+          <div className="mt-14 flex flex-col items-center gap-4">
+            <div className="w-14 h-px bg-[#D8C8C0]" />
+            <a
+              href={LINE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2.5 font-serif text-sm text-text-secondary hover:text-luxe-gold transition-colors"
+            >
+              <MessageCircle size={16} strokeWidth={1.5} />
+              完成對焦後，誠摯邀請你加入官方 LINE @799vhtvj，與我們分享這趟旅程的迴響
+            </a>
+          </div>
 
           <p className="desc-text text-[11px] text-text-tertiary leading-[1.5] mt-6 max-w-md mx-auto">
             本產品為數位天賦導航軟體與指令內容，一經發送交付即可享受完整高維對焦體驗。
