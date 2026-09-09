@@ -219,16 +219,19 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: #2c2c2a;
-  color: #faf9f6;
-  border: 1px solid #2c2c2a;
-  border-radius: 12px;
-  padding: 0.85rem 1.5rem;
+  background: linear-gradient(135deg, #3a3a37, #1a1a1a 65%);
+  color: #fdfbf7;
+  border: 1px solid var(--color-luxe-gold);
+  border-radius: 999px;
+  padding: 0.85rem 1.75rem;
+  font-family: var(--font-serif);
   font-size: 0.9rem;
+  letter-spacing: 0.03em;
+  box-shadow: 0 8px 20px rgba(44, 44, 42, 0.15);
   transition: box-shadow 0.25s ease, transform 0.2s ease;
 }
 .btn-luxe-cta:hover {
-  box-shadow: 0 0 0 3px rgba(184, 147, 90, 0.25);
+  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.22), 0 10px 24px rgba(44, 44, 42, 0.2);
   transform: translateY(-1px);
 }
 
