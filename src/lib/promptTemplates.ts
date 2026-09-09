@@ -24,7 +24,7 @@ export const RELATIONSHIP_STATUS_LABEL: Record<RelationshipStatus, string> = Obj
 
 // Only surfaced for domains where a same-sounding typo could flip the meaning of the
 // user's situation (e.g. 想交男朋友 vs 想教男朋友) into an unrelated one.
-export const RELATIONSHIP_STATUS_DOMAINS: LifeDomain[] = ["Romance", "Interpersonal"];
+export const RELATIONSHIP_STATUS_DOMAINS: LifeDomain[] = ["Romance"];
 
 export const ROMANCE_SINGLE_PRESETS = [
   "想交男朋友",
