@@ -119,8 +119,10 @@
   color: var(--color-accent-contrast);
   border-radius: 12px;
   padding: 0.7rem 1.3rem;
-  font-size: 0.875rem;
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
   font-weight: 400;
+  letter-spacing: 0.03em;
   box-shadow: 0 8px 24px rgba(44, 44, 42, 0.18);
   transition: box-shadow 0.25s ease, transform 0.2s ease, opacity 0.15s ease;
 }
@@ -138,8 +140,10 @@
   color: var(--color-text-secondary);
   border-radius: 12px;
   padding: 0.65rem 1.1rem;
+  font-family: var(--font-serif);
   font-size: 0.875rem;
   font-weight: 300;
+  letter-spacing: 0.02em;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 .btn-secondary:hover {
@@ -168,7 +172,9 @@
   border: 1px solid #2c2c2a;
   border-radius: 999px;
   padding: 0.65rem 1.2rem;
+  font-family: var(--font-serif);
   font-size: 0.75rem;
+  letter-spacing: 0.02em;
   color: #faf9f6;
   background: #2c2c2a;
   transition: box-shadow 0.25s ease, transform 0.2s ease, opacity 0.2s ease;
