@@ -1,4 +1,4 @@
-import { BookHeart, Briefcase, CalendarDays, Check, Copy, FileText, Wind } from "lucide-react";
+import { BookHeart, Briefcase, Check, Coins, Copy, Heart, Home, Wind } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import CopyPromptBlock from "../components/CopyPromptBlock";
@@ -6,23 +6,22 @@ import GeminiButton from "../components/GeminiButton";
 import PageHeader from "../components/PageHeader";
 import Toast from "../components/Toast";
 import { getTodayCard } from "../lib/dailyCard";
+import { computeKinFromBirthdate } from "../lib/dreamspellKin";
 import {
-  DEEP_DIVE_PROMPTS,
+  buildScenarioPrompt,
   LIFE_DOMAIN_LABEL,
   LIFE_DOMAIN_OPTIONS,
   RELATIONSHIP_STATUS_DOMAINS,
   RELATIONSHIP_STATUS_OPTIONS,
   ROMANCE_SINGLE_PRESETS,
+  SCENARIO_CATEGORIES,
   generateNavigationPrompt,
-  type DeepDiveContext,
 } from "../lib/promptTemplates";
 import { addSoulJournalEntry } from "../lib/soulJournal";
 import { getSelfProfile } from "../lib/store";
-import { computePsiKin, computeGoddessKin } from "../lib/dreamspellKin";
-import { computeYearlyKin, parseBirthMonthDay } from "../lib/yearlyFlow";
-import type { LifeDomain, RelationshipStatus } from "../types/talent";
+import type { LifeDomain, RelationshipStatus, TalentProfile } from "../types/talent";
 
-const DEEP_DIVE_ICONS = [Briefcase, FileText, Wind, CalendarDays];
+const SCENARIO_ICONS = [Briefcase, Heart, Home, Coins, Wind];
 
 interface PromptStationNavState {
   presetContext?: string;
@@ -37,20 +36,6 @@ export default function PromptStation() {
   const [journalToast, setJournalToast] = useState("");
   const selfProfile = useMemo(() => getSelfProfile(), []);
   const dailyCard = useMemo(() => getTodayCard(), []);
-
-  const deepDiveContext = useMemo<DeepDiveContext>(() => {
-    const kin = selfProfile?.maya_kin ?? null;
-    const birthMonthDay = selfProfile?.birth_date ? parseBirthMonthDay(selfProfile.birth_date) : null;
-    const yearly = birthMonthDay ? computeYearlyKin(birthMonthDay.month, birthMonthDay.day) : null;
-    return {
-      totem: selfProfile?.maya_totem ?? "",
-      kin,
-      psiKin: kin ? computePsiKin(kin) : null,
-      goddessKin: kin ? computeGoddessKin(kin) : null,
-      yearlyKin: yearly?.kin ?? null,
-      yearlyTotem: yearly?.totem ?? "",
-    };
-  }, [selfProfile]);
 
   useEffect(() => {
     const state = location.state as PromptStationNavState | null;
@@ -235,7 +220,7 @@ export default function PromptStation() {
                 <GeminiButton />
               </div>
 
-              {domain && <DeepDivePrompts ctx={deepDiveContext} />}
+              {domain && selfProfile && <ScenarioFocusCard selfProfile={selfProfile} />}
             </div>
           </section>
         </div>
@@ -246,55 +231,98 @@ export default function PromptStation() {
   );
 }
 
-const DEEP_DIVE_COPY_MS = 1500;
+const SCENARIO_COPY_MS = 1500;
 
-function DeepDivePrompts({ ctx }: { ctx: DeepDiveContext }) {
-  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+function ScenarioFocusCard({ selfProfile }: { selfProfile: TalentProfile }) {
+  const [activeCategoryKey, setActiveCategoryKey] = useState(SCENARIO_CATEGORIES[0].key);
+  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+  const [customQuestion, setCustomQuestion] = useState("");
+  const [copied, setCopied] = useState(false);
 
-  async function handleCopy(idx: number, text: string) {
+  const now = new Date();
+  const todayKin = computeKinFromBirthdate(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  const activeCategory = SCENARIO_CATEGORIES.find((c) => c.key === activeCategoryKey) ?? SCENARIO_CATEGORIES[0];
+
+  function handleSelectCategory(key: string) {
+    setActiveCategoryKey(key);
+    setSelectedQuestions([]);
+    setCustomQuestion("");
+    setCopied(false);
+  }
+
+  function toggleQuestion(q: string) {
+    setSelectedQuestions((prev) => (prev.includes(q) ? prev.filter((item) => item !== q) : [...prev, q]));
+    setCopied(false);
+  }
+
+  async function handleCopy() {
+    if (!selfProfile.maya_kin || !selfProfile.maya_totem) return;
+    const text = buildScenarioPrompt({
+      selfKin: selfProfile.maya_kin,
+      selfTotem: selfProfile.maya_totem,
+      todayKin: todayKin.kin,
+      todayTotem: todayKin.totem,
+      categoryLabel: activeCategory.label,
+      questions: selectedQuestions,
+      customQuestion,
+    });
     try {
       await navigator.clipboard.writeText(text);
-      setCopiedIdx(idx);
-      setTimeout(() => setCopiedIdx((v) => (v === idx ? null : v)), DEEP_DIVE_COPY_MS);
+      setCopied(true);
+      setTimeout(() => setCopied(false), SCENARIO_COPY_MS);
     } catch {
-      setCopiedIdx(null);
+      setCopied(false);
     }
   }
 
   return (
-    <div className="card-glass p-6">
-      <p className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary mb-4">
+    <div className="card-glass p-4 flex flex-col gap-3">
+      <p className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary">
         深化對話｜情境式追問
       </p>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {DEEP_DIVE_PROMPTS.map((item, idx) => {
-          const Icon = DEEP_DIVE_ICONS[idx];
-          const copied = copiedIdx === idx;
+
+      <div className="flex flex-wrap gap-2">
+        {SCENARIO_CATEGORIES.map((cat, idx) => {
+          const Icon = SCENARIO_ICONS[idx];
+          const isActive = activeCategoryKey === cat.key;
           return (
             <button
-              key={item.title}
-              onClick={() => handleCopy(idx, item.buildText(ctx))}
-              className="rounded-xl border border-border-gold bg-surface/70 p-4 text-left transition-colors hover:border-luxe-gold"
+              key={cat.key}
+              onClick={() => handleSelectCategory(cat.key)}
+              className={`dive-chip ${isActive ? "is-active" : ""}`}
             >
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <Icon size={15} strokeWidth={1.5} className="text-luxe-gold shrink-0" />
-                  <span className="font-serif text-sm font-medium text-text-primary">
-                    {item.title}
-                  </span>
-                </div>
-                {copied ? (
-                  <Check size={13} strokeWidth={1.75} className="text-luxe-gold shrink-0" />
-                ) : (
-                  <Copy size={13} strokeWidth={1.75} className="text-text-tertiary shrink-0" />
-                )}
-              </div>
-              <p className="desc-text text-xs text-text-secondary leading-relaxed mt-2">
-                {copied ? "已複製，請貼到 Gemini 對話中" : item.buildText(ctx)}
-              </p>
+              <Icon size={13} strokeWidth={1.5} className="mr-1" />
+              {cat.label}
             </button>
           );
         })}
+      </div>
+
+      <div className="rounded-xl border border-border bg-bg-subtle/40 p-3 flex flex-col gap-2.5">
+        <div className="flex flex-wrap gap-2">
+          {activeCategory.questions.map((q) => (
+            <button
+              key={q}
+              onClick={() => toggleQuestion(q)}
+              className={`dive-chip ${selectedQuestions.includes(q) ? "is-active" : ""}`}
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+        <input
+          value={customQuestion}
+          onChange={(e) => {
+            setCustomQuestion(e.target.value);
+            setCopied(false);
+          }}
+          placeholder="輸入自訂困境與疑問"
+          className="dive-input"
+        />
+        <button onClick={handleCopy} className="btn-secondary self-start border border-border !text-xs !py-1.5">
+          {copied ? <Check size={13} strokeWidth={1.75} /> : <Copy size={13} strokeWidth={1.75} />}
+          {copied ? "已複製" : "生成深度 Prompt"}
+        </button>
       </div>
     </div>
   );

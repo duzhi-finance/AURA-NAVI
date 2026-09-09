@@ -241,6 +241,52 @@
   transform: translateY(-1px);
 }
 
+.dive-input {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #eaeaea;
+  background: #fafafa;
+  padding: 0.45rem 0.85rem;
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  font-family: var(--font-sans);
+  letter-spacing: 0.03em;
+}
+.dive-input::placeholder {
+  color: #b8b3ad;
+}
+.dive-input:focus {
+  border-color: var(--color-luxe-gold);
+  box-shadow: 0 0 0 2px rgba(197, 160, 89, 0.12);
+}
+
+.dive-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #eaeaea;
+  background: #fafafa;
+  padding: 0.38rem 0.85rem;
+  font-family: var(--font-serif);
+  font-size: 0.75rem;
+  color: #555555;
+  letter-spacing: 0.05em;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+.dive-chip:hover {
+  border-color: var(--color-luxe-gold);
+  box-shadow: 0 0 0 1px rgba(197, 160, 89, 0.2), 0 4px 14px rgba(197, 160, 89, 0.14);
+  color: var(--color-text-primary);
+}
+.dive-chip.is-active {
+  border-color: var(--color-luxe-gold);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-weight: 500;
+  box-shadow: 0 0 0 1px rgba(197, 160, 89, 0.25);
+}
+
 .card-flip-scene {
   perspective: 1200px;
 }

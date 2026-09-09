@@ -1,4 +1,4 @@
-import { Briefcase, Check, Copy, Handshake, Heart, Home, Coins, Sparkles, Users, Wind } from "lucide-react";
+import { Briefcase, Check, Copy, Handshake, Heart, Home, Sparkles, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
@@ -6,13 +6,7 @@ import TotemEmblem from "../components/TotemEmblem";
 import { buildChakraCard } from "../lib/chakraMap";
 import { computeKinFromBirthdate } from "../lib/dreamspellKin";
 import { MAYA_TOTEMS } from "../lib/mayaOptions";
-import {
-  buildChakraGuidancePrompt,
-  buildScenarioPrompt,
-  buildSynastryQuestionPrompt,
-  SCENARIO_CATEGORIES,
-  SYNASTRY_TOPIC_GROUPS,
-} from "../lib/promptTemplates";
+import { buildChakraGuidancePrompt, buildSynastryQuestionPrompt, SYNASTRY_TOPIC_GROUPS } from "../lib/promptTemplates";
 import { getSelfProfile } from "../lib/store";
 import {
   classifyRelationshipRole,
@@ -25,7 +19,6 @@ import type { TalentProfile } from "../types/talent";
 
 const COPY_FEEDBACK_MS = 1500;
 
-const SCENARIO_ICONS = [Briefcase, Heart, Home, Coins, Wind];
 const SYNASTRY_TOPIC_ICONS = [Briefcase, Heart, Home, Handshake];
 
 export default function DeepDivePage() {
@@ -75,8 +68,6 @@ export default function DeepDivePage() {
       />
 
       <SynastryCard selfProfile={selfProfile} />
-
-      <ScenarioFocusCard selfProfile={selfProfile} />
 
       <section className="mb-10">
         <h2 className="text-sm font-medium text-text-secondary mb-4">
@@ -157,7 +148,6 @@ function ChakraRowCard({ seed, row }: { seed: number; row: ReturnType<typeof bui
 }
 
 function SynastryCard({ selfProfile }: { selfProfile: TalentProfile }) {
-  const [partnerName, setPartnerName] = useState("");
   const [partnerBirthdate, setPartnerBirthdate] = useState("");
   const [result, setResult] = useState<{
     kin: number;
@@ -203,7 +193,7 @@ function SynastryCard({ selfProfile }: { selfProfile: TalentProfile }) {
     const text = buildSynastryQuestionPrompt({
       selfKin: selfProfile.maya_kin,
       selfTotem: selfProfile.maya_totem,
-      partnerName,
+      partnerName: "",
       partnerKin: result.kin,
       partnerTotem: result.totem,
       roleLabel: RELATIONSHIP_ROLE_LABEL[result.role],
@@ -226,41 +216,35 @@ function SynastryCard({ selfProfile }: { selfProfile: TalentProfile }) {
   const compositeSeed = result ? MAYA_TOTEMS.indexOf(result.compositeTotem) : -1;
 
   return (
-    <section className="card-glass p-6 mb-6 flex flex-col gap-4">
+    <section className="card-glass p-4 mb-6 flex flex-col gap-3">
       <div className="flex items-center gap-2">
         <Users size={16} strokeWidth={1.5} className="text-luxe-gold shrink-0" />
         <h2 className="font-serif text-sm font-semibold text-text-primary">
           雙人／職場關係合盤對焦
         </h2>
       </div>
-      <p className="desc-text text-xs text-text-tertiary -mt-2">
+      <p className="text-xs text-[#555555] tracking-[0.05em] -mt-1.5">
         輸入主管、客戶或任何重要關係人的生日，不需先存入典藏館，即可快速合盤。
       </p>
 
-      <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
-        <input
-          value={partnerName}
-          onChange={(e) => setPartnerName(e.target.value)}
-          placeholder="對象名稱（如：主管）"
-          className="input-base"
-        />
+      <div className="flex flex-col gap-2 max-w-xs">
         <input
           type="date"
           value={partnerBirthdate}
           onChange={(e) => setPartnerBirthdate(e.target.value)}
-          className="input-base"
+          className="dive-input"
         />
-        <button onClick={handleStart} disabled={!partnerBirthdate} className="btn-primary justify-center disabled:opacity-40">
+        <button onClick={handleStart} disabled={!partnerBirthdate} className="btn-primary justify-center !py-2 disabled:opacity-40">
           開始合盤
         </button>
       </div>
 
       {result && (
-        <div className="rounded-xl border border-border-gold bg-bg-subtle/40 p-5 flex flex-col gap-4">
+        <div className="rounded-xl border border-border-gold bg-bg-subtle/40 p-4 flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-2 text-xs text-text-secondary">
             <TotemEmblem seed={partnerSeed >= 0 ? partnerSeed : 0} size={22} className="text-luxe-gold shrink-0" />
             <span className="rounded-lg bg-bg border border-border px-2.5 py-1.5 font-serif font-semibold">
-              {partnerName.trim() || "對方"}｜KIN {result.kin}
+              對方｜KIN {result.kin}
             </span>
             <TotemEmblem seed={compositeSeed >= 0 ? compositeSeed : 0} size={18} className="text-luxe-gold shrink-0 ml-1" />
             <span className="rounded-lg bg-bg border border-border px-2.5 py-1.5 font-serif font-semibold">
@@ -271,13 +255,13 @@ function SynastryCard({ selfProfile }: { selfProfile: TalentProfile }) {
             </span>
           </div>
 
-          <div className="flex flex-col gap-3 border-t border-border pt-4">
+          <div className="flex flex-col gap-2.5 border-t border-border pt-3">
             <p className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary">想深入了解哪個面向？</p>
             {SYNASTRY_TOPIC_GROUPS.map((group, idx) => {
               const Icon = SYNASTRY_TOPIC_ICONS[idx];
               return (
                 <div key={group.key} className="flex flex-wrap items-center gap-2">
-                  <span className="flex items-center gap-1 text-xs text-text-tertiary shrink-0 whitespace-nowrap">
+                  <span className="flex items-center gap-1 text-xs text-[#555555] shrink-0 whitespace-nowrap">
                     <Icon size={13} strokeWidth={1.5} className="text-luxe-gold" />
                     {group.label}
                   </span>
@@ -285,11 +269,7 @@ function SynastryCard({ selfProfile }: { selfProfile: TalentProfile }) {
                     <button
                       key={q}
                       onClick={() => toggleQuestion(q)}
-                      className={`rounded-full px-3 py-1.5 text-xs border transition-colors ${
-                        selectedQuestions.includes(q)
-                          ? "border-text-primary bg-bg text-text-primary font-medium"
-                          : "border-border text-text-secondary hover:border-text-tertiary"
-                      }`}
+                      className={`dive-chip ${selectedQuestions.includes(q) ? "is-active" : ""}`}
                     >
                       {q}
                     </button>
@@ -304,118 +284,15 @@ function SynastryCard({ selfProfile }: { selfProfile: TalentProfile }) {
                 setCopied(false);
               }}
               placeholder="自訂想要詢問的問題"
-              className="input-base"
+              className="dive-input"
             />
-            <button onClick={handleCopy} className="btn-secondary self-start border border-border !text-xs">
+            <button onClick={handleCopy} className="btn-secondary self-start border border-border !text-xs !py-1.5">
               {copied ? <Check size={13} strokeWidth={1.75} /> : <Copy size={13} strokeWidth={1.75} />}
               {copied ? "已複製" : "生成專屬合盤 Gemini 深度解讀 Prompt"}
             </button>
           </div>
         </div>
       )}
-    </section>
-  );
-}
-
-function ScenarioFocusCard({ selfProfile }: { selfProfile: TalentProfile }) {
-  const [activeCategoryKey, setActiveCategoryKey] = useState(SCENARIO_CATEGORIES[0].key);
-  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
-  const [customQuestion, setCustomQuestion] = useState("");
-  const [copied, setCopied] = useState(false);
-
-  const now = new Date();
-  const todayKin = computeKinFromBirthdate(now.getFullYear(), now.getMonth() + 1, now.getDate());
-  const activeCategory = SCENARIO_CATEGORIES.find((c) => c.key === activeCategoryKey) ?? SCENARIO_CATEGORIES[0];
-
-  function handleSelectCategory(key: string) {
-    setActiveCategoryKey(key);
-    setSelectedQuestions([]);
-    setCustomQuestion("");
-    setCopied(false);
-  }
-
-  function toggleQuestion(q: string) {
-    setSelectedQuestions((prev) => (prev.includes(q) ? prev.filter((item) => item !== q) : [...prev, q]));
-    setCopied(false);
-  }
-
-  async function handleCopy() {
-    if (!selfProfile.maya_kin || !selfProfile.maya_totem) return;
-    const text = buildScenarioPrompt({
-      selfKin: selfProfile.maya_kin,
-      selfTotem: selfProfile.maya_totem,
-      todayKin: todayKin.kin,
-      todayTotem: todayKin.totem,
-      categoryLabel: activeCategory.label,
-      questions: selectedQuestions,
-      customQuestion,
-    });
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), COPY_FEEDBACK_MS);
-    } catch {
-      setCopied(false);
-    }
-  }
-
-  return (
-    <section className="card-glass p-6 mb-10 flex flex-col gap-4">
-      <h2 className="font-serif text-sm font-semibold text-text-primary">全方位情境追問</h2>
-      <p className="desc-text text-xs text-text-tertiary -mt-2">
-        選擇你目前最想釐清的面向，挑選問題或自訂困境，讓 Gemini 陪你持續深聊。
-      </p>
-
-      <div className="flex flex-wrap gap-2">
-        {SCENARIO_CATEGORIES.map((cat, idx) => {
-          const Icon = SCENARIO_ICONS[idx];
-          return (
-            <button
-              key={cat.key}
-              onClick={() => handleSelectCategory(cat.key)}
-              className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs border transition-colors ${
-                activeCategoryKey === cat.key
-                  ? "border-text-primary bg-bg text-text-primary font-medium"
-                  : "border-border text-text-secondary hover:border-text-tertiary"
-              }`}
-            >
-              <Icon size={13} strokeWidth={1.5} />
-              {cat.label}
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="rounded-xl border border-border bg-bg-subtle/40 p-4 flex flex-col gap-3">
-        <div className="flex flex-wrap gap-2">
-          {activeCategory.questions.map((q) => (
-            <button
-              key={q}
-              onClick={() => toggleQuestion(q)}
-              className={`rounded-full px-3 py-1.5 text-xs border transition-colors ${
-                selectedQuestions.includes(q)
-                  ? "border-text-primary bg-bg text-text-primary font-medium"
-                  : "border-border text-text-secondary hover:border-text-tertiary"
-              }`}
-            >
-              {q}
-            </button>
-          ))}
-        </div>
-        <input
-          value={customQuestion}
-          onChange={(e) => {
-            setCustomQuestion(e.target.value);
-            setCopied(false);
-          }}
-          placeholder="輸入自訂困境與疑問"
-          className="input-base"
-        />
-        <button onClick={handleCopy} className="btn-secondary self-start border border-border !text-xs">
-          {copied ? <Check size={13} strokeWidth={1.75} /> : <Copy size={13} strokeWidth={1.75} />}
-          {copied ? "已複製" : "複製 Gemini 深度對話指令"}
-        </button>
-      </div>
     </section>
   );
 }

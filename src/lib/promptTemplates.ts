@@ -426,43 +426,6 @@ export function buildFullProfileSummary(profile: TalentProfile): string {
   return lines.join("\n").replace(/\n{3,}/g, "\n\n");
 }
 
-export interface DeepDiveContext {
-  totem: string;
-  kin: number | null;
-  psiKin: number | null;
-  goddessKin: number | null;
-  yearlyKin: number | null;
-  yearlyTotem: string;
-}
-
-export const DEEP_DIVE_PROMPTS: { title: string; buildText: (ctx: DeepDiveContext) => string }[] = [
-  {
-    title: "職場加薪／定位",
-    buildText: (ctx) =>
-      `請根據我的天賦圖譜（KIN ${ctx.kin ?? "—"}．${ctx.totem || "天賦圖騰"}${
-        ctx.psiKin ? `，PSI 隱藏推動 KIN ${ctx.psiKin}` : ""
-      }），分析我最適合的職場突破點與加薪策略。`,
-  },
-  {
-    title: "履歷與提案優化",
-    buildText: (ctx) => `幫我寫一份符合我「${ctx.totem || "天賦圖騰"}」洞察力特質的商業提案大綱。`,
-  },
-  {
-    title: "內耗排解",
-    buildText: (ctx) =>
-      `當我覺得直覺被質疑、與團隊不對頻時，我該如何進行心理調頻？${
-        ctx.goddessKin ? `（我的內在女神力為 KIN ${ctx.goddessKin}，請納入修復建議。）` : ""
-      }`,
-  },
-  {
-    title: "本月談判與加薪黃金日",
-    buildText: (ctx) =>
-      `請告訴我接下來這個月，最適合我進行重要商業談判與加薪協商的流年黃金日期。${
-        ctx.yearlyKin ? `（我今年的流年主印記為 KIN ${ctx.yearlyKin}．${ctx.yearlyTotem}）` : ""
-      }`,
-  },
-];
-
 export const GEMINI_URL = "https://gemini.google.com";
 export const GLOWING_URL = "https://glowing.cc";
 export const LINE_URL = "https://line.me/R/ti/p/@799vhtvj";
