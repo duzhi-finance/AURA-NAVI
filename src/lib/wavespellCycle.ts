@@ -56,3 +56,13 @@ export function computeCurrentCycleYear(birthDate: string, today: Date = new Dat
 
   return (age % 13) + 1;
 }
+
+/** 指定西元年份時，使用者處於 13 年生命週期的第幾年（1-13）。以年齡概算，不考慮月日。 */
+export function cycleYearForCalendarYear(birthDate: string, targetYear: number): number | null {
+  const parts = birthDate.split("-").map(Number);
+  if (parts.length !== 3 || parts.some((n) => Number.isNaN(n))) return null;
+  const [birthYear] = parts;
+  let age = targetYear - birthYear;
+  if (age < 0) age = 0;
+  return (age % 13) + 1;
+}

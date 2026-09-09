@@ -240,6 +240,88 @@ export function buildGuardPrompt(
 請用溫暖、精準、具備洞察力且落地的繁體中文回答，避免空泛的星座式描述。`;
 }
 
+/** 同 buildGuardPrompt，但用於尚未存檔的臨時合盤對象（僅有姓名與生日推算出的資料）。 */
+export function buildAdHocGuardPrompt(params: {
+  selfKin: number;
+  selfTotem: string;
+  partnerName: string;
+  partnerKin: number;
+  partnerTotem: string;
+  roleLabel: string;
+  roleGuide: string;
+  compositeKin: number;
+  compositeTotem: string;
+}): string {
+  const { selfKin, selfTotem, partnerName, partnerKin, partnerTotem, roleLabel, roleGuide, compositeKin, compositeTotem } =
+    params;
+  const name = partnerName.trim() || "對方";
+  return `你現在是一位精通星際瑪雅曆（Dreamspell）與職場人際心理學的「高維關係翻譯官」。
+
+我要跟「${name}」（KIN ${partnerKin}．${partnerTotem}）互動，我自己是 KIN ${selfKin}．${selfTotem}。
+
+雙方的合相印記（Composite KIN）為 KIN ${compositeKin}．${compositeTotem}，判定關係屬性為「${roleLabel}」：${roleGuide}
+
+請根據以上資訊，給我一份「與${name}溝通攻心大綱」，包含：
+1. 與對方互動時最容易踩到的地雷與誤解來源。
+2. 最能打動對方、建立信任的溝通切入點。
+3. 面對意見分歧時，最有效的化解與說服策略。
+
+請用溫暖、精準、具備洞察力且落地的繁體中文回答，避免空泛的星座式描述。`;
+}
+
+export function buildYearTransitionPrompt(params: {
+  selfKin: number;
+  selfTotem: string;
+  cycleYear: number;
+  yearTone: string;
+  yearTotem: string;
+  yearKin: number;
+  coreLesson: string;
+  breakthrough: string;
+}): string {
+  const { selfKin, selfTotem, cycleYear, yearTone, yearTotem, yearKin, coreLesson, breakthrough } = params;
+  return `你現在是一位精通星際瑪雅曆（Dreamspell）13 年生命大運週期的「高維生涯策略顧問」。
+
+我的本命是 KIN ${selfKin}．${selfTotem}。我正在檢視我 13 年生命大運週期中的第 ${cycleYear} 年：調性「${yearTone}」、圖騰「${yearTotem}」（KIN ${yearKin}）。
+這一年的核心學習課題是：${coreLesson}
+這一年的突破亮點是：${breakthrough}
+
+請根據以上資訊，給我一份「第 ${cycleYear} 年轉型關鍵策略」，包含：
+1. 這一年最適合我在職場上主動推進的方向。
+2. 這一年容易讓我卡關、內耗的情境，以及該如何提早避開。
+3. 一個具體、可以立刻開始執行的階段性行動建議。
+
+請用溫暖、精準、具備洞察力且落地的繁體中文回答，避免空泛的星座式描述。`;
+}
+
+export interface DailyScenarioContext {
+  selfKin: number;
+  selfTotem: string;
+  todayKin: number;
+  todayTotem: string;
+}
+
+export const DAILY_SCENARIO_TABS: { key: string; label: string; buildText: (ctx: DailyScenarioContext) => string }[] = [
+  {
+    key: "presentation",
+    label: "今日要簡報提案",
+    buildText: (ctx) =>
+      `我今天是「${ctx.selfTotem}」（KIN ${ctx.selfKin}），今天的日流能量是「${ctx.todayTotem}」（KIN ${ctx.todayKin}）。我今天要進行簡報提案，請根據這兩股能量疊加，給我今天最適合的簡報切入角度、語氣拿捏，以及最容易說服聽眾的表達策略。`,
+  },
+  {
+    key: "negotiation",
+    label: "今日要談判／爭取權益",
+    buildText: (ctx) =>
+      `我今天是「${ctx.selfTotem}」（KIN ${ctx.selfKin}），今天的日流能量是「${ctx.todayTotem}」（KIN ${ctx.todayKin}）。我今天要進行談判或爭取權益，請根據這兩股能量疊加，給我今天的談判時機判斷、可以強硬與該退讓的界線，以及爭取權益時最有力的切入點。`,
+  },
+  {
+    key: "burnout",
+    label: "今日遇到職場內耗",
+    buildText: (ctx) =>
+      `我今天是「${ctx.selfTotem}」（KIN ${ctx.selfKin}），今天的日流能量是「${ctx.todayTotem}」（KIN ${ctx.todayKin}）。我今天在職場上感到內耗、與人不對頻，請根據這兩股能量疊加，分析我今天內耗的可能來源，並給我一個能快速回到中心、重新聚焦的心理調頻方法。`,
+  },
+];
+
 export function buildFullProfileSummary(profile: TalentProfile): string {
   const lines: string[] = [];
   lines.push("✦ AURA-Navi 星軌檔案 ✦");
