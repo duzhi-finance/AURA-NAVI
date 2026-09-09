@@ -88,7 +88,7 @@ export default function TeamDnaPage() {
               <div className="text-sm text-text-secondary">{nickname.trim()}</div>
             )}
             <TotemEmblem seed={totemSeed >= 0 ? totemSeed : 0} size={96} className="text-luxe-gold my-2" />
-            <div className="text-2xl font-serif font-semibold text-text-primary">{result.totem}</div>
+            <div className="text-2xl font-serif font-medium text-text-primary">{result.totem}</div>
             <div className="flex flex-wrap justify-center gap-2 text-xs text-text-secondary mt-1">
               <span className="rounded-lg bg-bg border border-border px-2.5 py-1 font-serif font-semibold">
                 KIN {result.kin}

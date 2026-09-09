@@ -1,17 +1,18 @@
 @import "tailwindcss";
 
 @theme {
-  --font-serif: "Noto Serif TC", "Source Han Serif TC", "Songti TC", serif;
-  --font-sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", "Noto Serif TC", "Source Han Serif TC", "Songti TC", serif;
+  --font-sans: "Inter", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
 
-  --color-bg: #faf9f6;
+  --color-bg: #fdfbf7;
   --color-bg-subtle: #f5f3ee;
   --color-surface: #ffffff;
   --color-surface-hover: #f5f3ee;
   --color-border: #eae8e3;
+  --color-border-gold: rgba(197, 160, 89, 0.2);
 
-  --color-text-primary: #2c2c2a;
-  --color-text-secondary: #888888;
+  --color-text-primary: #2c2a29;
+  --color-text-secondary: #7a7571;
   --color-text-tertiary: #a0a0a0;
 
   --color-accent: #1a1a1a;
@@ -21,7 +22,7 @@
   --color-freq-rest: #5b7a99;
   --color-freq-sync: #a98b4a;
 
-  --color-luxe-gold: #b8935a;
+  --color-luxe-gold: #c5a059;
   --color-notice-bg: #f7ebeb;
   --color-notice-border: #e8d3d5;
   --color-notice-text: #5a4a4c;
@@ -40,7 +41,8 @@
     color: var(--color-text-primary);
     font-family: var(--font-sans);
     font-weight: 300;
-    line-height: 1.65;
+    line-height: 1.8;
+    letter-spacing: 0.03em;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -175,6 +177,41 @@
   box-shadow: 0 0 0 3px rgba(184, 147, 90, 0.22);
   transform: translateY(-1px);
   opacity: 0.9;
+}
+
+.card-glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--color-border-gold);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-glass:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(197, 160, 89, 0.08);
+}
+
+.btn-cta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #1a1a1a;
+  color: #fdfbf7;
+  border: 1px solid var(--color-luxe-gold);
+  padding: 1rem 2.25rem;
+  border-radius: 999px;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  letter-spacing: 0.12em;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+.btn-cta-pill:hover {
+  background: #2c2a29;
+  box-shadow: 0 15px 30px rgba(197, 160, 89, 0.25);
+  transform: scale(1.02);
 }
 
 .btn-luxe-cta {

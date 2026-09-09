@@ -3,7 +3,6 @@ import {
   Gem,
   Lock,
   MessageCircle,
-  Radar,
   Sparkles,
   type LucideIcon,
 } from "lucide-react";
@@ -83,7 +82,7 @@ export default function SalesPage() {
         <section className="relative mb-28 text-center overflow-hidden">
           <VerticalMicrocopy text="HIGH-DIMENSION COMPASS" className="top-0 right-0 hidden md:block" />
           <ChapterLabel number="00" title="封面宣言" className="justify-center flex mb-6" />
-          <h1 className="font-serif text-3xl md:text-4xl font-semibold text-text-primary leading-relaxed tracking-[0.04em]">
+          <h1 className="font-serif text-3xl md:text-4xl font-medium text-text-primary leading-relaxed tracking-[0.04em]">
             告別世俗的笨方法。
             <br />
             你不是不夠努力，你只是不必再抹滅天賦。
@@ -108,11 +107,13 @@ export default function SalesPage() {
             身為感知敏銳的靈性靈魂，你是否常常在職場與關係中感到無比挫折？
           </p>
 
-          <div className="mt-8 flex flex-col gap-4">
+          <div className="mt-8 grid gap-6 sm:grid-cols-3">
             {PAIN_POINTS.map((p) => (
-              <div key={p.title} className="panel p-6">
-                <div className="text-sm font-medium text-text-primary">{p.title}</div>
-                <p className="desc-text text-sm text-text-secondary leading-relaxed mt-2">
+              <div key={p.title} className="card-glass p-7">
+                <h3 className="font-serif text-base font-medium text-text-primary tracking-[0.03em]">
+                  {p.title}
+                </h3>
+                <p className="desc-text text-sm text-text-secondary leading-relaxed mt-3">
                   {p.description}
                 </p>
               </div>
@@ -155,12 +156,12 @@ export default function SalesPage() {
             拒絕標籤化，直擊靈魂最細微的性格紋理。
           </h2>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          <div className="mt-8 grid gap-5 sm:grid-cols-2">
             {SIX_DIMENSIONS.map((d) => (
-              <div key={d.title} className="panel p-6 flex flex-col gap-2">
+              <div key={d.title} className="card-glass p-6 flex flex-col gap-2 text-left">
                 <div className="flex items-center gap-2">
-                  <Radar size={14} strokeWidth={1.5} className="text-luxe-gold shrink-0" />
-                  <div className="text-sm font-medium text-text-primary">{d.title}</div>
+                  <span className="text-luxe-gold text-sm shrink-0">✦</span>
+                  <div className="font-serif text-sm font-medium text-text-primary">{d.title}</div>
                 </div>
                 <p className="desc-text text-xs text-text-secondary leading-relaxed">
                   {d.description}
@@ -176,9 +177,9 @@ export default function SalesPage() {
 
           <div className="grid gap-4 sm:grid-cols-3 text-left">
             {QUALITY_PROMISES.map(({ Icon, title, description }) => (
-              <div key={title} className="panel p-6 flex flex-col gap-2">
+              <div key={title} className="card-glass p-6 flex flex-col gap-2">
                 <Icon size={18} strokeWidth={1.25} className="text-text-primary" />
-                <div className="text-sm font-medium text-text-primary">{title}</div>
+                <div className="font-serif text-sm font-medium text-text-primary">{title}</div>
                 <p className="desc-text text-xs text-text-secondary leading-relaxed">
                   {description}
                 </p>
@@ -186,7 +187,7 @@ export default function SalesPage() {
             ))}
           </div>
 
-          <Link to="/app" className="btn-primary justify-center mt-12 mx-auto !text-base !px-8 !py-3.5">
+          <Link to="/app" className="btn-cta-pill justify-center mt-12 mx-auto">
             <Sparkles size={16} strokeWidth={1.75} />
             開啟你的 AURA-Navi 星軌導航
           </Link>
@@ -207,6 +208,14 @@ export default function SalesPage() {
         </section>
 
         <Footer />
+        <div className="h-20" />
+      </div>
+
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+        <Link to="/app" className="btn-cta-pill !text-sm !py-3 !px-6">
+          <Sparkles size={15} strokeWidth={1.75} />
+          開啟星軌導航
+        </Link>
       </div>
     </div>
   );

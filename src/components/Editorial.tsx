@@ -27,7 +27,7 @@ export function ChapterLabel({
 export function PullQuote({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <p
-      className={`title-metallic font-serif font-semibold text-xl md:text-2xl leading-relaxed tracking-[0.08em] ${className}`}
+      className={`title-metallic font-serif font-medium text-xl md:text-2xl leading-relaxed tracking-[0.08em] ${className}`}
     >
       『{children}』
     </p>
