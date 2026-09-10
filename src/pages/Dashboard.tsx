@@ -6,6 +6,7 @@ import { PullQuote, VerticalMicrocopy } from "../components/Editorial";
 import PageHeader from "../components/PageHeader";
 import TotemEmblem from "../components/TotemEmblem";
 import { formatBilingualDateLabel, getTodayFrequency } from "../lib/dailyFrequency";
+import { buildTalentOneLiner } from "../lib/deepTalent";
 import { computeKinFromBirthdate } from "../lib/dreamspellKin";
 import { buildFullProfileSummary, GLOWING_URL } from "../lib/promptTemplates";
 import { getSelfProfile } from "../lib/store";
@@ -78,6 +79,39 @@ export default function Dashboard() {
         titleGradient
       />
 
+      {!selfProfile?.birth_date && (
+        <div className="mb-6 rounded-2xl border border-border-gold bg-bg-subtle/50 px-5 py-4 flex flex-col gap-2.5">
+          <p className="text-[11px] uppercase tracking-[0.15em] text-luxe-gold">新手 3 步驟指南</p>
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2 text-sm text-text-secondary">
+            <Link
+              to="/app/archive"
+              state={{ autoEditSelf: true }}
+              className="inline-flex items-center gap-1.5 rounded-full bg-bg border border-border px-3 py-1.5 font-serif font-semibold text-text-primary hover:border-luxe-gold transition-colors"
+            >
+              1. 輸入生日
+            </Link>
+            <ArrowRight size={13} strokeWidth={1.75} className="text-text-tertiary shrink-0" />
+            <span>2. 解鎖天賦圖譜</span>
+            <ArrowRight size={13} strokeWidth={1.75} className="text-text-tertiary shrink-0" />
+            <span>3. 複製指令開啟 Gemini 導航</span>
+          </div>
+        </div>
+      )}
+
+      {selfProfile?.maya_kin != null && (
+        <div className="card-glass p-5 mb-6 flex items-start gap-3">
+          <Sparkles size={18} strokeWidth={1.5} className="text-luxe-gold shrink-0 mt-0.5" />
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary mb-1">
+              天賦解密總覽
+            </p>
+            <p className="desc-text text-sm text-text-primary leading-relaxed">
+              {buildTalentOneLiner(selfProfile.maya_kin - 1)}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="grid gap-5 md:grid-cols-2">
         <div className="panel p-7 flex flex-col gap-4 relative overflow-hidden">
           <VerticalMicrocopy text="THE SOUL FREQUENCY" className="top-7 right-3" />
@@ -99,6 +133,13 @@ export default function Dashboard() {
               今日能量：<span className="font-serif font-semibold text-text-primary">KIN {todayKin.kin}</span>{" "}
               {todayKin.totem}．{todayKin.tone}
             </span>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-serif font-semibold text-text-primary">每日商業與行動黃金曆</h3>
+            <p className="desc-text text-xs text-text-secondary mt-1">
+              今天適合談判簽約、提案簡報，還是適合靜心思考？
+            </p>
           </div>
 
           {yearlyKin && dailyStrategy ? (
@@ -223,8 +264,8 @@ export default function Dashboard() {
           <QuickLink
             to="/app/deep-dive"
             Icon={Layers}
-            title="深度星軌模組"
-            description="13 年生命大運與脈輪對應卡"
+            title="天賦與人生大運圖譜"
+            description="看清人生階段，找回職場優勢"
           />
         </div>
 
@@ -259,7 +300,7 @@ function GlowingGuideCard() {
         />
         <GuideStepBlock
           n={2}
-          title="找到共鳴主印記"
+          title="找到共鳴主印記（職場核心天賦）"
           instructions={[
             "在同一頁面往下滑動。",
             "找到你的「共鳴主印記」區塊。",
@@ -273,7 +314,7 @@ function GlowingGuideCard() {
         />
         <GuideStepBlock
           n={3}
-          title="探索隱藏推動力（PSI）"
+          title="探索隱藏推動力（PSI，潛意識爆發力）"
           instructions={[
             "在同一頁面繼續往下滑動。",
             "點擊「隱藏推動（PSI）」選項。",
@@ -287,7 +328,7 @@ function GlowingGuideCard() {
         />
         <GuideStepBlock
           n={4}
-          title="連結內在女神力"
+          title="連結內在女神力（情緒修復電池）"
           instructions={[
             "返回剛剛的共鳴主印記頁面。",
             "點擊「內在女神力」選項。",

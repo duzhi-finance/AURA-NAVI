@@ -66,6 +66,14 @@ export const TONE_RECHARGE_MODE = [
   "靜心冥想或獨處沉澱，回到內在中心。",
 ];
 
+/** One-sentence plain-language talent affirmation for the "天賦解密總覽" card. */
+export function buildTalentOneLiner(kinIndex0Based: number): string {
+  const totemIdx = ((kinIndex0Based % 20) + 20) % 20;
+  const toneIdx = ((kinIndex0Based % 13) + 13) % 13;
+  const totem = MAYA_TOTEMS[totemIdx];
+  return `根據你的天賦，你是一位「${totem}」型人才——最擅長${TONE_NUANCE[toneIdx]}，但也要留意${TOTEM_SHADOW[totemIdx]}。`;
+}
+
 export function computeDeepTalent(kinIndex0Based: number): DeepTalentData {
   const totemIdx = ((kinIndex0Based % 20) + 20) % 20;
   const toneIdx = ((kinIndex0Based % 13) + 13) % 13;

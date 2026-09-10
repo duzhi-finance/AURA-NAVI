@@ -1,6 +1,6 @@
 import { ArrowRight, Check, ClipboardList, Download, Pencil, Plus, Sparkles, Trash2, Upload, Users } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
 import ProfileFormModal from "../components/ProfileFormModal";
 import TotemEmblem from "../components/TotemEmblem";
@@ -15,8 +15,13 @@ import {
 } from "../lib/store";
 import type { TalentProfile } from "../types/talent";
 
+interface ArchiveNavState {
+  autoEditSelf?: boolean;
+}
+
 export default function Archive() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [profiles, setProfiles] = useState<TalentProfile[]>([]);
   const [editing, setEditing] = useState<TalentProfile | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -28,7 +33,19 @@ export default function Archive() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setProfiles(listProfiles());
+    const all = listProfiles();
+    setProfiles(all);
+
+    const state = location.state as ArchiveNavState | null;
+    if (state?.autoEditSelf) {
+      const self = all.find((p) => p.is_self);
+      if (self) {
+        setEditing(self);
+        setShowForm(true);
+      }
+    }
+    // only consume the incoming nav state once, on arrival
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function refresh() {
@@ -306,6 +323,7 @@ function ProfileCard({
       <div className="grid grid-cols-2 gap-2 text-xs text-text-secondary relative">
         <div className="rounded-lg bg-bg border border-border px-2.5 py-1.5">
           <span className="font-serif">KIN：{profile.maya_kin ?? "—"}</span>
+          <span className="block text-[10px] text-text-tertiary mt-0.5">職場核心天賦</span>
         </div>
         <div className="rounded-lg bg-bg border border-border px-2.5 py-1.5">
           音調：{profile.maya_tone || "—"}
@@ -342,7 +360,7 @@ function ProfileCard({
 const DEEP_TALENT_FIELDS: { key: keyof TalentProfile; label: string }[] = [
   { key: "totem_animal", label: "力量動物" },
   { key: "wavespell", label: "波符" },
-  { key: "hidden_push_psi", label: "隱藏推動（PSI）" },
+  { key: "hidden_push_psi", label: "隱藏推動（PSI，潛意識爆發力）" },
   { key: "core_resonance_nuance", label: "核心共鳴與細微差異" },
   { key: "hidden_personality", label: "隱藏性格" },
   { key: "support_challenge_energy", label: "支持能量與挑戰擴展" },

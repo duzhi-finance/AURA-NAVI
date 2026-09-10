@@ -23,7 +23,7 @@ const EMPTY_DEEP_TALENT: DeepTalentData = {
 const DEEP_TALENT_LABELS: { key: keyof DeepTalentData; label: string }[] = [
   { key: "totem_animal", label: "力量動物" },
   { key: "wavespell", label: "波符" },
-  { key: "hidden_push_psi", label: "隱藏推動（PSI）" },
+  { key: "hidden_push_psi", label: "隱藏推動（PSI，潛意識爆發力）" },
   { key: "core_resonance_nuance", label: "核心共鳴與細微差異" },
   { key: "hidden_personality", label: "隱藏性格" },
   { key: "support_challenge_energy", label: "支持能量與挑戰擴展" },

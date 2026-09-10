@@ -1,7 +1,9 @@
 import { Briefcase, Check, Copy, Handshake, Heart, Home, Sparkles, Users } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import InfoTip from "../components/InfoTip";
 import PageHeader from "../components/PageHeader";
+import SectionHeading from "../components/SectionHeading";
 import TotemEmblem from "../components/TotemEmblem";
 import { buildChakraCard } from "../lib/chakraMap";
 import { computeKinFromBirthdate } from "../lib/dreamspellKin";
@@ -20,6 +22,21 @@ import type { TalentProfile } from "../types/talent";
 const COPY_FEEDBACK_MS = 1500;
 
 const SYNASTRY_TOPIC_ICONS = [Briefcase, Heart, Home, Handshake];
+
+const CHAKRA_ROLE_SUBLABEL: Record<string, { tag: string; tip: string }> = {
+  "本命 KIN": {
+    tag: "職場核心天賦",
+    tip: "這是你平常最常展現、別人一眼就能看到的天賦樣貌。",
+  },
+  "PSI 隱藏推動": {
+    tag: "潛意識爆發力",
+    tip: "PSI 是你在壓力或危機時才會浮現的深層爆發力，平常不容易被看見。",
+  },
+  "內在女神力": {
+    tag: "情緒修復電池",
+    tip: "內在女神力是你情緒低落、極限崩潰時能重新充電、找回安全感的方式。",
+  },
+};
 
 export default function DeepDivePage() {
   const [selfProfile, setSelfProfile] = useState<TalentProfile | undefined>(undefined);
@@ -46,8 +63,8 @@ export default function DeepDivePage() {
       <div>
         <PageHeader
           eyebrow="13-Year Cycle & Chakra Atlas"
-          title="深度星軌模組"
-          description="雙人合盤對焦、13 年生命大運提醒，與身心靈三維脈輪卡。"
+          title="靈魂天賦與人生大運圖譜"
+          description="看清你當前的人生階段，找回不被套路的職場優勢。"
         />
         <div className="panel p-12 text-center text-text-secondary">
           <p>尚未建立你的靈魂印記。</p>
@@ -63,24 +80,29 @@ export default function DeepDivePage() {
     <div>
       <PageHeader
         eyebrow="13-Year Cycle & Chakra Atlas"
-        title="深度星軌模組"
-        description="雙人合盤對焦、13 年生命大運提醒，與身心靈三維脈輪卡。"
+        title="靈魂天賦與人生大運圖譜"
+        description="看清你當前的人生階段，找回不被套路的職場優勢。"
       />
 
       <SynastryCard selfProfile={selfProfile} />
 
       <section className="mb-10">
-        <h2 className="text-sm font-medium text-text-secondary mb-4">
-          13 年生命大運波符｜{wavespellName(selfProfile.maya_kin)}
-        </h2>
+        <SectionHeading
+          title="人生 13 年黃金週期導航"
+          tag={wavespellName(selfProfile.maya_kin)}
+          tip="波符是你 13 年一輪的人生節奏，每一年都對應不同的重點任務。"
+          subtitle="你現在該全力衝刺還是累積沉澱？一秒看懂當前運勢重點。"
+          hint="適合在：職涯迷惘、考慮跳槽、規劃年度目標時使用"
+        />
         <CycleYearReminder years={years} currentCycleYear={currentCycleYear} hasBirthDate={Boolean(selfProfile.birth_date)} />
       </section>
 
       <section>
-        <h2 className="text-sm font-medium text-text-secondary mb-1">身心靈三維脈輪卡</h2>
-        <p className="desc-text text-xs text-text-tertiary mb-4">
-          本命 KIN、PSI 隱藏推動與內在女神力，各自對應的脈輪、日常調頻建議，與能量堵塞排解引導。
-        </p>
+        <SectionHeading
+          title="高壓情緒調頻與復原力指南"
+          subtitle="當你感到內耗心累時，專屬於你的日常拔電充電法。"
+          hint="適合在：工作壓力大、睡不好、覺得自己陷入自我懷疑時使用"
+        />
 
         <div className="flex flex-col gap-4">
           {chakraRows.map((row) => {
@@ -113,12 +135,18 @@ function ChakraRowCard({ seed, row }: { seed: number; row: ReturnType<typeof bui
     }
   }
 
+  const sub = CHAKRA_ROLE_SUBLABEL[row.role];
+
   return (
     <div className="card-glass p-6 flex flex-col gap-3">
       <div className="flex items-center gap-3">
         <TotemEmblem seed={seed} size={32} className="text-luxe-gold shrink-0" />
         <div className="flex-1 min-w-0">
-          <div className="font-serif text-sm font-semibold text-text-primary">{row.role}</div>
+          <div className="flex items-center gap-1.5">
+            <span className="font-serif text-sm font-semibold text-text-primary">{row.role}</span>
+            {sub && <span className="text-[11px] text-text-tertiary">（{sub.tag}）</span>}
+            {sub && <InfoTip text={sub.tip} />}
+          </div>
           <div className="text-[11px] text-text-tertiary mt-0.5">
             KIN {row.kin}．{row.totem}｜{row.chakra}｜{row.earthFamily}
           </div>
@@ -161,6 +189,7 @@ function SynastryCard({ selfProfile }: { selfProfile: TalentProfile }) {
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [customQuestion, setCustomQuestion] = useState("");
   const [copied, setCopied] = useState(false);
+  const questionsRef = useRef<HTMLDivElement>(null);
 
   function handleStart() {
     const parts = partnerBirthdate.split("-").map(Number);
@@ -182,6 +211,10 @@ function SynastryCard({ selfProfile }: { selfProfile: TalentProfile }) {
     setCustomQuestion("");
     setCopied(false);
   }
+
+  useEffect(() => {
+    if (result) questionsRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [result]);
 
   function toggleQuestion(q: string) {
     setSelectedQuestions((prev) => (prev.includes(q) ? prev.filter((item) => item !== q) : [...prev, q]));
@@ -220,11 +253,14 @@ function SynastryCard({ selfProfile }: { selfProfile: TalentProfile }) {
       <div className="flex items-center gap-2">
         <Users size={16} strokeWidth={1.5} className="text-luxe-gold shrink-0" />
         <h2 className="font-serif text-sm font-semibold text-text-primary">
-          雙人／職場關係合盤對焦
+          職場與人際關係「防雷避坑」對焦
+          <span className="ml-1.5 text-xs font-sans font-normal text-text-tertiary">
+            （主管／客戶防雷指南）
+          </span>
         </h2>
       </div>
       <p className="text-xs text-[#555555] tracking-[0.05em] -mt-1.5">
-        輸入主管、客戶或任何重要關係人的生日，不需先存入典藏館，即可快速合盤。
+        輸入對方生日，揭密主管、客戶、伴侶的潛意識溝通地雷——不需先存入典藏館，即可快速合盤。
       </p>
 
       <div className="flex flex-col gap-2 max-w-xs">
@@ -247,15 +283,16 @@ function SynastryCard({ selfProfile }: { selfProfile: TalentProfile }) {
               對方｜KIN {result.kin}
             </span>
             <TotemEmblem seed={compositeSeed >= 0 ? compositeSeed : 0} size={18} className="text-luxe-gold shrink-0 ml-1" />
-            <span className="rounded-lg bg-bg border border-border px-2.5 py-1.5 font-serif font-semibold">
+            <span className="rounded-lg bg-bg border border-border px-2.5 py-1.5 font-serif font-semibold inline-flex items-center gap-1.5">
               合相 KIN {result.compositeKin}
+              <InfoTip text="合相 KIN 是把你和對方的印記相加後得出的第三組能量，代表你們相處時會共同放大的特質。" />
             </span>
             <span className="rounded-full bg-luxe-gold/15 border border-border-gold px-3 py-1.5 font-serif font-semibold text-text-primary">
               {RELATIONSHIP_ROLE_LABEL[result.role]}
             </span>
           </div>
 
-          <div className="flex flex-col gap-2.5 border-t border-border pt-3">
+          <div ref={questionsRef} className="flex flex-col gap-2.5 border-t border-border pt-3">
             <p className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary">想深入了解哪個面向？</p>
             {SYNASTRY_TOPIC_GROUPS.map((group, idx) => {
               const Icon = SYNASTRY_TOPIC_ICONS[idx];

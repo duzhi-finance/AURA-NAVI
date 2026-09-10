@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import CopyPromptBlock from "../components/CopyPromptBlock";
 import FrequencyRadar from "../components/FrequencyRadar";
 import GeminiButton from "../components/GeminiButton";
+import InfoTip from "../components/InfoTip";
 import PageHeader from "../components/PageHeader";
 import TotemEmblem from "../components/TotemEmblem";
 import { computeCompatibility } from "../lib/compatibility";
@@ -137,11 +138,12 @@ export default function RelationHub() {
       {synastry && (
         <div className="card-glass p-6 mt-6 flex flex-col gap-3">
           <p className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary">
-            Synastry ｜ 雙人合盤診斷
+            雙人合盤診斷｜防雷避坑指南
           </p>
           <div className="flex flex-wrap items-center gap-2 text-xs text-text-secondary">
-            <span className="rounded-lg bg-bg border border-border px-2.5 py-1.5 font-serif font-semibold">
+            <span className="rounded-lg bg-bg border border-border px-2.5 py-1.5 font-serif font-semibold inline-flex items-center gap-1.5">
               合相印記 KIN {synastry.composite.kin}
+              <InfoTip text="合相印記是把雙方的 KIN 相加後得到的第三組印記，代表兩人相處時會共同放大的能量特質。" />
             </span>
             <span className="rounded-lg bg-bg border border-border px-2.5 py-1.5">
               {synastry.composite.totem}．{synastry.composite.tone}
