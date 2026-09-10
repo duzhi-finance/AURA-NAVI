@@ -1,15 +1,16 @@
-import { ArrowRight, BookHeart, Check, ChevronRight, Copy, ExternalLink, FolderOpen, Layers, SendHorizonal, Sparkles, type LucideIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowRight, BookHeart, Check, ChevronRight, Copy, ExternalLink, FolderOpen, Layers, Lock, SendHorizonal, Sparkles, type LucideIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import DailyCardDraw from "../components/DailyCardDraw";
 import { PullQuote, VerticalMicrocopy } from "../components/Editorial";
+import OnboardingStepper from "../components/OnboardingStepper";
 import PageHeader from "../components/PageHeader";
 import TotemEmblem from "../components/TotemEmblem";
 import { formatBilingualDateLabel, getTodayFrequency } from "../lib/dailyFrequency";
-import { buildTalentOneLiner } from "../lib/deepTalent";
-import { computeKinFromBirthdate } from "../lib/dreamspellKin";
+import { buildTalentOneLiner, computeDeepTalent } from "../lib/deepTalent";
+import { computeGoddessKin, computeKinFromBirthdate, computePsiKin, kinToResult } from "../lib/dreamspellKin";
 import { buildFullProfileSummary, GLOWING_URL } from "../lib/promptTemplates";
-import { getSelfProfile } from "../lib/store";
+import { createProfileId, getSelfProfile, saveProfile } from "../lib/store";
 import { MAYA_TOTEMS } from "../lib/mayaOptions";
 import {
   computeDailyStrategy,
@@ -19,20 +20,66 @@ import {
 import type { TalentProfile } from "../types/talent";
 
 const COPY_FEEDBACK_MS = 1500;
+const SPOTLIGHT_DURATION_MS = 5000;
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [selfProfile, setSelfProfile] = useState<TalentProfile | undefined>(undefined);
+  const [birthdateInput, setBirthdateInput] = useState("");
+  const [justUnlocked, setJustUnlocked] = useState(false);
   const [copiedSummary, setCopiedSummary] = useState(false);
   const [copiedDailyFocus, setCopiedDailyFocus] = useState(false);
+  const promptStationRef = useRef<HTMLDivElement>(null);
   const frequency = getTodayFrequency();
   const now = new Date();
   const todayKin = computeKinFromBirthdate(now.getFullYear(), now.getMonth() + 1, now.getDate());
   const todaySeed = MAYA_TOTEMS.indexOf(todayKin.totem);
 
+  const hasBirthDate = Boolean(selfProfile?.birth_date);
+  const psiResult = selfProfile?.maya_kin ? kinToResult(computePsiKin(selfProfile.maya_kin)) : null;
+  const goddessResult = selfProfile?.maya_kin ? kinToResult(computeGoddessKin(selfProfile.maya_kin)) : null;
+
   const birthMonthDay = selfProfile?.birth_date ? parseBirthMonthDay(selfProfile.birth_date) : null;
   const yearlyKin = birthMonthDay ? computeYearlyKin(birthMonthDay.month, birthMonthDay.day) : null;
   const dailyStrategy = yearlyKin ? computeDailyStrategy(yearlyKin.kin, todayKin.kin) : null;
+
+  function handleUnlock() {
+    const parts = birthdateInput.split("-").map(Number);
+    if (parts.length !== 3 || parts.some((n) => Number.isNaN(n))) return;
+    const [y, m, d] = parts;
+    const kinResult = computeKinFromBirthdate(y, m, d);
+    const deepTalent = computeDeepTalent(kinResult.kin - 1);
+    const updated: TalentProfile = {
+      profile_id: selfProfile?.profile_id ?? createProfileId(),
+      profile_type: selfProfile?.profile_type ?? "自己",
+      is_self: true,
+      name_alias: selfProfile?.name_alias ?? "自己",
+      birth_date: birthdateInput,
+      maya_kin: kinResult.kin,
+      maya_tone: kinResult.tone,
+      maya_totem: kinResult.totem,
+      life_path_num: selfProfile?.life_path_num ?? null,
+      core_traits_tags: selfProfile?.core_traits_tags ?? [],
+      relationship_notes: selfProfile?.relationship_notes ?? "",
+      ...deepTalent,
+      created_at: selfProfile?.created_at ?? new Date().toISOString(),
+    };
+    saveProfile(updated);
+    setSelfProfile(updated);
+    setJustUnlocked(true);
+  }
+
+  useEffect(() => {
+    if (!justUnlocked) return;
+    const scrollTimer = setTimeout(() => {
+      promptStationRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 650);
+    const dismissTimer = setTimeout(() => setJustUnlocked(false), SPOTLIGHT_DURATION_MS);
+    return () => {
+      clearTimeout(scrollTimer);
+      clearTimeout(dismissTimer);
+    };
+  }, [justUnlocked]);
 
   function handleBringTodayEnergy() {
     const presetContext = selfProfile?.maya_totem
@@ -79,39 +126,78 @@ export default function Dashboard() {
         titleGradient
       />
 
-      {!selfProfile?.birth_date && (
-        <div className="mb-6 rounded-2xl border border-border-gold bg-bg-subtle/50 px-5 py-4 flex flex-col gap-2.5">
-          <p className="text-[11px] uppercase tracking-[0.15em] text-luxe-gold">新手 3 步驟指南</p>
-          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-2 text-sm text-text-secondary">
-            <Link
-              to="/app/archive"
-              state={{ autoEditSelf: true }}
-              className="inline-flex items-center gap-1.5 rounded-full bg-bg border border-border px-3 py-1.5 font-serif font-semibold text-text-primary hover:border-luxe-gold transition-colors"
+      <OnboardingStepper currentStep={hasBirthDate ? 2 : 1} />
+
+      {!hasBirthDate ? (
+        <div className="card-glass p-8 mb-8 flex flex-col items-center text-center gap-4 max-w-lg mx-auto">
+          <span className="text-luxe-gold text-2xl">✦</span>
+          <h1 className="font-serif text-xl font-semibold text-text-primary">
+            第一步：輸入生日，取得你的瑪雅靈魂印記
+          </h1>
+          <p className="desc-text text-sm text-text-secondary leading-relaxed max-w-sm">
+            只需要 3 秒鐘，鎖定你的本命 KIN 碼、PSI 隱藏天賦與內在女神力。
+          </p>
+          <div className="flex flex-col gap-3 w-full max-w-xs mt-2">
+            <input
+              type="date"
+              value={birthdateInput}
+              onChange={(e) => setBirthdateInput(e.target.value)}
+              className="dive-input text-center"
+            />
+            <button
+              onClick={handleUnlock}
+              disabled={!birthdateInput}
+              className="btn-primary justify-center disabled:opacity-40"
             >
-              1. 輸入生日
-            </Link>
-            <ArrowRight size={13} strokeWidth={1.75} className="text-text-tertiary shrink-0" />
-            <span>2. 解鎖天賦圖譜</span>
-            <ArrowRight size={13} strokeWidth={1.75} className="text-text-tertiary shrink-0" />
-            <span>3. 複製指令開啟 Gemini 導航</span>
+              解鎖我的靈魂天賦
+              <ArrowRight size={16} strokeWidth={1.75} />
+            </button>
           </div>
         </div>
-      )}
-
-      {selfProfile?.maya_kin != null && (
-        <div className="card-glass p-5 mb-6 flex items-start gap-3">
-          <Sparkles size={18} strokeWidth={1.5} className="text-luxe-gold shrink-0 mt-0.5" />
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary mb-1">
+      ) : (
+        selfProfile?.maya_kin != null && (
+          <div className="card-glass p-6 mb-8 animate-reveal">
+            <p className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary mb-3">
               天賦解密總覽
             </p>
-            <p className="desc-text text-sm text-text-primary leading-relaxed">
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div className="rounded-xl bg-bg border border-border px-2 py-3">
+                <div className="text-[10px] text-text-tertiary mb-1">本命 KIN</div>
+                <div className="font-serif font-semibold text-text-primary text-sm">
+                  KIN {selfProfile.maya_kin}
+                </div>
+                <div className="text-[10px] text-text-tertiary mt-0.5">{selfProfile.maya_totem}</div>
+              </div>
+              <div className="rounded-xl bg-bg border border-border px-2 py-3">
+                <div className="text-[10px] text-text-tertiary mb-1">PSI 隱藏推動</div>
+                <div className="font-serif font-semibold text-text-primary text-sm">
+                  KIN {psiResult?.kin ?? "—"}
+                </div>
+                <div className="text-[10px] text-text-tertiary mt-0.5">{psiResult?.totem}</div>
+              </div>
+              <div className="rounded-xl bg-bg border border-border px-2 py-3">
+                <div className="text-[10px] text-text-tertiary mb-1">內在女神力</div>
+                <div className="font-serif font-semibold text-text-primary text-sm">
+                  KIN {goddessResult?.kin ?? "—"}
+                </div>
+                <div className="text-[10px] text-text-tertiary mt-0.5">{goddessResult?.totem}</div>
+              </div>
+            </div>
+            <p className="desc-text text-sm text-text-primary leading-relaxed mt-4">
               {buildTalentOneLiner(selfProfile.maya_kin - 1)}
             </p>
           </div>
-        </div>
+        )
       )}
 
+      <div className={`relative ${!hasBirthDate ? "pointer-events-none select-none" : ""}`}>
+        {!hasBirthDate && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-2xl bg-bg/70 backdrop-blur-[2px]">
+            <Lock size={20} strokeWidth={1.5} className="text-text-tertiary" />
+            <p className="desc-text text-xs text-text-tertiary">完成第一步即可解鎖</p>
+          </div>
+        )}
+        <div className={!hasBirthDate ? "opacity-30" : ""}>
       <div className="grid gap-5 md:grid-cols-2">
         <div className="panel p-7 flex flex-col gap-4 relative overflow-hidden">
           <VerticalMicrocopy text="THE SOUL FREQUENCY" className="top-7 right-3" />
@@ -249,12 +335,22 @@ export default function Dashboard() {
             title="取得我的瑪雅印記"
             description="前往 glowing.cc 輸入生日生成圖卡"
           />
-          <QuickLink
-            to="/app/prompt-station"
-            Icon={SendHorizonal}
-            title="一鍵生成 Gemini 導航指令"
-            description="合成高維對焦 Prompt"
-          />
+          <div
+            ref={promptStationRef}
+            className={`relative rounded-2xl ${justUnlocked ? "animate-spotlight ring-2 ring-luxe-gold" : ""}`}
+          >
+            {justUnlocked && (
+              <div className="absolute -top-9 left-1/2 -translate-x-1/2 z-10 whitespace-nowrap rounded-full bg-luxe-gold text-white text-[11px] px-3 py-1.5 shadow-lg">
+                接下來請點擊這裡生成你的 AI 指令！
+              </div>
+            )}
+            <QuickLink
+              to="/app/prompt-station"
+              Icon={SendHorizonal}
+              title="一鍵生成 Gemini 導航指令"
+              description="合成高維對焦 Prompt"
+            />
+          </div>
           <QuickLink
             to="/app/archive"
             Icon={FolderOpen}
@@ -270,6 +366,8 @@ export default function Dashboard() {
         </div>
 
         <GlowingGuideCard />
+      </div>
+        </div>
       </div>
     </div>
   );
