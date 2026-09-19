@@ -9,7 +9,7 @@ import {
 import { Link } from "react-router-dom";
 import { ChapterLabel, IssueLabel, PullQuote, VerticalMicrocopy } from "../components/Editorial";
 import Footer from "../components/Footer";
-import { LINE_URL } from "../lib/promptTemplates";
+import { LINE_URL } from "../lib/links";
 
 const PAIN_POINTS: { title: string; description: string }[] = [
   {

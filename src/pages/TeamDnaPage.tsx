@@ -7,7 +7,7 @@ import TotemEmblem from "../components/TotemEmblem";
 import { TONE_COMMUNICATION_STYLE, TONE_NUANCE, TONE_RECHARGE_MODE } from "../lib/deepTalent";
 import { computeKinFromBirthdate, type DreamspellResult } from "../lib/dreamspellKin";
 import { MAYA_TONES, MAYA_TOTEMS } from "../lib/mayaOptions";
-import { LINE_URL } from "../lib/promptTemplates";
+import { LINE_URL } from "../lib/links";
 
 export default function TeamDnaPage() {
   const [nickname, setNickname] = useState("");

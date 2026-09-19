@@ -1,5 +1,3 @@
-import { cardSeedIndex, type DailyCard } from "./dailyCard";
-
 function wrapCjkText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
   const lines: string[] = [];
   let current = "";
@@ -82,41 +80,51 @@ function drawTotemEmblem(
   ctx.globalAlpha = 1;
 }
 
-function todayFileStamp(date: Date = new Date()): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}${m}${d}`;
+export interface SoulCardOptions {
+  cardNumber: number;
+  cardName: string;
+  totem: string;
+  totemSeed: number;
+  kin: number;
+  quote: string;
 }
 
-export interface StoryCardOptions {
-  dateLabel: string;
-  frequencyLabel: string;
-  frequencyColor: string;
-  card: DailyCard;
-}
+export const SOUL_CARD_WIDTH = 1080;
+export const SOUL_CARD_HEIGHT = 1920;
 
-export async function exportDailyStoryCard(opts: StoryCardOptions): Promise<void> {
-  if (document.fonts?.ready) {
-    await document.fonts.ready;
-  }
-
-  const W = 1080;
-  const H = 1920;
-  const canvas = document.createElement("canvas");
+/** Draws the soul card synchronously onto an already-sized (1080x1920) canvas. */
+export function drawSoulCard(canvas: HTMLCanvasElement, opts: SoulCardOptions): void {
+  const W = SOUL_CARD_WIDTH;
+  const H = SOUL_CARD_HEIGHT;
   canvas.width = W;
   canvas.height = H;
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
-  const gold = "#b8935a";
-  const ink = "#2c2c2a";
+  const gold = "#c5a059";
+  const ink = "#f2efe9";
 
   const bgGrad = ctx.createLinearGradient(0, 0, W, H);
-  bgGrad.addColorStop(0, "#fffdf8");
-  bgGrad.addColorStop(1, "#faf9f6");
+  bgGrad.addColorStop(0, "#14131a");
+  bgGrad.addColorStop(1, "#08070b");
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, W, H);
+
+  // faint starfield
+  let seedState = opts.kin * 9301 + 49297;
+  const rand = () => {
+    seedState = (seedState * 9301 + 49297) % 233280;
+    return seedState / 233280;
+  };
+  ctx.fillStyle = "#ffffff";
+  for (let i = 0; i < 140; i++) {
+    ctx.globalAlpha = 0.15 + rand() * 0.5;
+    const r = 0.8 + rand() * 1.6;
+    ctx.beginPath();
+    ctx.arc(rand() * W, rand() * H, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
 
   const margin = 64;
   ctx.strokeStyle = gold;
@@ -134,43 +142,56 @@ export async function exportDailyStoryCard(opts: StoryCardOptions): Promise<void
   ctx.font = "500 32px 'Noto Serif TC', serif";
   ctx.fillText("A U R A · N A V I", W / 2, 220);
 
-  ctx.fillStyle = "#888888";
-  ctx.font = "300 30px 'Noto Serif TC', serif";
-  ctx.fillText(opts.dateLabel, W / 2, 270);
+  ctx.fillStyle = "#b9b3a9";
+  ctx.font = "300 28px 'Noto Serif TC', serif";
+  ctx.fillText("全方位個人靈魂使用說明書", W / 2, 268);
 
-  ctx.fillStyle = opts.frequencyColor;
-  ctx.font = "500 52px 'Noto Serif TC', serif";
-  ctx.fillText(`今日流年 · ${opts.frequencyLabel}`, W / 2, 380);
+  drawTotemEmblem(ctx, W / 2, 720, 260, opts.totemSeed, gold);
 
-  const seed = cardSeedIndex(opts.card);
-  drawTotemEmblem(ctx, W / 2, 760, 260, seed, gold);
+  ctx.fillStyle = gold;
+  ctx.font = "500 44px 'Noto Serif TC', serif";
+  ctx.fillText(`命數 ${opts.cardNumber}`, W / 2, 1080);
 
   ctx.fillStyle = ink;
   ctx.font = "400 96px 'Noto Serif TC', serif";
-  ctx.fillText(opts.card.name, W / 2, 1180);
+  ctx.fillText(opts.cardName, W / 2, 1180);
 
-  ctx.font = "300 40px 'Noto Sans TC', sans-serif";
-  ctx.fillStyle = "#5a5a56";
-  const lines = wrapCjkText(ctx, opts.card.insight, 720);
-  let ly = 1280;
+  ctx.fillStyle = "#d9d3c8";
+  ctx.font = "300 34px 'Noto Serif TC', serif";
+  ctx.fillText(`KIN ${opts.kin}．${opts.totem}`, W / 2, 1240);
+
+  ctx.font = "300 38px 'Noto Sans TC', sans-serif";
+  ctx.fillStyle = "#d9d3c8";
+  const lines = wrapCjkText(ctx, opts.quote, 760);
+  let ly = 1340;
   for (const line of lines) {
     ctx.fillText(line, W / 2, ly);
-    ly += 58;
+    ly += 56;
   }
 
   ctx.globalAlpha = 0.75;
   ctx.fillStyle = gold;
   ctx.font = "500 24px 'Noto Serif TC', serif";
-  ctx.fillText("CELESTIAL SYNASTRY CHRONOGRAPH", W / 2, H - margin - 60);
+  ctx.fillText("SOUL DECODE MANUAL", W / 2, H - margin - 60);
   ctx.globalAlpha = 1;
+}
 
+function fileStamp(date: Date = new Date()): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}${m}${d}`;
+}
+
+/** Exports an already-drawn canvas to a downloaded PNG file, fully client-side. */
+export async function downloadCanvasAsPng(canvas: HTMLCanvasElement, filenamePrefix = "aura-navi-soul-card"): Promise<void> {
   const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
   if (!blob) return;
 
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `aura-navi-story-${todayFileStamp()}.png`;
+  a.download = `${filenamePrefix}-${fileStamp()}.png`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

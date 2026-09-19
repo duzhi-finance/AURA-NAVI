@@ -1,11 +1,5 @@
 import { HashRouter, Route, Routes } from "react-router-dom";
-import Layout from "./components/Layout";
-import Dashboard from "./pages/Dashboard";
-import RelationHub from "./pages/RelationHub";
-import PromptStation from "./pages/PromptStation";
-import Archive from "./pages/Archive";
-import DeepDivePage from "./pages/DeepDivePage";
-import SoulJournalPage from "./pages/SoulJournalPage";
+import SoulManual from "./pages/SoulManual";
 import TeamDnaPage from "./pages/TeamDnaPage";
 import SalesPage from "./pages/SalesPage";
 
@@ -15,14 +9,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<SalesPage />} />
         <Route path="team-dna" element={<TeamDnaPage />} />
-        <Route path="app" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="relations" element={<RelationHub />} />
-          <Route path="prompt-station" element={<PromptStation />} />
-          <Route path="archive" element={<Archive />} />
-          <Route path="deep-dive" element={<DeepDivePage />} />
-          <Route path="journal" element={<SoulJournalPage />} />
-        </Route>
+        <Route path="app" element={<SoulManual />} />
       </Routes>
     </HashRouter>
   );
