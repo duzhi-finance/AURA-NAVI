@@ -532,4 +532,51 @@
     animation: none;
   }
 }
+
+.soul-chat-bubble-ai {
+  align-self: flex-start;
+  max-width: 88%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--sm-border);
+  border-radius: 14px 14px 14px 4px;
+  padding: 0.7rem 0.95rem;
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  line-height: 1.75;
+  color: var(--sm-text-secondary);
+}
+
+.soul-chat-bubble-user {
+  align-self: flex-end;
+  max-width: 88%;
+  margin-left: auto;
+  background: linear-gradient(135deg, rgba(197, 160, 89, 0.22), rgba(197, 160, 89, 0.1));
+  border: 1px solid rgba(197, 160, 89, 0.3);
+  border-radius: 14px 14px 4px 14px;
+  padding: 0.7rem 0.95rem;
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  line-height: 1.75;
+  color: var(--sm-text);
+}
+
+.soul-chat-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--sm-border);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.45rem 0.9rem;
+  font-family: var(--font-serif);
+  font-size: 0.75rem;
+  color: var(--sm-text-secondary);
+  letter-spacing: 0.03em;
+  text-align: left;
+  transition: border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+.soul-chat-chip:hover {
+  border-color: var(--color-luxe-gold);
+  color: var(--sm-text);
+  box-shadow: 0 0 0 1px rgba(197, 160, 89, 0.2);
+}
 } /* @layer components */

@@ -1,18 +1,21 @@
 import { Download, Lock, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import TotemEmblem from "../components/TotemEmblem";
-import { LINE_URL } from "../lib/links";
+import AiConsultantChat from "../components/AiConsultantChat";
+import { LINE_URL, UNLOCK_CODE } from "../lib/links";
 import { computeKinFromBirthdate } from "../lib/dreamspellKin";
 import { drawSoulCard, downloadCanvasAsPng, SOUL_CARD_WIDTH, SOUL_CARD_HEIGHT } from "../lib/soulCard";
 import { MAYA_TOTEMS } from "../lib/mayaOptions";
 import { computeLifePathNumber, getCard, type MajorArcanaCard } from "../lib/tarotMajorArcana";
+import { excerpt, wavespellName, buildRelationshipManual, buildLandingPlans, buildWavespellGuide } from "../lib/reportText";
 
 type Phase = "landing" | "loading" | "report";
 
 const LOADING_MS = 1500;
 const UNLOCK_PRICE = "NT$199";
+const UNLOCK_STORAGE_KEY = "soul-report-unlocked";
 
-interface SoulReport {
+export interface SoulReport {
   kin: number;
   tone: string;
   totem: string;
@@ -23,45 +26,29 @@ interface SoulReport {
   supplementCards: MajorArcanaCard[];
 }
 
-function excerpt(text: string, maxLen: number): string {
-  const firstClause = text.split(/[、。]/)[0] ?? text;
-  if (firstClause.length <= maxLen) return firstClause;
-  return `${firstClause.slice(0, maxLen)}…`;
-}
-
-function wavespellName(kin: number): string {
-  const kinIndex0 = kin - 1;
-  const wavespellStart0 = kinIndex0 - (kinIndex0 % 13);
-  return `${MAYA_TOTEMS[wavespellStart0 % 20]}波符`;
-}
-
-function buildRelationshipManual(card: MajorArcanaCard): string {
-  return `你在親密關係中最容易感到「躁」的原因，來自${card.name}特質中的：${excerpt(card.disadvantage, 40)}。
-
-地雷區：當你不自覺地陷入這個模式時，最容易讓親密的人感到不解或受傷，也是最常被誤會的時刻。
-
-白話相處指南：對方需要明白，你的優勢其實是「${excerpt(card.advantage, 32)}」——只要給你多一點空間去發揮這個特質，你反而會展現出最好的一面。`;
-}
-
-function buildLandingPlans(card: MajorArcanaCard): string[] {
-  return [
-    `辨認出你的核心天賦：「${excerpt(card.advantage, 36)}」，刻意在工作中創造能發揮它的場景，而不是等機會自己出現。`,
-    `留意你的內耗盲點：「${excerpt(card.disadvantage, 36)}」，建立一個提醒自己踩煞車的機制，例如固定時間覆盤。`,
-    `本週先做一件事：找一個能讓你發揮${card.name}特質、又不會踩到盲點的小任務，練習「優雅發揮天賦」而不是「用蠻力硬撐」。`,
-  ];
-}
-
-function buildWavespellGuide(wavespell: string, kin: number, totem: string): string {
-  return `你的年度能量轉化鑰匙，來自「${wavespell}」的底色——這股力量與你 KIN ${kin}．${totem} 的本命特質彼此呼應，是你這一年最該留意的隱藏節奏。
-
-當你感覺卡關、內耗時，回到「${totem}」最純粹的樣子，就是你重新校準高維頻率的方式。`;
+function readUnlockedFlag(): boolean {
+  try {
+    return localStorage.getItem(UNLOCK_STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
 }
 
 export default function SoulManual() {
   const [phase, setPhase] = useState<Phase>("landing");
   const [birthdate, setBirthdate] = useState("");
   const [report, setReport] = useState<SoulReport | null>(null);
+  const [unlocked, setUnlocked] = useState(readUnlockedFlag);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  function handleUnlock() {
+    setUnlocked(true);
+    try {
+      localStorage.setItem(UNLOCK_STORAGE_KEY, "true");
+    } catch {
+      // best-effort persistence only
+    }
+  }
 
   function handleDecode() {
     const parts = birthdate.split("-").map(Number);
@@ -119,7 +106,14 @@ export default function SoulManual() {
         {phase === "landing" && <LandingScreen birthdate={birthdate} setBirthdate={setBirthdate} onDecode={handleDecode} />}
         {phase === "loading" && <LoadingScreen />}
         {phase === "report" && report && (
-          <ReportScreen report={report} canvasRef={canvasRef} onDownload={handleDownload} onRestart={() => setPhase("landing")} />
+          <ReportScreen
+            report={report}
+            canvasRef={canvasRef}
+            unlocked={unlocked}
+            onUnlock={handleUnlock}
+            onDownload={handleDownload}
+            onRestart={() => setPhase("landing")}
+          />
         )}
       </div>
     </div>
@@ -186,15 +180,30 @@ function LoadingScreen() {
 function ReportScreen({
   report,
   canvasRef,
+  unlocked,
+  onUnlock,
   onDownload,
   onRestart,
 }: {
   report: SoulReport;
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
+  unlocked: boolean;
+  onUnlock: () => void;
   onDownload: () => void;
   onRestart: () => void;
 }) {
   const { primaryCard, dualCard, supplementCards } = report;
+  const [codeInput, setCodeInput] = useState("");
+  const [codeError, setCodeError] = useState(false);
+
+  function handleCodeSubmit() {
+    if (codeInput.trim().toUpperCase() === UNLOCK_CODE) {
+      setCodeError(false);
+      onUnlock();
+    } else {
+      setCodeError(true);
+    }
+  }
 
   return (
     <div className="flex flex-col gap-10">
@@ -241,33 +250,74 @@ function ReportScreen({
         </div>
       </section>
 
-      {/* Region C: locked */}
+      {/* Region C: unlocked content + locked preview */}
       <section className="flex flex-col gap-4">
         <p className="text-[11px] uppercase tracking-[0.2em] text-luxe-gold text-center">情境診斷與高維破局</p>
 
-        <LockedSection title="親密關係使用說明書" body={buildRelationshipManual(primaryCard)} />
-        <LockedSection
-          title="天賦開掛落地方案"
-          body={buildLandingPlans(primaryCard)
-            .map((line, i) => `${i + 1}. ${line}`)
-            .join("\n\n")}
-        />
-        <LockedSection
-          title="瑪雅高維波符指引"
-          body={buildWavespellGuide(report.wavespell, report.kin, report.totem)}
-        />
+        {unlocked ? (
+          <>
+            <UnlockedSection title="親密關係使用說明書" body={buildRelationshipManual(primaryCard)} />
+            <UnlockedSection
+              title="天賦開掛落地方案"
+              body={buildLandingPlans(primaryCard)
+                .map((line, i) => `${i + 1}. ${line}`)
+                .join("\n\n")}
+            />
+            <UnlockedSection
+              title="瑪雅高維波符指引"
+              body={buildWavespellGuide(report.wavespell, report.kin, report.totem)}
+            />
+          </>
+        ) : (
+          <>
+            <LockedSection title="親密關係使用說明書" body={buildRelationshipManual(primaryCard)} />
+            <LockedSection
+              title="天賦開掛落地方案"
+              body={buildLandingPlans(primaryCard)
+                .map((line, i) => `${i + 1}. ${line}`)
+                .join("\n\n")}
+            />
+            <LockedSection
+              title="瑪雅高維波符指引"
+              body={buildWavespellGuide(report.wavespell, report.kin, report.totem)}
+            />
 
-        <div className="soul-panel p-6 flex flex-col items-center text-center gap-3 mt-2">
-          <TotemEmblem seed={report.totemSeed} size={40} className="text-luxe-gold" />
-          <p className="desc-text text-sm text-[var(--sm-text-secondary)] leading-relaxed max-w-sm">
-            解鎖完整報告，取得你的親密關係地雷、3 個天賦落地方案，與瑪雅波符年度指引。
-          </p>
-          <a href={LINE_URL} target="_blank" rel="noopener noreferrer" className="soul-btn-primary w-full max-w-xs">
-            立即解鎖專屬完整報告（{UNLOCK_PRICE}）
-          </a>
-          <p className="text-[11px] text-[var(--sm-text-tertiary)]">點擊後將導向 LINE 洽詢解鎖方式</p>
-        </div>
+            <div className="soul-panel p-6 flex flex-col items-center text-center gap-3 mt-2">
+              <TotemEmblem seed={report.totemSeed} size={40} className="text-luxe-gold" />
+              <p className="desc-text text-sm text-[var(--sm-text-secondary)] leading-relaxed max-w-sm">
+                解鎖完整報告，取得你的親密關係地雷、3 個天賦落地方案、瑪雅波符年度指引，以及專屬 AI
+                售後導航員即時問答。
+              </p>
+              <a href={LINE_URL} target="_blank" rel="noopener noreferrer" className="soul-btn-primary w-full max-w-xs">
+                立即解鎖專屬完整報告（{UNLOCK_PRICE}）
+              </a>
+              <p className="text-[11px] text-[var(--sm-text-tertiary)]">點擊後將導向 LINE 洽詢解鎖方式</p>
+
+              <div className="w-full max-w-xs flex flex-col gap-2 mt-3 pt-3 border-t border-[var(--sm-border)]">
+                <label className="flex flex-col gap-1.5 text-left">
+                  <span className="text-[11px] text-[var(--sm-text-tertiary)]">已付款？輸入客服提供的解鎖碼</span>
+                  <input
+                    value={codeInput}
+                    onChange={(e) => {
+                      setCodeInput(e.target.value);
+                      setCodeError(false);
+                    }}
+                    placeholder="請輸入解鎖碼"
+                    className="soul-input !py-2 !text-sm"
+                  />
+                </label>
+                <button onClick={handleCodeSubmit} disabled={!codeInput.trim()} className="soul-btn-secondary !text-xs">
+                  送出解鎖碼
+                </button>
+                {codeError && <p className="text-[11px] text-[#d98a8a]">解鎖碼不正確，請確認後再輸入一次。</p>}
+              </div>
+            </div>
+          </>
+        )}
       </section>
+
+      {/* Region D: AI 售後導航員 chat, only for unlocked users */}
+      {unlocked && <AiConsultantChat report={report} />}
 
       <button onClick={onRestart} className="soul-btn-secondary self-center !text-xs mt-2">
         重新解碼另一組生日
@@ -276,6 +326,15 @@ function ReportScreen({
       <p className="desc-text text-[10px] text-[var(--sm-text-tertiary)] text-center leading-relaxed mt-4">
         本報告結合星際瑪雅曆與生命靈數，僅供自我探索與策略參考，不能取代專業心理諮商、醫療或法律建議。資料僅於本機瀏覽器暫存，不會上傳伺服器。
       </p>
+    </div>
+  );
+}
+
+function UnlockedSection({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="soul-panel p-6">
+      <h3 className="text-sm font-serif font-semibold text-luxe-gold mb-2">{title}</h3>
+      <p className="desc-text text-sm text-[var(--sm-text-secondary)] leading-relaxed whitespace-pre-line">{body}</p>
     </div>
   );
 }
