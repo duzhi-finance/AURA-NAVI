@@ -1,5 +1,4 @@
 import type { TalentProfile } from "../types/talent";
-import { computeDeepTalent } from "./deepTalent";
 
 const STORAGE_KEY = "aura-navi:talent_profiles";
 
@@ -63,35 +62,23 @@ export function createProfileId(): string {
   return `profile_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-const SEEDED_FLAG_KEY = "aura-navi:seeded_v1";
+const ONBOARDING_DONE_KEY = "aura-navi:onboarding_done";
 
-const DEMO_PROFILES: TalentProfile[] = [
-  {
-    profile_id: "demo_self_215",
-    profile_type: "自己",
-    is_self: true,
-    name_alias: "自己",
-    birth_date: "",
-    maya_kin: 215,
-    maya_tone: "",
-    maya_totem: "藍鷹",
-    life_path_num: null,
-    core_traits_tags: [],
-    relationship_notes: "",
-    ...computeDeepTalent(215 - 1),
-    created_at: new Date(2026, 0, 1).toISOString(),
-  },
-];
-
-export function ensureSeedProfiles() {
+/** Whether the first-run onboarding wizard (get imprint -> build profile -> first prompt) has been completed. */
+export function isOnboardingDone(): boolean {
   try {
-    if (localStorage.getItem(SEEDED_FLAG_KEY)) return;
-    if (readAll().length === 0) {
-      writeAll(DEMO_PROFILES);
-    }
-    localStorage.setItem(SEEDED_FLAG_KEY, "1");
+    return localStorage.getItem(ONBOARDING_DONE_KEY) === "1";
   } catch {
-    // storage unavailable — skip seeding silently
+    // storage unavailable -- fail open rather than trap the user in the wizard
+    return true;
+  }
+}
+
+export function markOnboardingDone(): void {
+  try {
+    localStorage.setItem(ONBOARDING_DONE_KEY, "1");
+  } catch {
+    // storage unavailable -- nothing to persist, onboarding will simply re-show next load
   }
 }
 

@@ -8,9 +8,6 @@ import DeepDivePage from "./pages/DeepDivePage";
 import SoulJournalPage from "./pages/SoulJournalPage";
 import TeamDnaPage from "./pages/TeamDnaPage";
 import SalesPage from "./pages/SalesPage";
-import { ensureSeedProfiles } from "./lib/store";
-
-ensureSeedProfiles();
 
 export default function App() {
   return (

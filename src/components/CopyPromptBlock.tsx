@@ -4,13 +4,14 @@ import Toast from "./Toast";
 
 const COPY_FEEDBACK_MS = 1500;
 
-export default function CopyPromptBlock({ text }: { text: string }) {
+export default function CopyPromptBlock({ text, onCopy }: { text: string; onCopy?: () => void }) {
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
+      onCopy?.();
       setTimeout(() => setCopied(false), COPY_FEEDBACK_MS);
     } catch {
       setCopied(false);

@@ -1,8 +1,9 @@
-import { BookHeart, Briefcase, Check, Coins, Copy, Heart, Home, Wind } from "lucide-react";
+import { BookHeart, Briefcase, Check, Coins, Copy, Heart, Home, Sparkles, Wind } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useOutletContext } from "react-router-dom";
 import CopyPromptBlock from "../components/CopyPromptBlock";
 import GeminiButton from "../components/GeminiButton";
+import type { OnboardingContext } from "../components/Layout";
 import PageHeader from "../components/PageHeader";
 import Toast from "../components/Toast";
 import { getTodayCard } from "../lib/dailyCard";
@@ -29,6 +30,8 @@ interface PromptStationNavState {
 
 export default function PromptStation() {
   const location = useLocation();
+  const outletContext = useOutletContext<OnboardingContext | undefined>();
+  const firstRunPending = outletContext?.firstRunPending ?? false;
   const [domain, setDomain] = useState<LifeDomain | null>(null);
   const [relationshipStatus, setRelationshipStatus] = useState<RelationshipStatus | null>(null);
   const [isManagementFocus, setIsManagementFocus] = useState(false);
@@ -103,6 +106,16 @@ export default function PromptStation() {
         title="高維策略樞紐"
         description="三步驟生成專屬你的高維解析指令，複製後帶著瑪雅圖卡前往 Gemini 深度對話。"
       />
+
+      {firstRunPending && (
+        <div className="mb-6 rounded-2xl border border-border-gold bg-bg-subtle/50 px-5 py-4 flex items-start gap-3">
+          <Sparkles size={18} strokeWidth={1.5} className="text-luxe-gold shrink-0 mt-0.5" />
+          <p className="desc-text text-sm text-text-secondary leading-relaxed">
+            檔案建好了！最後一步：選一個你目前最想聚焦的生命領域，簡單寫下你的情況，複製指令貼到
+            Gemini，就完成你的第一次天賦導航。
+          </p>
+        </div>
+      )}
 
       <StepIndicator current={step} />
 
@@ -194,7 +207,7 @@ export default function PromptStation() {
             <div className="mt-4 flex flex-col gap-4">
               {domain ? (
                 <>
-                  <CopyPromptBlock text={prompt} />
+                  <CopyPromptBlock text={prompt} onCopy={outletContext?.completeFirstRun} />
                   <div className="desc-text text-[11px] text-text-tertiary leading-relaxed -mt-2">
                     <p>使用說明：複製指令後請貼入 Gemini（需登入 Google 帳號）。</p>
                     <p>免責提醒：AI 生成之解讀內容僅供策略思考參考，具體人生與職場決策請自行判斷。</p>

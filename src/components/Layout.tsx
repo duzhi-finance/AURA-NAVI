@@ -1,7 +1,11 @@
 import { BookHeart, Compass, FolderOpen, SendHorizonal, Users } from "lucide-react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
+import { isOnboardingDone, listProfiles, markOnboardingDone, saveProfile } from "../lib/store";
+import type { TalentProfile } from "../types/talent";
 import { IssueLabel } from "./Editorial";
 import { AppFooter } from "./Footer";
+import OnboardingWizard from "./OnboardingWizard";
 
 const NAV_ITEMS = [
   { to: "/app", label: "星軌儀表板", chapter: "01", Icon: Compass, end: true },
@@ -11,7 +15,48 @@ const NAV_ITEMS = [
   { to: "/app/archive", label: "靈魂典藏館", chapter: "05", Icon: FolderOpen, end: false },
 ];
 
+export interface OnboardingContext {
+  /** True until the user has copied their first navigation prompt on Prompt Station. */
+  firstRunPending: boolean;
+  completeFirstRun: () => void;
+}
+
 export default function Layout() {
+  const location = useLocation();
+  const [profiles, setProfiles] = useState<TalentProfile[] | null>(null);
+  const [onboardingDone, setOnboardingDone] = useState(true);
+
+  useEffect(() => {
+    setProfiles(listProfiles());
+    setOnboardingDone(isOnboardingDone());
+  }, []);
+
+  // avoid a flash of the locked/gated UI before localStorage has been read
+  if (profiles === null) return null;
+
+  if (profiles.length === 0) {
+    return (
+      <OnboardingWizard
+        onProfileSaved={(profile) => {
+          saveProfile(profile);
+          setProfiles(listProfiles());
+        }}
+      />
+    );
+  }
+
+  if (!onboardingDone && location.pathname !== "/app/prompt-station") {
+    return <Navigate to="/app/prompt-station" replace />;
+  }
+
+  const onboardingContext: OnboardingContext = {
+    firstRunPending: !onboardingDone,
+    completeFirstRun: () => {
+      markOnboardingDone();
+      setOnboardingDone(true);
+    },
+  };
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-bg">
       <aside className="hidden md:flex md:w-64 md:flex-col md:border-r md:border-border md:p-7 md:gap-10">
@@ -41,7 +86,7 @@ export default function Layout() {
 
         <main className="flex-1 min-w-0 px-5 py-8 md:px-14 md:py-14 pb-24 md:pb-14">
           <div className="mx-auto w-full max-w-5xl">
-            <Outlet />
+            <Outlet context={onboardingContext} />
             <AppFooter />
           </div>
         </main>

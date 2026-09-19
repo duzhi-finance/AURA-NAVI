@@ -9,6 +9,10 @@ interface Props {
   initial?: TalentProfile;
   onSave: (profile: TalentProfile) => void;
   onClose: () => void;
+  /** Default checkbox state when creating a brand-new profile (ignored once `initial` is set). */
+  defaultIsSelf?: boolean;
+  /** First-run onboarding mode: KIN becomes required, and there is no cancel/skip. */
+  onboarding?: boolean;
 }
 
 const EMPTY_DEEP_TALENT: DeepTalentData = {
@@ -29,9 +33,9 @@ const DEEP_TALENT_LABELS: { key: keyof DeepTalentData; label: string }[] = [
   { key: "support_challenge_energy", label: "支持能量與挑戰擴展" },
 ];
 
-export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
+export default function ProfileFormModal({ initial, onSave, onClose, defaultIsSelf, onboarding }: Props) {
   const [profileType, setProfileType] = useState(initial?.profile_type ?? "");
-  const [isSelf, setIsSelf] = useState(initial?.is_self ?? false);
+  const [isSelf, setIsSelf] = useState(initial?.is_self ?? defaultIsSelf ?? false);
   const [nameAlias, setNameAlias] = useState(initial?.name_alias ?? "");
   const [birthdate, setBirthdate] = useState(initial?.birth_date ?? "");
   const [kin, setKin] = useState(initial?.maya_kin != null ? String(initial.maya_kin) : "");
@@ -63,6 +67,7 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!nameAlias.trim()) return;
+    if (onboarding && !kin.trim()) return;
 
     const profile: TalentProfile = {
       profile_id: initial?.profile_id ?? createProfileId(),
@@ -86,14 +91,23 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-30 flex items-center justify-center bg-text-primary/40 p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-30 flex items-center justify-center bg-text-primary/40 p-4"
+      onClick={onboarding ? undefined : onClose}
+    >
       <div
         className="bg-bg border border-border w-full max-w-lg rounded-2xl p-7 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="font-serif text-xl font-normal text-text-primary mb-6">
-          {isEditing ? "編輯靈魂印記" : "新增靈魂印記"}
+        <h2 className={`font-serif text-xl font-normal text-text-primary ${onboarding ? "mb-2" : "mb-6"}`}>
+          {onboarding ? "建立你的 Talent DNA 檔案" : isEditing ? "編輯靈魂印記" : "新增靈魂印記"}
         </h2>
+        {onboarding && (
+          <p className="desc-text text-xs text-text-secondary leading-relaxed mb-6">
+            填入你的暱稱與 KIN 碼即可完成建檔——KIN
+            是瑪雅曆法中屬於你的專屬能量代碼，剛剛在 glowing.cc 算出來的那組數字就是它。
+          </p>
+        )}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <Field label="類型">
             <input
@@ -132,13 +146,14 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
           </Field>
 
           <div className="grid grid-cols-2 gap-4">
-            <Field label="KIN 碼">
+            <Field label={onboarding ? "KIN 碼 *" : "KIN 碼"}>
               <input
                 value={kin}
                 onChange={(e) => setKin(e.target.value.replace(/[^0-9]/g, ""))}
                 placeholder="215"
                 className="input-base"
                 inputMode="numeric"
+                required={onboarding}
               />
             </Field>
             <Field label="生命靈數">
@@ -215,11 +230,13 @@ export default function ProfileFormModal({ initial, onSave, onClose }: Props) {
           </details>
 
           <div className="flex justify-end gap-2 mt-2">
-            <button type="button" onClick={onClose} className="btn-secondary">
-              取消
-            </button>
+            {!onboarding && (
+              <button type="button" onClick={onClose} className="btn-secondary">
+                取消
+              </button>
+            )}
             <button type="submit" className="btn-primary">
-              儲存
+              {onboarding ? "建立我的檔案" : "儲存"}
             </button>
           </div>
         </form>
