@@ -1,7 +1,9 @@
-import { Download, Lock, Sparkles } from "lucide-react";
+import { Download, Lock, Share2, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import TotemEmblem from "../components/TotemEmblem";
 import AiConsultantChat from "../components/AiConsultantChat";
+import DailyGuidanceCard from "../components/DailyGuidanceCard";
+import Toast from "../components/Toast";
 import { LINE_URL, UNLOCK_CODE } from "../lib/links";
 import { computeKinFromBirthdate } from "../lib/dreamspellKin";
 import { drawSoulCard, downloadCanvasAsPng, SOUL_CARD_WIDTH, SOUL_CARD_HEIGHT } from "../lib/soulCard";
@@ -14,8 +16,10 @@ type Phase = "landing" | "loading" | "report";
 const LOADING_MS = 1500;
 const UNLOCK_PRICE = "NT$199";
 const UNLOCK_STORAGE_KEY = "soul-report-unlocked";
+const REPORT_CACHE_KEY = "soul-report-birthdate";
 
 export interface SoulReport {
+  birthdateLabel: string;
   kin: number;
   tone: string;
   totem: string;
@@ -26,12 +30,62 @@ export interface SoulReport {
   supplementCards: MajorArcanaCard[];
 }
 
+function formatBirthdateLabel(y: number, m: number, d: number): string {
+  return `西元 ${y} 年 ${m} 月 ${d} 日`;
+}
+
 function readUnlockedFlag(): boolean {
   try {
     return localStorage.getItem(UNLOCK_STORAGE_KEY) === "true";
   } catch {
     return false;
   }
+}
+
+function readCachedBirthdate(): [number, number, number] | null {
+  try {
+    const raw = localStorage.getItem(REPORT_CACHE_KEY);
+    if (!raw) return null;
+    const parts = raw.split("-").map(Number);
+    if (parts.length !== 3 || parts.some((n) => Number.isNaN(n))) return null;
+    return parts as [number, number, number];
+  } catch {
+    return null;
+  }
+}
+
+function writeCachedBirthdate(y: number, m: number, d: number) {
+  try {
+    localStorage.setItem(REPORT_CACHE_KEY, `${y}-${m}-${d}`);
+  } catch {
+    // best-effort persistence only
+  }
+}
+
+function clearCachedBirthdate() {
+  try {
+    localStorage.removeItem(REPORT_CACHE_KEY);
+  } catch {
+    // best-effort persistence only
+  }
+}
+
+function buildReport(y: number, m: number, d: number): SoulReport {
+  const kinResult = computeKinFromBirthdate(y, m, d);
+  const lifePath = computeLifePathNumber(y, m, d);
+  const totemSeed = MAYA_TOTEMS.indexOf(kinResult.totem);
+
+  return {
+    birthdateLabel: formatBirthdateLabel(y, m, d),
+    kin: kinResult.kin,
+    tone: kinResult.tone,
+    totem: kinResult.totem,
+    totemSeed: totemSeed >= 0 ? totemSeed : 0,
+    wavespell: wavespellName(kinResult.kin),
+    primaryCard: getCard(lifePath.primary),
+    dualCard: lifePath.dualNumber != null ? getCard(lifePath.dualNumber) : null,
+    supplementCards: lifePath.supplementChain.slice(1).map(getCard),
+  };
 }
 
 export default function SoulManual() {
@@ -57,23 +111,28 @@ export default function SoulManual() {
 
     setPhase("loading");
     setTimeout(() => {
-      const kinResult = computeKinFromBirthdate(y, m, d);
-      const lifePath = computeLifePathNumber(y, m, d);
-      const totemSeed = MAYA_TOTEMS.indexOf(kinResult.totem);
-
-      setReport({
-        kin: kinResult.kin,
-        tone: kinResult.tone,
-        totem: kinResult.totem,
-        totemSeed: totemSeed >= 0 ? totemSeed : 0,
-        wavespell: wavespellName(kinResult.kin),
-        primaryCard: getCard(lifePath.primary),
-        dualCard: lifePath.dualNumber != null ? getCard(lifePath.dualNumber) : null,
-        supplementCards: lifePath.supplementChain.slice(1).map(getCard),
-      });
+      setReport(buildReport(y, m, d));
+      writeCachedBirthdate(y, m, d);
       setPhase("report");
     }, LOADING_MS);
   }
+
+  function handleRestart() {
+    clearCachedBirthdate();
+    setReport(null);
+    setBirthdate("");
+    setPhase("landing");
+  }
+
+  useEffect(() => {
+    const cached = readCachedBirthdate();
+    if (!cached) return;
+    const [y, m, d] = cached;
+    setBirthdate(`${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`);
+    setReport(buildReport(y, m, d));
+    setPhase("report");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (phase !== "report" || !report || !canvasRef.current) return;
@@ -112,7 +171,7 @@ export default function SoulManual() {
             unlocked={unlocked}
             onUnlock={handleUnlock}
             onDownload={handleDownload}
-            onRestart={() => setPhase("landing")}
+            onRestart={handleRestart}
           />
         )}
       </div>
@@ -209,6 +268,7 @@ function ReportScreen({
     <div className="flex flex-col gap-10">
       {/* Region A: soul card */}
       <section className="flex flex-col items-center gap-4">
+        <p className="text-[11px] text-[var(--sm-text-tertiary)]">已解碼日期：{report.birthdateLabel}</p>
         <div className="w-full max-w-[300px] rounded-2xl overflow-hidden border border-[var(--sm-border)] shadow-2xl">
           <canvas
             ref={canvasRef}
@@ -249,6 +309,8 @@ function ReportScreen({
           <p className="desc-text text-sm text-[var(--sm-text-secondary)] leading-relaxed">{primaryCard.disadvantage}</p>
         </div>
       </section>
+
+      <DailyGuidanceCard cardNumber={primaryCard.number} />
 
       {/* Region C: unlocked content + locked preview */}
       <section className="flex flex-col gap-4">
@@ -319,6 +381,8 @@ function ReportScreen({
       {/* Region D: AI 售後導航員 chat, only for unlocked users */}
       {unlocked && <AiConsultantChat report={report} />}
 
+      <ShareSection report={report} />
+
       <button onClick={onRestart} className="soul-btn-secondary self-center !text-xs mt-2">
         重新解碼另一組生日
       </button>
@@ -327,6 +391,47 @@ function ReportScreen({
         本報告結合星際瑪雅曆與生命靈數，僅供自我探索與策略參考，不能取代專業心理諮商、醫療或法律建議。資料僅於本機瀏覽器暫存，不會上傳伺服器。
       </p>
     </div>
+  );
+}
+
+function ShareSection({ report }: { report: SoulReport }) {
+  const [toastMsg, setToastMsg] = useState("");
+  const [showToast, setShowToast] = useState(false);
+
+  async function handleShare() {
+    const url = `${window.location.origin}${window.location.pathname}#/app`;
+    const text = `我剛剛在「全方位個人靈魂使用說明書」測出我的命數是「${report.primaryCard.number}．${report.primaryCard.name}」，瑪雅印記是 KIN ${report.kin}．${report.totem}！你的命數是什麼？來測測看：`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "全方位個人靈魂使用說明書", text, url });
+        return;
+      } catch {
+        // user cancelled the native share sheet, fall through to clipboard copy
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(`${text}${url}`);
+      setToastMsg("已複製分享文字與連結，貼給朋友吧！");
+    } catch {
+      setToastMsg("複製失敗，請手動分享連結給朋友。");
+    }
+    setShowToast(true);
+    window.setTimeout(() => setShowToast(false), 2200);
+  }
+
+  return (
+    <section className="soul-panel p-6 flex flex-col items-center text-center gap-3">
+      <Share2 size={20} strokeWidth={1.5} className="text-luxe-gold" />
+      <p className="desc-text text-sm text-[var(--sm-text-secondary)] leading-relaxed max-w-sm">
+        分享你的塔羅命數與瑪雅印記給朋友，邀請他們也來解碼自己的靈魂使用說明書。
+      </p>
+      <button onClick={handleShare} className="soul-btn-secondary !text-xs">
+        <Share2 size={14} strokeWidth={1.75} />
+        分享給朋友
+      </button>
+      <Toast message={toastMsg} show={showToast} />
+    </section>
   );
 }
 

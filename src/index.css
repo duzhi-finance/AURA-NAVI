@@ -401,26 +401,21 @@
   }
 }
 
-/* Scoped dark "曜黑" theme for the single-page Soul Manual -- deliberately does not
-   touch the root tokens above, which SalesPage/TeamDnaPage still rely on. */
+/* Scoped light "Editorial Luxury" theme for the single-page Soul Manual --
+   reuses the same warm pearl-white palette as SalesPage/TeamDnaPage so the
+   whole site reads as one consistent product. The downloadable soul card
+   (Region A, drawn on <canvas> in soulCard.ts) intentionally stays dark/
+   mystical regardless of this theme -- it's a standalone collectible image. */
 .soul-manual {
-  --sm-bg: #08070b;
-  --sm-surface: rgba(255, 255, 255, 0.04);
-  --sm-border: rgba(197, 160, 89, 0.22);
-  --sm-text: #f2efe9;
-  --sm-text-secondary: #b9b3a9;
-  --sm-text-tertiary: #7d786f;
+  --sm-bg: var(--color-bg);
+  --sm-surface: var(--color-surface);
+  --sm-border: var(--color-border);
+  --sm-text: var(--color-text-primary);
+  --sm-text-secondary: var(--color-text-secondary);
+  --sm-text-tertiary: var(--color-text-tertiary);
 
   min-height: 100vh;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(197, 160, 89, 0.12), transparent),
-    radial-gradient(1px 1px at 20% 30%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 75% 15%, rgba(255, 255, 255, 0.4), transparent),
-    radial-gradient(1px 1px at 60% 70%, rgba(255, 255, 255, 0.35), transparent),
-    radial-gradient(1px 1px at 90% 55%, rgba(255, 255, 255, 0.3), transparent),
-    radial-gradient(1px 1px at 10% 80%, rgba(255, 255, 255, 0.4), transparent),
-    radial-gradient(1px 1px at 40% 90%, rgba(255, 255, 255, 0.3), transparent),
-    var(--sm-bg);
+  background: var(--sm-bg);
   color: var(--sm-text);
 }
 
@@ -428,20 +423,19 @@
   background: var(--sm-surface);
   border: 1px solid var(--sm-border);
   border-radius: 20px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
 }
 
 .soul-input {
   width: 100%;
   border-radius: 12px;
   border: 1px solid var(--sm-border);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--color-bg-subtle);
   color: var(--sm-text);
   padding: 0.75rem 1rem;
   outline: none;
   font-family: var(--font-serif);
-  color-scheme: dark;
+  color-scheme: light;
   transition: border-color 0.15s ease;
 }
 .soul-input:focus {
@@ -507,7 +501,7 @@
   justify-content: center;
   gap: 0.5rem;
   text-align: center;
-  background: linear-gradient(180deg, transparent, rgba(8, 7, 11, 0.85) 55%);
+  background: linear-gradient(180deg, transparent, rgba(253, 251, 247, 0.94) 55%);
   border-radius: inherit;
 }
 
@@ -536,7 +530,7 @@
 .soul-chat-bubble-ai {
   align-self: flex-start;
   max-width: 88%;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--color-bg-subtle);
   border: 1px solid var(--sm-border);
   border-radius: 14px 14px 14px 4px;
   padding: 0.7rem 0.95rem;
@@ -550,7 +544,7 @@
   align-self: flex-end;
   max-width: 88%;
   margin-left: auto;
-  background: linear-gradient(135deg, rgba(197, 160, 89, 0.22), rgba(197, 160, 89, 0.1));
+  background: linear-gradient(135deg, rgba(197, 160, 89, 0.18), rgba(197, 160, 89, 0.08));
   border: 1px solid rgba(197, 160, 89, 0.3);
   border-radius: 14px 14px 4px 14px;
   padding: 0.7rem 0.95rem;
@@ -565,7 +559,7 @@
   align-items: center;
   border-radius: 999px;
   border: 1px solid var(--sm-border);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--color-surface);
   padding: 0.45rem 0.9rem;
   font-family: var(--font-serif);
   font-size: 0.75rem;

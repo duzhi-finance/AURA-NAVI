@@ -37,6 +37,8 @@ const CHIP = {
   talent: { id: "talent", label: "我想知道怎麼發揮我的天賦" },
   drain: { id: "drain", label: "我最近很容易內耗、情緒低落" },
   year: { id: "year", label: "我想了解今年的能量重點" },
+  money: { id: "money", label: "我想聊聊財務/金錢狀況" },
+  growth: { id: "growth", label: "我想聊聊自我成長方向" },
 } as const satisfies Record<string, ChatChip>;
 
 export const INITIAL_CHIPS: ChatChip[] = [
@@ -45,6 +47,8 @@ export const INITIAL_CHIPS: ChatChip[] = [
   CHIP.talent,
   CHIP.drain,
   CHIP.year,
+  CHIP.money,
+  CHIP.growth,
 ];
 
 const NODES: Record<string, ChatNode> = {
@@ -261,6 +265,92 @@ ${pick(CLOSERS, turn)}`;
     followups: [
       { id: "talent", label: "換個話題，聊聊我的天賦" },
       { id: "relationship", label: "換個話題，聊聊感情" },
+    ],
+  },
+  money: {
+    reply: (report, turn) => {
+      const { primaryCard: card } = report;
+      return `${pick(OPENERS, turn)}
+
+你跟金錢的關係，其實反映的是${card.name}特質怎麼看待「安全感」——${excerpt(card.advantage, 34)}，這是你賺錢、談判、爭取應得報酬時最大的底氣。但${excerpt(card.disadvantage, 30)}，也常常悄悄影響你看待金錢的方式，讓你在該爭取的時候猶豫，或在該收手的時候停不下來。
+
+${pick(CLOSERS, turn)}`;
+    },
+    followups: [
+      { id: "money_deepen", label: "這個模式具體會怎麼影響我？" },
+      { id: "money_action", label: "那我該怎麼調整？" },
+      { id: "career", label: "換個話題，聊聊工作" },
+    ],
+  },
+  money_deepen: {
+    reply: (report, turn) => {
+      const { primaryCard: card } = report;
+      return `${pick(OPENERS, turn)}
+
+具體來說，${card.name}的內耗面容易讓你在金錢上做出「情緒化」而非「策略性」的決定——可能是該談加薪時退縮，也可能是心情不好就花錢犒賞自己，事後又懊悔。這不是自制力的問題，是還沒有一套屬於你的金錢決策節奏。
+
+${pick(CLOSERS, turn)}`;
+    },
+    followups: [
+      { id: "money_action", label: "那我該怎麼調整？" },
+      { id: "growth", label: "換個話題，聊聊自我成長" },
+    ],
+  },
+  money_action: {
+    reply: (report, turn) => {
+      const { primaryCard: card } = report;
+      return `${pick(OPENERS, turn)}
+
+建議你建立一個「先擱置 24 小時」的小規則——不管是大筆花費還是重要的金錢決定，都先放一天再行動，讓${excerpt(card.advantage, 20)}的理性面有機會介入，而不是任由情緒面主導。同時，練習把「我值得」掛在嘴邊，尤其是在談判、爭取報酬的時候。
+
+${pick(CLOSERS, turn)}`;
+    },
+    followups: [
+      { id: "career", label: "換個話題，聊聊工作" },
+      { id: "drain", label: "換個話題，聊聊內耗情緒" },
+    ],
+  },
+  growth: {
+    reply: (report, turn) => {
+      const { primaryCard: card } = report;
+      return `${pick(OPENERS, turn)}
+
+你的成長方向，其實藏在${card.name}最擅長的事情裡：${excerpt(card.advantage, 36)}。很多人以為自我成長是要「補足弱點」，但對你來說，真正的突破反而是把這個已經很強的特質，練到更純熟、更收放自如。
+
+${pick(CLOSERS, turn)}`;
+    },
+    followups: [
+      { id: "growth_deepen", label: "那我該從哪裡開始練習？" },
+      { id: "growth_action", label: "如果我一直停滯不前怎麼辦？" },
+      { id: "year", label: "換個話題，了解今年的能量重點" },
+    ],
+  },
+  growth_deepen: {
+    reply: (report, turn) => {
+      const { primaryCard: card } = report;
+      return `${pick(OPENERS, turn)}
+
+從一個你已經在做、卻沒有特別重視的小習慣開始——那很可能就是${excerpt(card.advantage, 20)}正在悄悄運作的證據。把它變成刻意練習，而不是理所當然的日常，你會發現它能被放大到意想不到的程度。
+
+${pick(CLOSERS, turn)}`;
+    },
+    followups: [
+      { id: "growth_action", label: "如果我一直停滯不前怎麼辦？" },
+      { id: "talent", label: "換個話題，聊聊我的天賦" },
+    ],
+  },
+  growth_action: {
+    reply: (report, turn) => {
+      const { primaryCard: card } = report;
+      return `${pick(OPENERS, turn)}
+
+停滯感通常不是因為你不夠努力，而是${excerpt(card.disadvantage, 30)}讓你卡在原地打轉。試著找一件小到不會引發這個模式的事情先做，用「小勝利」慢慢累積信心，而不是一開始就挑戰最難的關卡。
+
+${pick(CLOSERS, turn)}`;
+    },
+    followups: [
+      { id: "drain", label: "換個話題，聊聊內耗情緒" },
+      { id: "money", label: "換個話題，聊聊財務狀況" },
     ],
   },
 };
