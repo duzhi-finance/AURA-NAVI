@@ -1,5 +1,6 @@
 import { HashRouter, Route, Routes } from "react-router-dom";
-import SoulManual from "./pages/SoulManual";
+import AppDashboard from "./pages/AppDashboard";
+import DomainPage from "./pages/DomainPage";
 import TeamDnaPage from "./pages/TeamDnaPage";
 import SalesPage from "./pages/SalesPage";
 
@@ -9,7 +10,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<SalesPage />} />
         <Route path="team-dna" element={<TeamDnaPage />} />
-        <Route path="app" element={<SoulManual />} />
+        <Route path="app" element={<AppDashboard />} />
+        <Route path="app/:domainId" element={<DomainPage />} />
       </Routes>
     </HashRouter>
   );

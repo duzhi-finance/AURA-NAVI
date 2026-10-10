@@ -1,16 +1,9 @@
 import type { MajorArcanaCard } from "./tarotMajorArcana";
-import { MAYA_TOTEMS } from "./mayaOptions";
 
 export function excerpt(text: string, maxLen: number): string {
   const firstClause = text.split(/[、。]/)[0] ?? text;
   if (firstClause.length <= maxLen) return firstClause;
   return `${firstClause.slice(0, maxLen)}…`;
-}
-
-export function wavespellName(kin: number): string {
-  const kinIndex0 = kin - 1;
-  const wavespellStart0 = kinIndex0 - (kinIndex0 % 13);
-  return `${MAYA_TOTEMS[wavespellStart0 % 20]}波符`;
 }
 
 export function buildRelationshipManual(card: MajorArcanaCard): string {
@@ -35,10 +28,69 @@ export function buildLandingPlans(card: MajorArcanaCard): string[] {
   ];
 }
 
-export function buildWavespellGuide(wavespell: string, kin: number, totem: string): string {
-  return `你的年度能量轉化鑰匙，來自「${wavespell}」的底色——這股力量與你 KIN ${kin}．${totem} 的本命特質彼此呼應，是你這一年最該留意、也最容易被忽略的隱藏節奏。
+export function buildPersonalityAnalysis(card: MajorArcanaCard): string {
+  return `你的日常行為模式，說穿了就是${card.name}這張牌的縮影。別人眼中的你，往往是這樣的：
 
-當外在環境變動、計畫被打亂的時候，這股波符的力量會特別明顯——它不是要阻礙你，而是在提醒你「該調整步伐」了。順著它的節奏走，會比逆著它硬闖輕鬆許多，成果往往也更好。
+${card.advantage}
 
-當你感覺卡關、內耗，甚至有點迷失方向時，回到「${totem}」最純粹的樣子——不加修飾、不勉強自己扮演別人期待的角色——就是你重新校準高維頻率、找回自己步調的方式。建議把這段指引存下來，每次感覺不對勁的時候拿出來重讀一次，你會發現答案其實一直都在你自己身上，只是需要被重新喚醒。`;
+這是你最自然、不用刻意表現就會流露出來的樣子——也是身邊的人會記住你、信任你的原因。
+
+但每個人格都有它的影子面，你的影子藏在這裡：
+
+${card.disadvantage}
+
+有趣的是，這兩面其實是同一股力量的正反面，不是兩個互相矛盾的你。認識自己最快的方式，不是去消滅影子面，而是學會在對的場合，讓對的那一面上場。`;
+}
+
+export function buildLifeNumberIdentity(card: MajorArcanaCard): string {
+  return `命數 ${card.number}，在塔羅的系統裡對應的是「${card.name}」——這張牌不只是一個分類標籤，它更像是你靈魂選擇這一世要練習的主題。
+
+你是${card.name}型的人，代表你這一生最核心的課題，就藏在這張牌的優劣勢裡：
+
+${card.advantage}
+
+${card.disadvantage}
+
+跟你同樣是${card.name}型的人，會有類似的核心驅動力，但活出來的樣子可能天差地遠——差別就在於有沒有「自覺」。知道自己是${card.name}型，等於拿到一份自己的使用說明書，接下來的每一個選擇，都可以更貼近自己真正的設定，而不是照著別人的劇本走。`;
+}
+
+export function buildTalentPotential(card: MajorArcanaCard): string {
+  return `你與生俱來、最不該被浪費的天賦，就是${card.name}帶給你的這股力量：
+
+${card.advantage}
+
+很多人終其一生都在尋找自己的天賦，但你的天賦其實早就在那裡了——只是太熟悉，反而容易被你自己忽略，甚至覺得「這有什麼了不起」。真正厲害的人，不是擁有稀有的天賦，而是知道怎麼把自己本來就有的東西，用得淋漓盡致。
+
+而阻礙天賦發揮的，往往是同一張牌的另一面：
+
+${card.disadvantage}
+
+天賦跟內耗常常是一體兩面——你最強的地方，用力過猛時就會變成弱點。練習的重點不是逼自己變成另一種人，而是學會收放：知道什麼時候該讓${card.name}的力量全開，什麼時候該踩煞車，讓它維持在剛剛好的強度。`;
+}
+
+export function buildDrainRelief(card: MajorArcanaCard): string {
+  return `你會感到內耗，通常不是因為「做得不夠多」，而是因為${card.name}特質裡的這一面正在悄悄消耗你：
+
+${card.disadvantage}
+
+這股力量沒有被看見、沒有被安放時，就會從「保護你」變成「困住你」——明明很累，卻又說不出具體是為了什麼。
+
+真正能讓你回血的方式，是回到你的核心優勢，重新把力氣放在對的地方：
+
+${card.advantage}
+
+下次感覺被掏空時，先別急著逼自己振作，試著問自己：「我現在是不是又掉進${excerpt(card.disadvantage, 20)}的迴圈了？」光是辨認出這個模式，就已經是鬆綁的開始。`;
+}
+
+export function buildYearlyOutlook(primaryCard: MajorArcanaCard, yearCard: MajorArcanaCard, year: number): string {
+  if (yearCard.number === primaryCard.number) {
+    return `${year} 年對你來說是一個特別的年份——這一年的能量牌剛好疊回你的本命牌「${primaryCard.name}」，等於是把你的核心課題再加強一次。今年很適合正面迎向${excerpt(primaryCard.advantage, 24)}這件事，把它活得更徹底，而不是繞路。`;
+  }
+  return `你今年的流年牌是「${yearCard.number}．${yearCard.name}」——這是今年疊加在你本命「${primaryCard.name}」之上的額外能量主題。
+
+今年的核心提醒是：${yearCard.advantage}
+
+而今年要留意的卡關點：${yearCard.disadvantage}
+
+把你的本命牌（${primaryCard.name}）當作底色，今年的流年牌（${yearCard.name}）則是這一年特別被放大的主題——兩者疊在一起看，會比單看一張牌更接近你今年實際會經歷的樣子。`;
 }

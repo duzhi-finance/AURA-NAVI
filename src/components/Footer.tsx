@@ -3,7 +3,7 @@ export default function Footer() {
   return (
     <footer className="desc-text mt-16 pt-6 border-t border-border text-[11px] text-text-tertiary leading-[1.6]">
       <p>
-        身心靈免責：本工具內容結合星際瑪雅曆與生命靈數，僅供自我探索與策略參考，不能取代專業心理諮商、醫療或法律建議。
+        身心靈免責：本工具內容結合塔羅大牌與生命靈數，僅供自我探索與策略參考，不能取代專業心理諮商、醫療或法律建議。
       </p>
       <p className="mt-1.5">
         數位退換貨政策：本產品為數位軟體與指令內容，一經交付發送即視同完成服務，恕不接受退換貨。

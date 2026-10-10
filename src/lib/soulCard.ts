@@ -83,9 +83,6 @@ function drawTotemEmblem(
 export interface SoulCardOptions {
   cardNumber: number;
   cardName: string;
-  totem: string;
-  totemSeed: number;
-  kin: number;
   quote: string;
 }
 
@@ -111,7 +108,7 @@ export function drawSoulCard(canvas: HTMLCanvasElement, opts: SoulCardOptions): 
   ctx.fillRect(0, 0, W, H);
 
   // faint starfield
-  let seedState = opts.kin * 9301 + 49297;
+  let seedState = opts.cardNumber * 9301 + 49297;
   const rand = () => {
     seedState = (seedState * 9301 + 49297) % 233280;
     return seedState / 233280;
@@ -146,7 +143,7 @@ export function drawSoulCard(canvas: HTMLCanvasElement, opts: SoulCardOptions): 
   ctx.font = "300 28px 'Noto Serif TC', serif";
   ctx.fillText("全方位個人靈魂使用說明書", W / 2, 268);
 
-  drawTotemEmblem(ctx, W / 2, 720, 260, opts.totemSeed, gold);
+  drawTotemEmblem(ctx, W / 2, 720, 260, opts.cardNumber, gold);
 
   ctx.fillStyle = gold;
   ctx.font = "500 44px 'Noto Serif TC', serif";
@@ -156,14 +153,10 @@ export function drawSoulCard(canvas: HTMLCanvasElement, opts: SoulCardOptions): 
   ctx.font = "400 96px 'Noto Serif TC', serif";
   ctx.fillText(opts.cardName, W / 2, 1180);
 
-  ctx.fillStyle = "#d9d3c8";
-  ctx.font = "300 34px 'Noto Serif TC', serif";
-  ctx.fillText(`KIN ${opts.kin}．${opts.totem}`, W / 2, 1240);
-
   ctx.font = "300 38px 'Noto Sans TC', sans-serif";
   ctx.fillStyle = "#d9d3c8";
   const lines = wrapCjkText(ctx, opts.quote, 760);
-  let ly = 1340;
+  let ly = 1280;
   for (const line of lines) {
     ctx.fillText(line, W / 2, ly);
     ly += 56;

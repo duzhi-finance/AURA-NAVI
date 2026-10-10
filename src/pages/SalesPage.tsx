@@ -32,29 +32,29 @@ const TRANSLATION_FEATURES: { title: string; description: string }[] = [
     description: "將你的直覺洞察，轉化為邏輯嚴謹、具備高度商業價值的策略報告。",
   },
   {
-    title: "頻率校準策略",
-    description: "自動算定當日流年（進攻日／沉澱日），鎖定今日最適合進行的商業突破點。",
+    title: "七大領域深度解析",
+    description: "命數人格、天賦潛能、個性剖析、感情關係、工作事業、內耗排解、流年運勢，每個主題都能一直往下探索。",
   },
   {
-    title: "無痛團隊破冰",
-    description:
-      "提供「靈魂天賦原貌｜30 秒職場頻率與充電模式檢測」輕頁面，讓主管與團隊成員在無隱私壓力的氛圍下輕鬆對焦。",
+    title: "一鍵複製指令，無限追問",
+    description: "每個解析下方都有專屬提示詞，複製貼到你慣用的 AI，就能延續同一個對話串繼續深聊。",
   },
 ];
 
-const SIX_DIMENSIONS: { title: string; description: string }[] = [
-  { title: "核心共鳴與細微差異", description: "解析調性微光，看見同圖騰下的微觀性格特質。" },
-  { title: "對方的隱藏性格", description: "揭開對方的潛意識防線，找到最舒服的相處距離。" },
-  { title: "力量動物（Totem Animal）", description: "召喚內在直覺圖騰，找回身體與行動力的最高頻率。" },
-  { title: "隱藏推動（PSI）", description: "喚醒沉睡在記憶庫深處的爆發力與底層天賦。" },
-  { title: "波符藍圖（Wavespell）", description: "明確你此生 13 天的生命軸線與靈魂使命。" },
-  { title: "支持與挑戰擴展", description: "清楚掌握誰是你的靈魂貴人，誰是磨練你的擴展石。" },
+const SEVEN_DIMENSIONS: { title: string; description: string }[] = [
+  { title: "命數人格", description: "你是幾號人？這組數字藏著你這一生最核心的靈魂課題。" },
+  { title: "天賦潛能", description: "找出你與生俱來、最不該被浪費的優勢，學會收放自如地發揮它。" },
+  { title: "個性剖析", description: "別人眼中的你，跟你自己知道的你，差在哪裡——看懂自己的正面與影子面。" },
+  { title: "感情關係", description: "你在親密關係裡最容易踩到的地雷，以及最自然的相處之道。" },
+  { title: "工作事業", description: "把天賦落地成具體可行的職涯行動方案，而不是停在想法階段。" },
+  { title: "內耗排解", description: "找出讓你悄悄被掏空的模式，學會把力氣放回對的地方。" },
+  { title: "流年運勢", description: "本命牌疊加今年的流年牌，掌握這一年特別被放大的能量主題。" },
 ];
 
 const QUALITY_PROMISES: { Icon: LucideIcon; title: string; description: string }[] = [
   { Icon: Lock, title: "獨立本機儲存", description: "所有檔案僅保留於你的個人裝置，完全不上傳雲端，保障最高隱私。" },
-  { Icon: Sparkles, title: "一鍵 Gemini 導航", description: "精密編排高維 Navigation Prompt，複製後直連 Gemini 開啟高品質對話。" },
-  { Icon: Gem, title: "雜誌視覺美學", description: "採用古典繁體宋體與柔和莫蘭迪色系，帶來宛如翻閱精品刊物般的極致享受。" },
+  { Icon: Sparkles, title: "一鍵複製指令", description: "精密編排高維提示詞，複製後貼到你慣用的 AI，開啟高品質的無限追問對話。" },
+  { Icon: Gem, title: "雜誌視覺美學", description: "採用古典繁體宋體與柔和粉系配色，帶來宛如翻閱精品刊物般的極致享受。" },
 ];
 
 export default function SalesPage() {
@@ -132,7 +132,7 @@ export default function SalesPage() {
             不懂神秘學沒關係，我們替你講出商業世界聽得懂的語言。
           </h2>
           <p className="desc-text text-sm text-text-secondary leading-relaxed mt-4 max-w-lg">
-            AURA-Navi 是一套結合星際瑪雅曆與現代策略的 AI 導航樞紐。我們將你內在的神秘學特質，精準翻譯成世俗看得懂的「商業策略、溝通話術與客製化提案」：
+            AURA-Navi 是一套結合塔羅生命靈數與現代策略的高維解碼工具。我們將你內在的神秘學特質，精準翻譯成世俗看得懂的「商業策略、溝通話術與客製化提案」：
           </p>
 
           <div className="mt-8 grid gap-5 sm:grid-cols-3">
@@ -152,14 +152,14 @@ export default function SalesPage() {
 
         {/* Chapter 03 -- Six Dimensions */}
         <section className="mb-28 relative overflow-hidden">
-          <VerticalMicrocopy text="SIX DIMENSIONS OF SOUL" className="top-0 right-0 hidden md:block" />
+          <VerticalMicrocopy text="SEVEN DIMENSIONS OF SOUL" className="top-0 right-0 hidden md:block" />
           <ChapterLabel number="03" title="深度天賦圖譜" className="mb-5" />
           <h2 className="font-serif text-xl md:text-2xl font-medium text-text-primary tracking-[0.04em] leading-relaxed">
             拒絕標籤化，直擊靈魂最細微的性格紋理。
           </h2>
 
           <div className="mt-8 grid gap-5 sm:grid-cols-2">
-            {SIX_DIMENSIONS.map((d) => (
+            {SEVEN_DIMENSIONS.map((d) => (
               <div key={d.title} className="card-glass p-6 flex flex-col gap-2 text-left">
                 <div className="flex items-center gap-2">
                   <span className="text-luxe-gold text-sm shrink-0">✦</span>
