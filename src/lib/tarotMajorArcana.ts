@@ -235,3 +235,13 @@ export function computeLifePathNumber(year: number, month: number, day: number):
 
   return { primary: reduced, dualNumber: null, supplementChain: [] };
 }
+
+/**
+ * Day/Attitude number: sum just the digits of the day-of-month, reduced to a
+ * single digit. A second, genuinely-computed facet distinct from the life-path
+ * number -- represents how you show up day-to-day, vs. the life path's deeper
+ * soul lesson. Two people who share a life-path card will usually differ here.
+ */
+export function computeDayNumber(day: number): number {
+  return reduceToAtMost(sumAllDigits(day), 9);
+}

@@ -4,11 +4,19 @@ import Toast from "./Toast";
 import { buildCopyPrompt, FOLLOWUP_QUESTIONS, type Domain } from "../lib/domains";
 import type { SoulProfile } from "../lib/soulProfile";
 
-export default function QuickFollowUps({ domain, profile }: { domain: Domain; profile: SoulProfile }) {
+export default function QuickFollowUps({
+  domain,
+  profile,
+  context,
+}: {
+  domain: Domain;
+  profile: SoulProfile;
+  context?: string;
+}) {
   const [showToast, setShowToast] = useState(false);
 
   async function handleCopy(question: string) {
-    const text = buildCopyPrompt(domain, profile, question);
+    const text = buildCopyPrompt(domain, profile, { context, followUpQuestion: question });
     try {
       await navigator.clipboard.writeText(text);
     } catch {

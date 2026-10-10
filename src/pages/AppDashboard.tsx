@@ -281,6 +281,12 @@ function DashboardScreen({
           <h3 className="text-sm font-serif font-semibold text-luxe-gold mb-1.5">隱藏內耗盲點</h3>
           <p className="desc-text text-sm text-[var(--sm-text-secondary)] leading-relaxed">{primaryCard.disadvantage}</p>
         </div>
+        <div className="border-t border-[var(--sm-border)] pt-4">
+          <h3 className="text-sm font-serif font-semibold text-luxe-gold mb-1.5">
+            日數牌：{profile.dayCard.name}（你日常外顯的樣子）
+          </h3>
+          <p className="desc-text text-sm text-[var(--sm-text-secondary)] leading-relaxed">{profile.dayCard.advantage}</p>
+        </div>
       </section>
 
       <DailyGuidanceCard cardNumber={primaryCard.number} />

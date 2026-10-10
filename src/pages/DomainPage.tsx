@@ -17,6 +17,7 @@ export default function DomainPage() {
   const [unlocked, setUnlocked] = useState(readUnlockedFlag);
   const [codeInput, setCodeInput] = useState("");
   const [codeError, setCodeError] = useState(false);
+  const [context, setContext] = useState("");
 
   if (!profile) return <Navigate to="/app" replace />;
   if (!domain) return <Navigate to="/app" replace />;
@@ -31,7 +32,8 @@ export default function DomainPage() {
     }
   }
 
-  const body = domain.buildBody(profile.primaryCard, profile);
+  const body = domain.buildBody(profile);
+  const trimmedContext = context.trim();
 
   return (
     <div className="soul-manual">
@@ -57,11 +59,30 @@ export default function DomainPage() {
               </p>
             </section>
 
-            <section className="flex flex-col items-center gap-3">
-              <CopyPromptButton text={buildCopyPrompt(domain, profile)} />
+            <section className="soul-panel p-6 flex flex-col gap-3">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-luxe-gold">
+                想讓分析更貼近你？多說一點你的狀況（選填）
+              </p>
+              <textarea
+                value={context}
+                onChange={(e) => setContext(e.target.value)}
+                placeholder={`例如：我最近在猶豫要不要轉職、跟伴侶常常因為小事吵架⋯⋯`}
+                rows={3}
+                className="soul-input !py-2.5 !text-sm resize-none"
+              />
+              {trimmedContext && (
+                <p className="desc-text text-xs text-[var(--sm-text-secondary)] leading-relaxed border-t border-[var(--sm-border)] pt-3">
+                  你提到：「{trimmedContext}」——這段話會一起打包進下方的複製指令，你的 AI
+                  就能針對你的實際狀況給出真正客製化的分析，而不是套版答案。
+                </p>
+              )}
             </section>
 
-            <QuickFollowUps domain={domain} profile={profile} />
+            <section className="flex flex-col items-center gap-3">
+              <CopyPromptButton text={buildCopyPrompt(domain, profile, { context })} />
+            </section>
+
+            <QuickFollowUps domain={domain} profile={profile} context={context} />
           </>
         ) : (
           <section className="soul-panel p-6 relative overflow-hidden min-h-[220px]">

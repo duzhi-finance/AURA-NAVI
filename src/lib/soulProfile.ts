@@ -1,4 +1,4 @@
-import { computeLifePathNumber, getCard, type MajorArcanaCard } from "./tarotMajorArcana";
+import { computeDayNumber, computeLifePathNumber, getCard, type MajorArcanaCard } from "./tarotMajorArcana";
 
 const PROFILE_CACHE_KEY = "soul-profile-birthdate";
 const UNLOCK_STORAGE_KEY = "soul-report-unlocked";
@@ -12,6 +12,7 @@ export interface SoulProfile {
   primaryCard: MajorArcanaCard;
   dualCard: MajorArcanaCard | null;
   supplementCards: MajorArcanaCard[];
+  dayCard: MajorArcanaCard;
 }
 
 function formatBirthdateLabel(y: number, m: number, d: number): string {
@@ -28,6 +29,7 @@ export function buildProfile(y: number, m: number, d: number): SoulProfile {
     primaryCard: getCard(lifePath.primary),
     dualCard: lifePath.dualNumber != null ? getCard(lifePath.dualNumber) : null,
     supplementCards: lifePath.supplementChain.slice(1).map(getCard),
+    dayCard: getCard(computeDayNumber(d)),
   };
 }
 
